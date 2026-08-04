@@ -166,6 +166,53 @@
     }
   }
 
+  /* ---------- O LEQUE DA EQUIPE -----------------------------
+     Geometria de melhorias/card.md, acabamento da direcao TUBO.
+     --------------------------------------------------------- */
+  .leque { height: 22rem; }
+  @media (min-width: 480px) { .leque { height: 26rem; } }
+  @media (min-width: 640px) { .leque { height: 28rem; } }
+  @media (min-width: 768px) { .leque { height: 34rem; } }
+  @media (min-width: 1024px){ .leque { height: 38rem; } }
+
+  .leque-card {
+    position: absolute;
+    width: 11rem;
+    aspect-ratio: 628 / 793;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    will-change: transform;
+    /* o mesmo aro de dois tons dos cards de servico */
+    border: 1px solid transparent;
+    background:
+      var(--color-off) padding-box,
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--color-branco) 34%, var(--color-rule)) 0%,
+        var(--color-rule) 26%,
+        var(--color-rule) 62%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 8%, transparent),
+      0 24px 50px -30px var(--color-void);
+  }
+  @media (min-width: 768px) { .leque-card { width: 14rem; } }
+  @media (min-width: 1024px){ .leque-card { width: 16rem; } }
+
+  /* controle de painel, nao pilula de vidro */
+  .leque-seta {
+    display: flex; align-items: center; justify-content: center;
+    width: 3rem; height: 3rem;
+    border-radius: var(--radius-botao);
+    border: 1px solid var(--color-rule);
+    background: var(--color-off);
+    color: var(--color-branco-2);
+    transition: color 200ms var(--ease-out-cut), border-color 200ms var(--ease-out-cut);
+  }
+  .leque-seta:hover { color: var(--color-ambar); border-color: var(--color-ambar); }
+  .tecnico .leque-seta { background: transparent; color: var(--color-void); }
+  .tecnico .leque-seta:hover { color: var(--color-void);
+    border-color: color-mix(in srgb, var(--color-void) 45%, transparent); }
+
   /* ---------- EYEBROW ---------------------------------------
      Marcador de pixel na cor do tubo + contraste de valor na
      propria linha: termo em branco, qualificador apagado,
@@ -437,10 +484,10 @@
   .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
   .navbar__zap:hover { color: var(--color-void); }
 
-  /* a ancora nao pode parar atras da barra */
+  /* a ancora nao pode parar atras do menu flutuante */
   @media (max-width: 1023px) {
-    html { scroll-padding-block-end: 5rem; }
-    body { padding-block-end: 4.5rem; }
+    html { scroll-padding-block-end: 6rem; }
+    body { padding-block-end: 6rem; }
   }
 
   /* ---------- A FOLHA DE SEÇÕES ----------------------------- */

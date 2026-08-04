@@ -8,7 +8,9 @@ import { VideoFacade } from '@/components/VideoFacade'
 import { CardServico, LinhaServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
-import { NavInferior } from '@/components/NavInferior'
+import { MenuLiquido } from '@/components/MenuLiquido'
+import { LequeEquipe } from '@/components/LequeEquipe'
+import { Haze } from '@/components/Haze'
 import { Blackout } from '@/components/Blackout'
 import { Tubo, Zap, Secao, Eyebrow } from '@/components/ui'
 
@@ -195,7 +197,8 @@ export default function Home() {
           cards para o que vende, indice para o resto, em cinco blocos
           de tamanho desigual. A assimetria vira informacao: o bloco LED
           e o maior porque e o que a empresa faz de diferente. */}
-      <Secao id="servicos">
+      <Secao id="servicos" className="relative overflow-hidden">
+        <Haze />
         <LuzCursor seletor="#servicos" />
         <Reveal>
           <Eyebrow><b>Serviços</b> · <i>13</i>, monta junto ou separado</Eyebrow>
@@ -243,7 +246,8 @@ export default function Home() {
       </Secao>
 
       {/* ══════════════ EVENTOS EM VÍDEO ══════════════ */}
-      <Secao id="eventos">
+      <Secao id="eventos" className="relative overflow-hidden">
+        <Haze densidade={650} />
         <Reveal>
           <Eyebrow><b>Acervo</b> · <i>10</i> vídeos de festas que aconteceram</Eyebrow>
           <h2 className="max-w-[20ch] text-2xl lg:text-3xl">Veja como fica</h2>
@@ -346,14 +350,10 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={90}>
-            <div className="grid grid-cols-3 gap-2">
-              {FOTOS_EQUIPE.map((f, i) => (
-                <img key={f.src} src={f.src} width={f.w} height={f.h} loading="lazy"
-                     decoding="async"
-                     alt={`Integrante da equipe da Rapa Sound — foto ${i + 1}`}
-                     className="aspect-3/4 w-full object-cover" />
-              ))}
-            </div>
+            <LequeEquipe cards={FOTOS_EQUIPE.map((f, i) => ({
+              src: f.src,
+              alt: `Integrante da equipe da Rapa Sound — foto ${i + 1}`,
+            }))} />
           </Reveal>
         </div>
       </Secao>
@@ -462,7 +462,7 @@ export default function Home() {
         </div>
       </footer>
 
-      <NavInferior />
+      <MenuLiquido />
     </>
   )
 }
