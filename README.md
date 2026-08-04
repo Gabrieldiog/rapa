@@ -26,7 +26,9 @@ Conversão única: WhatsApp. Mobile-first — o tráfego vem do link na bio do I
 2. **[INVENTARIO.md](INVENTARIO.md)** — o que existe hoje no site, medido e transcrito.
    Inclui os 116 artistas do rider técnico, extraídos de dentro de imagem pela primeira vez.
 3. **[PENDENCIAS.md](PENDENCIAS.md)** — o que depende do cliente, com o valor assumido em uso.
-4. [bri.md](bri.md) — briefing original, mantido como registro histórico.
+4. **[REDIRECTS.md](REDIRECTS.md)** — o mapa `301` das 13 URLs antigas para âncoras, e as duas
+   armadilhas técnicas que ele esconde.
+5. [bri.md](bri.md) — briefing original, mantido como registro histórico.
 
 ## Os três achados que mudaram o plano
 
