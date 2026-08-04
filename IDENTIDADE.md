@@ -93,21 +93,23 @@ Um só na página inteira. Não toca na paleta.
 
 ## Tipografia
 
-**Texto: Cabinet Grotesk** — Indian Type Foundry via Fontshare, gratuita para uso comercial.
+| Papel | Fonte | Origem | Uso |
+|---|---|---|---|
+| Display | **Zodiak** | Indian Type Foundry · Fontshare · grátis comercial | só H1 e H2 |
+| Texto | **Cabinet Grotesk** | Indian Type Foundry · Fontshare · grátis comercial | corpo |
+| Utilitária | **Chivo Mono** | Omnibus-Type · SIL OFL | estado técnico, dado, label |
 
-**Display: 🔴 EM ABERTO — condição 2, bloqueante.**
+**Condição 2 resolvida em 2026-08-04**, por teste em aparelho real contra quatro candidatos.
+Melodrama era a aprovada em princípio e **perdeu**: a ressalva do cliente do projeto — de que
+um serif de moda brigaria com o conceito de pixel/técnico — se confirmou no aparelho.
 
-Melodrama foi a proposta aprovada em princípio, com duas verificações pendentes:
+Zodiak mantém a tese da direção (haste de contraste alto em âmbar sobre preto lendo como pixel
+de LED aceso) com terminais mais duros e menos registro editorial. Sobrevive ao estado técnico
+sem desmenti-lo.
 
-1. A haste de contraste altíssimo sobre `--void` serrilha ou some em Android de baixa
-   densidade? Verificação empírica, em aparelho real.
-2. O serif de moda briga com o conceito de pixel/técnico? Melodrama tem registro
-   editorial-fashion, e a página tem um estado técnico com peso igual.
+O display continua atrás do token **`--font-display`**. A direção sobrevive à troca do display;
+se algo mudar, é uma linha.
 
-**Se qualquer uma reprovar, o display muda e a direção não.** Por isso o display fica atrás
-de **um único token** — `--font-display` — e a troca é uma linha.
-
-- Utilitária: **monoespaçada**, do estado técnico. A definir junto com o display.
 - Escala: `12 · 14 · 16 · 19 · 24 · 32 · 44 · 64 · 96`
 - Pesos permitidos: 400 e 700. Nada entre.
 
