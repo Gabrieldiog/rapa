@@ -21,12 +21,19 @@ export function Zap({ texto, children, className = '' }:
       target="_blank"
       rel="noopener noreferrer"
       data-zap
-      className={`inline-flex min-h-12 items-center gap-3 bg-ambar px-6 text-void
-                  font-mono text-xs font-medium uppercase tracking-[0.1em]
-                  transition-transform duration-200 hover:-translate-y-0.5 ${className}`}
+      className={`group inline-flex min-h-13 items-center gap-3 rounded-[var(--radius-botao)]
+                  bg-ambar px-7 text-void font-mono text-xs font-medium uppercase
+                  tracking-[0.1em] shadow-[0_10px_30px_-14px_var(--color-ambar)]
+                  transition-[transform,box-shadow] duration-200
+                  hover:-translate-y-0.5 hover:shadow-[0_16px_38px_-14px_var(--color-ambar)]
+                  active:translate-y-0 ${className}`}
     >
       {children}
-      <span aria-hidden className="text-base leading-none">→</span>
+      <span aria-hidden
+            className="text-base leading-none transition-transform duration-200
+                       group-hover:translate-x-1">
+        →
+      </span>
     </a>
   )
 }

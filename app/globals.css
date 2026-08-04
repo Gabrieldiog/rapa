@@ -37,9 +37,28 @@
   --text-base: 1.1875rem; --text-lg: 1.5rem;  --text-xl: 2rem;
   --text-2xl: 2.75rem;  --text-3xl: 4rem;    --text-4xl: 6rem;
 
+  /* --- ACABAMENTO ---------------------------------------------
+     Raio em escala, nao igual em tudo — border-radius identico em
+     tudo e um dos sinais de pagina gerada. O raio cresce com a
+     superficie, como em equipamento de verdade: um botao tem canto
+     mais fechado que um rack.
+     ---------------------------------------------------------- */
+  --radius-cut:   2px;   /* filete, tag, chip */
+  --radius-botao: 6px;   /* CTA, controle */
+  --radius-card:  14px;  /* card, painel */
+  --radius-placa: 22px;  /* bloco grande, media */
+
   /* --- MOTION --- */
   --ease-tubo: linear(0,.11 3.3%,.4 8.6%,.83 15.5%,1.02 19.6%,1.06 22.7%,1.03 28%,1 34.6%,1);
   --ease-out-cut: linear(0,.53 12%,.79 25%,.92 38%,.98 55%,1);
+}
+
+/* Permite animar a cor do tubo de verdade (transicao de custom
+   property so funciona se ela for registrada). */
+@property --tubo-cor {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #FFA300;
 }
 
 @layer base {
@@ -115,15 +134,34 @@
      indice) e o acender do tubo no hover/foco. So transform e
      opacity — nunca width/height/top/left.
      --------------------------------------------------------- */
+  /* O ARO DE DOIS TONS — o que separa "painel" de "<div> com contorno".
+     Duas camadas no mesmo background: superficie em padding-box, aro em
+     border-box. A de cima cobre o miolo, entao a de baixo so aparece no
+     1px da borda. Zero DOM, zero JS. */
   .card {
     position: relative;
-    background: var(--color-off);
-    border: 1px solid var(--color-rule);
-    padding: 1.75rem 1.5rem 1.5rem 2rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-card);
+    padding: 1.75rem 1.5rem 1.5rem 2.25rem;
     overflow: hidden;
     isolation: isolate;
-    transition: border-color 240ms var(--ease-out-cut),
-                transform 320ms var(--ease-tubo);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-branco) 4%, var(--color-off)) 0%,
+        var(--color-off) 38%) padding-box,
+      /* claro em cima (pega a luz), filete no meio, sombra na base */
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--color-branco) 30%, var(--color-rule)) 0%,
+        var(--color-rule) 26%,
+        var(--color-rule) 62%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    /* bisel: 1px de luz no topo, 1px de sombra na base. Filete, nao elevacao. */
+    box-shadow:
+      inset 0  1px 0 0 color-mix(in srgb, var(--color-branco)  7%, transparent),
+      inset 0 -1px 0 0 color-mix(in srgb, var(--color-void)   55%, transparent);
+    transition: transform 320ms var(--ease-tubo),
+                box-shadow 260ms var(--ease-out-cut),
+                background 260ms var(--ease-out-cut);
   }
   .card::after {
     /* a luz que o tubo joga na superficie — nasce do proprio tubo */
@@ -131,20 +169,216 @@
     position: absolute;
     inset: 0;
     z-index: -1;
+    border-radius: inherit;
     background: radial-gradient(
       120% 100% at 0% 50%,
-      color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 16%, transparent) 0%,
+      color-mix(in srgb, var(--tubo-cor) 18%, transparent) 0%,
       transparent 62%
     );
     opacity: 0;
     transition: opacity 320ms var(--ease-out-cut);
   }
+  /* no hover/foco o aro incorpora a cor do tubo, sem trocar de estrutura */
   .card:hover, .card:focus-within {
-    border-color: color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 42%, var(--color-rule));
     transform: translateY(-3px);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-branco) 5%, var(--color-off)) 0%,
+        var(--color-off) 38%) padding-box,
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--tubo-cor) 46%, var(--color-rule)) 0%,
+        color-mix(in srgb, var(--tubo-cor) 22%, var(--color-rule)) 30%,
+        var(--color-rule) 70%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 10%, transparent),
+      0 18px 40px -24px color-mix(in srgb, var(--tubo-cor) 55%, transparent);
   }
   .card:hover::after, .card:focus-within::after { opacity: 1; }
   .card:hover .tubo, .card:focus-within .tubo { opacity: 1; }
+
+  /* o tubo acompanha o raio do card em que vive */
+  .card .tubo {
+    inset-block: 0.9rem;
+    inset-inline-start: 0.85rem;
+    border-radius: var(--radius-cut);
+  }
+
+  /* ---------- O FACHO QUE ACENDE OS PIXELS -------------------
+     O cursor nao soma brilho por cima: ele revela a matriz de LEDs
+     que esta sob o difusor. Disco de tamanho FIXO movido so por
+     translate3d — a mascara e estatica em relacao a ele, entao
+     viaja junto sem repintar. Compositor puro.
+     --------------------------------------------------------- */
+  .luz {
+    position: absolute;
+    top: 0; left: 0;
+    width: 15rem;
+    aspect-ratio: 1;
+    margin: -7.5rem 0 0 -7.5rem;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    /* pontos discretos, mesma gramatica do .tubo — nunca luz continua */
+    background-image: radial-gradient(circle at center,
+      var(--tubo-cor) 0 1.1px, transparent 1.5px);
+    background-size: 7px 7px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
+            mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
+    mix-blend-mode: screen;
+    transform: translate3d(var(--mx, 50%), var(--my, 35%), 0);
+    transition: opacity 260ms var(--ease-out-cut);
+  }
+  /* so onde existe ponteiro fino. Em touch nem chega a ser pintado. */
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .luz { opacity: .85; }
+  }
+  .card > :not(.luz) { position: relative; z-index: 1; }
+
+  /* ---------- A LINHA DE ÍNDICE ------------------------------
+     13 e primo: nao existe grade de colunas iguais sem orfao.
+     A saida e parar de tratar os 13 como iguais. Sem caixa, sem
+     sombra — so filete e ritmo.
+     --------------------------------------------------------- */
+  .linha {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem 1fr auto;
+    align-items: baseline;
+    gap: 0 1.25rem;
+    min-height: 4.5rem;          /* alvo de toque com folga */
+    padding-block: 1.15rem;
+    border-block-start: 1px solid var(--color-rule);
+    transition: background-color 220ms var(--ease-out-cut);
+  }
+  .bloco .linha:last-child { border-block-end: 1px solid var(--color-rule); }
+
+  /* o codigo de rider. E dado, logo ambar. Nao e 01/02/03. */
+  .linha__cod {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: .12em;
+    color: color-mix(in srgb, var(--color-ambar) 78%, var(--color-branco-2));
+    font-variant-numeric: tabular-nums;
+  }
+  .linha__px {
+    position: absolute;
+    inset-inline-start: -1rem;
+    inset-block-start: 1.6rem;
+    width: 3px; height: 12px;
+    border-radius: var(--radius-cut);
+    background: var(--tubo-cor);
+    opacity: .26;
+    transition: opacity 220ms var(--ease-out-cut);
+  }
+  .linha:hover, .linha:focus-within {
+    background-color: color-mix(in srgb, var(--tubo-cor) 5%, transparent);
+  }
+  .linha:hover .linha__px, .linha:focus-within .linha__px { opacity: 1; }
+  .linha__seta {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    transition: transform 220ms var(--ease-tubo), opacity 220ms var(--ease-out-cut);
+  }
+  .linha:hover .linha__seta, .linha:focus-within .linha__seta {
+    transform: translate3d(4px, 0, 0); opacity: 1;
+  }
+  /* em touch a seta e permanente — hover nao existe la */
+  @media (hover: none) { .linha__seta { opacity: 1; } }
+
+  /* ---------- TRILHO DO PALCO ------------------------------- */
+  .trilho { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
+  .trilho::-webkit-scrollbar { height: 3px; }
+  .trilho::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 2px; }
+
+  .mini img { opacity: .45; }
+  .mini:hover img, .mini:focus-visible img { opacity: .8; }
+  .mini[aria-current] img { opacity: 1; }
+
+  /* o tubo da miniatura: pixels discretos, so acende no item em exibicao */
+  .mini-tubo {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 3px;
+    background-image: linear-gradient(to right,
+      var(--color-ambar) 0 4px, transparent 4px 10px);
+    background-size: 10px 100%;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out-cut);
+  }
+  .mini[aria-current] .mini-tubo { opacity: 1; }
+
+  /* ---------- NAV INFERIOR ----------------------------------
+     Quatro alvos no polegar. O botao flutuante de WhatsApp foi
+     absorvido como quarto slot — nao ha mais sobreposicao.
+     svh e nao vh: a barra de endereco do iOS muda o vh.
+     max() no inset porque o Safari zera o safe-area quando
+     esconde a toolbar.
+     --------------------------------------------------------- */
+  .navbar {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: color-mix(in srgb, var(--color-void) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-block-start: 1px solid var(--color-rule);
+    padding-block-end: max(env(safe-area-inset-bottom), .5rem);
+  }
+  .navbar__alvo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    padding-block: .6rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+    text-align: center;
+    transition: color 180ms var(--ease-out-cut);
+  }
+  .navbar__alvo:hover { color: var(--color-branco); }
+  .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
+  .navbar__zap:hover { color: var(--color-void); }
+
+  /* a ancora nao pode parar atras da barra */
+  @media (max-width: 1023px) {
+    html { scroll-padding-block-end: 5rem; }
+    body { padding-block-end: 4.5rem; }
+  }
+
+  /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
+  .folha {
+    margin: 0 0 auto;
+    inset-block-start: auto;
+    inset-block-end: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 72svh;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-branco);
+  }
+  .folha::backdrop { background: color-mix(in srgb, var(--color-void) 72%, transparent); }
+  .folha__corpo {
+    background: var(--color-off);
+    border-block-start: 1px solid var(--color-rule);
+    border-start-start-radius: var(--radius-placa);
+    border-start-end-radius: var(--radius-placa);
+    padding: 1.5rem 1.25rem max(env(safe-area-inset-bottom), 1.5rem);
+    max-height: 72svh;
+    overflow-y: auto;
+  }
+
+  /* sem JS a barra ainda leva a tres ancoras que funcionam */
+  .no-js .navbar button { display: none; }
 
   /* ---------- REVEAL ----------------------------------------
      Caminho rapido em CSS puro onde animation-timeline existe;
@@ -191,5 +425,6 @@
   }
   .rev { opacity: 1 !important; transform: none !important; }
   .blackout { display: none; }
+  .luz { display: none; }
   .card:hover, .card:focus-within { transform: none; }
 }

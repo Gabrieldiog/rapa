@@ -55,48 +55,68 @@ export type Servico = {
   urlAntiga: string
   /** 'festa' = colore com magenta/congo · 'tecnico' = branco de trabalho */
   estado: 'festa' | 'tecnico'
+  /** Codigo de rider — a notacao que a industria usa em mapa de palco.
+   *  PA = public address, LX = lighting. Substitui a numeracao 01/02/03,
+   *  que e proibida e alem disso mentirosa: servico nao tem ordem. */
+  codigo: string
+  bloco: 'som' | 'luz' | 'led' | 'cenografia' | 'pacotes'
 }
+
+/** 13 e primo — nao existe grade de colunas iguais que o acomode sem
+ *  orfao. A saida e parar de tratar os 13 como iguais: cinco blocos de
+ *  tamanho desigual, em que a assimetria vira informacao. O bloco LED e
+ *  o maior porque e o que a empresa faz de diferente. */
+export const BLOCOS: { id: Servico['bloco']; titulo: string; nota: string }[] = [
+  { id: 'som', titulo: 'Som', nota: 'A base de tudo' },
+  { id: 'luz', titulo: 'Luz', nota: 'Cênica e de pista' },
+  { id: 'led', titulo: 'LED', nota: 'A metade que nos diferencia' },
+  { id: 'cenografia', titulo: 'Cenografia e conteúdo', nota: 'O que fica na foto' },
+  { id: 'pacotes', titulo: 'Pacotes', nota: 'A festa inteira' },
+]
+
+/** Os tres que vendem: entram como card, nao como linha de indice. */
+export const DESTAQUE_LED = ['painel-de-led', 'pista-de-led', 'tunel-de-led']
 
 export const SERVICOS: Servico[] = [
   { ancora: 'sonorizacao-palco', nome: 'Sonorização e palco',
     desc: 'Estruturas que elevam qualquer atração, proporcionando som impecável e palco digno de grandes shows.',
-    urlAntiga: '/sonorizacaopalco/', estado: 'tecnico' },
+    urlAntiga: '/sonorizacaopalco/', codigo: 'PA', bloco: 'som', estado: 'tecnico' },
   { ancora: 'iluminacao-cenica', nome: 'Iluminação cênica',
     desc: 'Desenvolvemos uma atmosfera de luz ideal para qualquer evento.',
-    urlAntiga: '/iluminacao-cenica/', estado: 'tecnico' },
+    urlAntiga: '/iluminacao-cenica/', codigo: 'LX', bloco: 'luz', estado: 'tecnico' },
   { ancora: 'iluminacao-pista', nome: 'Iluminação de pista',
     desc: 'Luzes que realçam cada momento e transformam seu evento em um espetáculo visual.',
-    urlAntiga: '/iluminacao-pista/', estado: 'festa' },
+    urlAntiga: '/iluminacao-pista/', codigo: 'LX-P', bloco: 'luz', estado: 'festa' },
   { ancora: 'painel-de-led', nome: 'Painel de LED',
     desc: 'Utilizamos tecnologias avançadas para um visual impactante.',
-    urlAntiga: '/painel-de-led/', estado: 'festa' },
+    urlAntiga: '/painel-de-led/', codigo: 'LED-P', bloco: 'led', estado: 'festa' },
   { ancora: 'pista-de-led', nome: 'Pista de LED',
     desc: 'Onde o brilho e a grandiosidade se encontram, criando uma pista de dança imponente.',
-    urlAntiga: '/pista-de-led/', estado: 'festa' },
+    urlAntiga: '/pista-de-led/', codigo: 'LED-F', bloco: 'led', estado: 'festa' },
   { ancora: 'tubos-de-led', nome: 'Tubos de LED',
     desc: 'Efeitos luminosos modernos e atraentes que criam ambientes dinâmicos e inesquecíveis.',
-    urlAntiga: '/tubos-de-led/', estado: 'festa' },
+    urlAntiga: '/tubos-de-led/', codigo: 'LED-T', bloco: 'led', estado: 'festa' },
   { ancora: 'tunel-de-led', nome: 'Túnel de LED',
     desc: 'Uma experiência envolvente que leva você para uma nova dimensão.',
-    urlAntiga: '/tunel-de-led/', estado: 'festa' },
+    urlAntiga: '/tunel-de-led/', codigo: 'LED-TN', bloco: 'led', estado: 'festa' },
   { ancora: 'efeitos-especiais', nome: 'Efeitos especiais',
     desc: 'Detalhes que acrescentam um toque especial ao seu evento.',
-    urlAntiga: '/efeitos-especiais/', estado: 'festa' },
+    urlAntiga: '/efeitos-especiais/', codigo: 'FX', bloco: 'led', estado: 'festa' },
   { ancora: 'projetos-3d', nome: 'Projetos 3D personalizados',
     desc: 'Criação de ambientes únicos e exclusivos.',
-    urlAntiga: '/projetos-3d-personalizados/', estado: 'tecnico' },
+    urlAntiga: '/projetos-3d-personalizados/', codigo: '3D', bloco: 'cenografia', estado: 'tecnico' },
   { ancora: 'area-instagramavel', nome: 'Área instagramável',
     desc: 'Um espaço pensado para brilhar nas suas fotos e eternizar o momento perfeito.',
-    urlAntiga: '/area-instagramavel/', estado: 'festa' },
+    urlAntiga: '/area-instagramavel/', codigo: 'SET', bloco: 'cenografia', estado: 'festa' },
   { ancora: 'criacao-de-conteudo', nome: 'Criação de conteúdo',
     desc: 'Criamos projetos personalizados que contam a sua história.',
-    urlAntiga: '/criacao-de-conteudo/', estado: 'tecnico' },
+    urlAntiga: '/criacao-de-conteudo/', codigo: 'REC', bloco: 'cenografia', estado: 'tecnico' },
   { ancora: 'quinze-anos', nome: 'Emoções 15 anos',
     desc: 'Um momento mágico que celebra o início de uma nova fase, repleto de brilho e encanto.',
-    urlAntiga: '/emocoes-15-anos/', estado: 'festa' },
+    urlAntiga: '/emocoes-15-anos/', codigo: '15A', bloco: 'pacotes', estado: 'festa' },
   { ancora: 'casamento', nome: 'Emoções casamento',
     desc: 'Cenários perfeitos para histórias de amor inesquecíveis, no dia mais especial da sua vida.',
-    urlAntiga: '/emocoes-casamento/', estado: 'festa' },
+    urlAntiga: '/emocoes-casamento/', codigo: 'CAS', bloco: 'pacotes', estado: 'festa' },
 ]
 
 /* ============================================================
@@ -165,6 +185,18 @@ export const RIDER: { categoria: string; nomes: string[] }[] = [
 ]
 
 export const TOTAL_ARTISTAS = RIDER.reduce((n, c) => n + c.nomes.length, 0) // 116
+
+/**
+ * Os nomes de alcance nacional, escolhidos de dentro da lista real.
+ * Nada acrescentado — e so hierarquia: prova social funciona quando o
+ * nome que a pessoa reconhece aparece primeiro. No site antigo os 116
+ * tinham exatamente o mesmo peso, e por isso nenhum tinha peso nenhum.
+ */
+export const DESTAQUES = [
+  'Bruno & Marrone', 'Alexandre Pires', 'César Menotti & Fabiano', 'Raimundos',
+  'Só Pra Contrariar', 'Biquini Cavadão', 'Banda Eva', 'Sérgio Reis',
+  'Thaeme & Thiago', 'Matheus & Kauan', 'Latino', 'Jerry Smith',
+]
 
 /* ============================================================
    FAQ — as objecoes reais, colhidas em forum e blog do setor.
