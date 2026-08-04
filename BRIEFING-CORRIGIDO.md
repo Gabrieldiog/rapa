@@ -76,6 +76,37 @@ A linha de base de **peso** foi medida de verdade (4,41 MB / 77 requisições �
 INVENTARIO.md §7). LCP, INP e CLS exigem navegador e ficam como pendência da Fase 5, junto com
 os screenshots de antes/depois.
 
+## 9. A tabela de motion do briefing está errada para este público
+
+Ver `pesquisa/02-motion.md`, que mediu os pesos localmente (bundle tree-shaken + gzip) em vez
+de citar número de blog.
+
+**O briefing manda usar Lenis** — "inércia, maior impacto percebido por menor custo". Para um
+público de desktop isso é verdade. Para este, é exatamente o contrário:
+
+- No `dist/lenis.mjs`, `syncTouch` é **`false` por padrão**. `smoothWheel` só afeta roda de
+  mouse e trackpad. Ou seja: **em touch o Lenis repassa o scroll nativo sem tocar em nada.**
+  Num tráfego que é quase todo mobile, ele custa 5,5 KB + um `requestAnimationFrame` eterno e
+  **entrega zero efeito visual**.
+- Ligar `syncTouch: true` para "fazer valer" degrada o scroll no iOS e reintroduz jitter em
+  `position: sticky` — o próprio mantenedor confirma na issue #499.
+- E o `lenis.css` oficial traz `.lenis.lenis-smooth iframe { pointer-events: none; }`.
+  **Com 10 embeds de YouTube na página, isso é "o vídeo não responde ao toque" garantido.**
+
+O briefing acertou ao dizer que o Lenis **não** quebra `position: sticky` — isso se confirmou
+(zero `transform` no dist; ele dirige o scroll nativo). O erro é de adequação ao público,
+não de fato.
+
+**GSAP:** a licença mudou e a mudança é boa. Desde 30/04/2025 é a Standard "No Charge" da
+Webflow — uso comercial liberado, **todos os plugins antes pagos agora grátis** (SplitText,
+ScrollSmoother, MorphSVG). Não há impedimento de licença. O que pesa é o tamanho:
+core + ScrollTrigger = **45,1 KB gzip, 76% do teto de 60 KB**, para uma landing única.
+
+**Orçamento real medido:** a stack proposta pela pesquisa resolve feixe de luz, haze, blackout
+e reveals com **CSS nativo + ~1,1 KB de JS** — 2% do teto. Decidir na Fase 4, com a direção de
+arte na mão: se a assinatura aprovada exigir uma timeline orquestrada de verdade, GSAP se
+justifica; se não, não se paga 45 KB por ela.
+
 ---
 
 ## O que continua valendo do briefing original
