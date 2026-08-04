@@ -21,10 +21,19 @@ parecia mais sofisticada, era pior aqui). Custo medido: **478 bytes gzip de CSS,
 **O sistema de títulos** passa a ter dois estados, como o resto da página: FESTA (Zodiak, uma
 palavra com cor, marcador de pixel aceso) e TÉCNICO (Chivo Mono, branco, filete, número).
 
-**Três correções ao que estava assumido no projeto**, todas verificadas — ver §7:
-1. `--magenta` sobre `--void` dá **4,17:1**, não 5,1:1 como diz o `IDENTIDADE.md`.
-2. `chivomono-400.woff2` e `chivomono-500.woff2` são **o mesmo arquivo** (MD5 idêntico).
-3. `text-wrap: balance` vale até **seis** linhas no Chromium, não quatro.
+**Cinco correções**, todas verificadas:
+1. `--magenta` sobre `--void` dá **4,17:1**, não 5,1:1 como diz o `IDENTIDADE.md` (§7).
+2. `chivomono-400.woff2` e `chivomono-500.woff2` são **o mesmo arquivo** — MD5 idêntico (§7).
+3. `text-wrap: balance` vale até **seis** linhas no Chromium, não quatro (§4.4).
+4. O `-webkit-` de `background-clip` **não** é mais pelo Safari iOS (14+, 2020) — é pelo
+   **Chrome abaixo de 120** e pelo Firefox (§2.1).
+5. Detectar animação de rolagem só com `animation-timeline` **tem furo**: o Firefox Nightly passa
+   no teste e não suporta `animation-range` (§3.2).
+
+**Duas armadilhas que derrubariam a implementação**, e que não são óbvias:
+- `will-change`, `transform`, `opacity` ou `position` no `.led` **fazem a palavra sumir** no
+  Chrome — contexto de empilhamento quebra `background-clip: text` (§2.2).
+- Um espaço **dentro** do `inline-block` de uma palavra impede a quebra de linha do título (§5).
 
 ---
 
@@ -370,7 +379,7 @@ Baseline: `limited`. Escores WPT: Chrome 0,878 · Safari 0,865 · **Firefox 0,08
 > que a versão ligada ao scroll seria um erro aqui** — ela deixaria a palavra parada para quase
 > todo mundo até a pessoa rolar. Ver §3.3.
 
-### 3.2 Detecção de feature — usar a forma documentada
+### 3.2 ⚠️ Detecção de feature — a forma simples tem furo
 
 Existem três formas circulando, e **duas delas estão erradas**. Esta é a correção mais
 importante desta seção.
@@ -434,6 +443,36 @@ não veria. Progressive enhancement de cabeça para baixo.
 **Então a varredura fica no tempo, finita, para todo mundo** (§2.3). Não é concessão: uma animação
 de 2 passadas que termina **já resolve** o problema que o scroll-linking resolveria — não existe
 loop eterno para consertar.
+
+### 3.3.1 A evidência de campo: ninguém faz isso
+
+Varredura de **106 páginas ao vivo** de sites premiados (Awwwards, Godly, minimal.gallery,
+httpster), baixando o CSS compilado e procurando as propriedades:
+
+| Sinal | Ocorrências |
+|---|---|
+| `animation-timeline` (rolagem em CSS) | **0** |
+| `view-timeline` / `scroll-timeline` | **0** |
+| GSAP `ScrollTrigger` | 16 |
+| GSAP `SplitText` | 12 |
+
+**Nenhum site do conjunto conduz cor de título por rolagem em CSS.** Tudo que é ligado a scroll
+nesses sites é GSAP com `scrub`, e é ligado a **transform**, não a cor. O caso mais próximo, a
+**Nudot** (`nudot.com.tw`), escorrega as palavras do título para cima com `yPercent:-130` num
+`scrub:1.2` — movimento, não cor.
+
+Três sites deram falso positivo em `background-clip:text` (Bauhaus Clock, AGR Studio, Karol
+Ortyl): é o `[data-text-fill]` que o **Framer** injeta por padrão, gradiente **estático**, não
+um título gradiente projetado.
+
+⚠️ Ausência de exemplo não é prova de que seja ruim — pode ser só suporte recente (Safari 26 é
+de setembro/2025). Mas somada ao raciocínio de §3.3, reforça: **cor de título conduzida por
+rolagem ainda não é uma técnica assentada**, e este projeto não precisa ser quem descobre isso.
+
+> **O contra-argumento, que vale ter à mão.** Chris Coyier, *Death to Scroll Fade!* (2026-02-20),
+> citando David Bushell: *"movement for the sake of it… when it catches our eye for no useful
+> reason, we end up resenting it."* É exatamente o risco de uma cor que passeia sem ir a lugar
+> nenhum — e a razão de a varredura daqui **terminar**.
 
 ### 3.4 Onde a rolagem entra de verdade — a drenagem
 
@@ -807,7 +846,80 @@ estão pagos. Fica registrado como a técnica de referência caso o `Reveal` sai
 
 ### 6.2 Galerias — tratamento de título memorável, 2025–2026
 
-*(varredura de Awwwards, Godly, Land-book, 21st.dev, SiteInspire e FWA — em andamento)*
+Método: 106 páginas baixadas ao vivo, `<h1>`/`<h2>` e o CSS compilado lidos na fonte. Nada
+inferido de captura de tela.
+
+#### Uma palavra destacada no título — o que existe de verdade
+
+| # | Site | O tratamento |
+|---|---|---|
+| 1 | **digitz.fr** | Uma **letra** só: o `g` de "di**g**itale" em ciano. A segunda linha vira itálico **e** ciano. O display é forçado a romano (`font-style:normal!important`), então o itálico é override deliberado. |
+| 2 | **khasiyev.com** | Serifada itálica dentro da grotesca: `.oi-serif{font-family:var(--font-accent);font-size:1.03em;font-style:italic;font-weight:200}`. **O `1.03em` é o detalhe** — compensação óptica para a serifada leve não encolher ao lado da Inter. |
+| 3 | **bellhopco.com** | Uma frase trocada por manuscrita, **cor diferente por seção** (verde/azul/laranja). Cada instância tem `margin-top` negativo à mão (−30 a −70 px) para encaixar na linha de base. |
+| 4 | **trevornoah.com** | `Finding the <span class="u-text-accent">extraordinary</span>`, com `--color-accent:#ff9bb4`. E itálico noutro ponto: `only three things are certain: <em>death</em>…` |
+| 5 | **wiz.io** | `Protect <span class="text-primary-blue">Everything</span>`. O `<span>` duplo com `relative z-10` existe para deitar uma camada atrás da palavra. |
+| 6 | **viens-la.com** | **O mais sistemático, e o mais próximo do nosso caso.** A cor de cada palavra destacada vem de um atributo: `<span data-surrounded="#ffe375">Digital</span>`, com rotação de 5 cores pelo site. **A cor é dado, não classe.** |
+| 7 | **vigilante.group** | A palavra vira **imagem**: só os substantivos que carregam sentido ("ideas", "impact") ganham miniatura pareada. |
+| 8 | **eirdis.com** | Itálico em **parte de uma palavra**: `<em>Ragnars</em>dóttir`. ⚠️ Marcação verificada; a regra compilada não foi localizada. |
+| 9 | **cofounder.co** | Título em dois tons, cada metade com **filtro SVG** próprio (`feGaussianBlur`/`feComposite`). Noutro ponto a oração subordinada leva `background-clip:text` com gradiente branco→branco translúcido. |
+| 10 | **hex.tech** | Oração de abertura em itálico, resto romano — e num terceiro caso o itálico vai para o **fim**. ⚠️ CSS injetado em runtime. |
+| 11 | **serotoninn.com** | Palavra entre parênteses em itálico, com os parênteses em peso diferente: `CORSETS<i><strong>(</strong>witch<strong>)</strong></i>`. |
+| 12 | **kommakomma.is** | Palavras que **se trocam** no lugar: "You only quote" → "We only design", com âncora lateral para a linha não refluir. |
+
+**O que isso confirma para nós.** Destacar **uma palavra** de um título é padrão vivo e corrente
+em 2025–2026 — não é invenção. Os dois eixos usados são **cor** e **itálico**; o mais comum é cor.
+E o exemplo 6 (viens-là) valida a arquitetura proposta aqui: cor como **valor**, não como classe.
+Nosso `.led` é a versão de um destaque só — mais disciplinada que a rotação de 5 cores deles,
+porque a nossa restrição dura só autoriza uma palavra.
+
+#### Sobretítulo além de caixa-alta + tracking
+
+| Site | Dispositivo |
+|---|---|
+| **krakenindustries.co** | `.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.24em}` num `flex justify-between align-items:baseline` — o eyebrow é **alinhado pela base contra um segundo elemento na borda oposta**, virando linha de texto, não etiqueta empilhada. Divisor interno de travessão: `CUSTOM ORDER — MADE BY HAND`. |
+| **krakenindustries.co** | `.how-num{font-family:var(--mono);font-size:40px;color:var(--acc)}` — o índice `01`/`02` **a 40 px**, maior que tudo no bloco. O oposto do número miudinho. |
+| **aspensearch.com** | `grid-cols-[auto_1fr]` põe o número em coluna própria ao lado do conteúdo, com `pt-[0.2em]` para alinhá-lo à **altura de maiúscula**. ✅ **Confirma o `mt-[0.45em]` de §4.3** — é o mesmo problema, resolvido do mesmo jeito. |
+| **aspensearch.com** | Etiqueta em caixa **só com `border-b` + `border-l`**: encaixa no canto do cartão em vez de flutuar como pílula. Inverte no `peer-hover`. |
+| **digitz.fr** | Marcador de **comentário de código** como dispositivo: `// COOKIES & MESURE D'AUDIENCE`. |
+| **serotoninn.com** | Índice **dentro** do `<h2>`, não como elemento à parte: `02. New Arrivals`, `03. Campaign`. |
+| **nudot.com.tw** | Rótulos entre parênteses, usando largura plena vs. meia para controlar o vão óptico. |
+
+**Leitura:** os quatro dispositivos que aparecem repetidamente são **(a)** monoespaçada contra a
+display, **(b)** número de índice, **(c)** filete/borda parcial e **(d)** alinhamento pela base
+contra outro elemento. O sistema de §4.3 usa (a), (b) e (c) — mais o marcador de pixel, que é o
+único item que nenhum deles tem, porque é a assinatura desta marca.
+
+#### Revelação de texto em CSS puro — os que realmente existem
+
+| Fonte | Técnica |
+|---|---|
+| **krakenindustries.co** | Palavra a palavra, CSS puro, `--i` + `transition-delay`. **É a nossa arquitetura, no ar.** Ver §5. |
+| Chris Coyier, 2024-01-23, `master.dev` | `<mark>` com `background-size:0 100%` → `100%` em `animation-timeline:view()`. Zero JS, zero span, e a marcação **quebra de linha naturalmente**. |
+| Tyler Gaw, 2023-07-19 | `view-timeline-name` + `clip-path:polygon()` varrendo o bloco. **Lê como linha a linha sem dividir nada.** |
+| Roman Komarov / Coyier, 2024-10-31 | `animation-timeline:view(inline)` escalando texto até cada linha preencher o contêiner. |
+| Lee Meyer, CSS-Tricks, 2026-02-17 | `animation-range-start: calc(90%/sibling-count() * sibling-index())` — CSS puro depois do split. |
+| Bramus, 2025-12-12 | **`animation-trigger`**, o substituto nativo do IntersectionObserver. MDN BCD: **só Chrome 146**. |
+
+⚠️ **`nerdy.dev`** (Adam Argyle) é o único site pessoal encontrado com scroll-driven de texto de
+verdade no ar — 14 ocorrências de `animation-timeline` no CSS, incluindo um sumário que se
+acende por `view-timeline` nomeado por heading.
+
+⚠️ **Não citar** `tympanus.net/codrops/2025/11/04/…3d-scroll-driven-text-animations…`: o título
+diz scroll-driven, o CSS tem **zero** `animation-timeline`. É 100% GSAP.
+
+#### Novidade que simplifica o §5 no futuro
+
+**`sibling-index()`** já é cross-browser — Chrome 138, Firefox 154, Safari 26.2. Quando a base
+instalada amadurecer, ele **elimina o `style={{'--i': i}}`** do `PorPalavra`: o índice passa a
+sair do CSS, e o componente vira um `split` puro sem atributo inline. Ainda é cedo (Safari 26.2
+é recentíssimo), mas é o caminho.
+
+#### Galerias que não renderam nada
+
+`land-book.com` **403** · `siteinspire.com` **429** · `thefwa.com` listagem **500** ·
+`godly.website` e `21st.dev` respondem 200 mas são renderizados no cliente, sem links no HTML —
+não dá para extrair sem browser. Os 12 exemplos acima saíram de **awwwards.com/websites/typography**,
+**awwwards.com/websites/sites_of_the_day**, **minimal.gallery** e **httpster.net**.
 
 ---
 
@@ -861,3 +973,7 @@ palavra **sem** cor.
 3. **Conferir no iOS Safari 26** se o `scroll(root block)` com `animation-range` em `svh` se
    comporta com a barra de endereço recolhendo.
 4. **Decidir o Chivo Mono 500** (§7.2) antes de fechar a tabela de §4.2.
+5. **Conferir a contagem de linhas do H1 a 380 px** em browser de verdade — a tabela de §4.1 é
+   estimada por largura média de caractere, não medida.
+6. **Se um dia a drenagem de §3.4 for ao ar**, usar o `@supports` composto de §3.2 — não a
+   forma simples.

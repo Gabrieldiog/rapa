@@ -47,7 +47,16 @@ export function Secao({ id, children, className = '' }:
   )
 }
 
-/** Sobretitulo utilitario. No estado tecnico ele carrega o dado. */
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="lab mb-5">{children}</p>
+/**
+ * Sobretítulo. Não é só uppercase com tracking: leva um marcador de
+ * pixel na cor do tubo da seção, e contraste de valor dentro da
+ * própria linha — <b> para o termo, <i> para o numeral.
+ */
+export function Eyebrow({ children, cor }: { children: ReactNode; cor?: string }) {
+  return (
+    <p className="eyebrow mb-5"
+       style={cor ? ({ ['--tubo-cor' as string]: cor }) : undefined}>
+      {children}
+    </p>
+  )
 }

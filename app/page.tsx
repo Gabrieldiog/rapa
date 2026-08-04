@@ -39,9 +39,12 @@ export default function Home() {
 
         <div className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl
                         flex-col justify-end px-5 pb-16 pt-28 lg:px-8 lg:pb-24">
-          <Eyebrow>Uberlândia · quase 30 anos</Eyebrow>
+          <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
+          {/* o H1 NAO pode entrar num <Reveal>: opacity/transform criam
+              contexto de empilhamento e o background-clip:text some no
+              Chrome. E ele e candidato a LCP. */}
           <h1 className="max-w-[16ch] text-3xl lg:text-4xl">
-            Som, luz e LED para 15&nbsp;anos e casamento
+            Som, luz e <span className="led">LED</span> para 15&nbsp;anos e casamento
           </h1>
           <p className="mt-7 max-w-[46ch] text-base text-branco-2">
             A gente cuida do som, da luz e da estrutura. No dia, tem técnico nosso
@@ -64,7 +67,7 @@ export default function Home() {
         <Tubo cor="var(--color-magenta)" aceso />
         <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-20">
           <Reveal>
-            <Eyebrow>O que mais fazemos</Eyebrow>
+            <Eyebrow cor="var(--color-magenta)"><b>15 anos</b> · o que mais fazemos</Eyebrow>
             <h2 className="text-2xl lg:text-3xl">Festa de 15 anos</h2>
             <p className="mt-6 text-base text-branco-2">
               Entrada, valsa, abertura de pista. Cada momento pede uma luz
@@ -92,7 +95,7 @@ export default function Home() {
         </div>
 
         <Reveal className="mt-20">
-          <Eyebrow>Quem já contratou, contando</Eyebrow>
+          <Eyebrow cor="var(--color-magenta)"><b>Depoimentos</b> · <i>4</i> em vídeo</Eyebrow>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {DEPOIMENTOS.map((v) => (
               <figure key={v.id}>
@@ -119,7 +122,7 @@ export default function Home() {
 
         <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-20">
           <Reveal>
-            <Eyebrow>Casamento</Eyebrow>
+            <Eyebrow cor="var(--color-congo)"><b>Casamento</b> · cerimônia, recepção e pista</Eyebrow>
             <h2 className="max-w-[15ch] text-2xl lg:text-3xl">
               A noite inteira pede três luzes diferentes
             </h2>
@@ -195,7 +198,7 @@ export default function Home() {
       <Secao id="servicos">
         <LuzCursor seletor="#servicos" />
         <Reveal>
-          <Eyebrow>13 serviços · monta junto ou separado</Eyebrow>
+          <Eyebrow><b>Serviços</b> · <i>13</i>, monta junto ou separado</Eyebrow>
           <h2 className="max-w-[20ch] text-2xl lg:text-3xl">
             Do palco ao túnel de LED
           </h2>
@@ -242,7 +245,7 @@ export default function Home() {
       {/* ══════════════ EVENTOS EM VÍDEO ══════════════ */}
       <Secao id="eventos">
         <Reveal>
-          <Eyebrow>Festas que já aconteceram</Eyebrow>
+          <Eyebrow><b>Acervo</b> · <i>10</i> vídeos de festas que aconteceram</Eyebrow>
           <h2 className="max-w-[20ch] text-2xl lg:text-3xl">Veja como fica</h2>
         </Reveal>
         <div className="mt-12">
@@ -267,7 +270,7 @@ export default function Home() {
       <Secao id="rider" className="relative">
         <Tubo cor="var(--color-branco)" aceso />
         <Reveal>
-          <Eyebrow>Rider técnico · {TOTAL_ARTISTAS} artistas</Eyebrow>
+          <Eyebrow><b>Rider técnico</b> · <i>{TOTAL_ARTISTAS}</i> artistas</Eyebrow>
           <h2 className="max-w-[24ch] text-2xl lg:text-3xl">
             Quem já subiu nos nossos palcos
           </h2>
@@ -330,7 +333,7 @@ export default function Home() {
       <Secao id="sobre" className="border-t border-rule">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
           <Reveal>
-            <Eyebrow>Desde o começo</Eyebrow>
+            <Eyebrow><b>A casa</b> · quase <i>30</i> anos</Eyebrow>
             <h2 className="max-w-[18ch] text-2xl lg:text-3xl">Quase 30 anos</h2>
             <p className="mt-6 text-base text-branco-2">
               A Rapa Sound é de Uberlândia e atende casamento, festa de 15 anos e
@@ -358,7 +361,7 @@ export default function Home() {
       {/* ══════════════ FAQ ══════════════ */}
       <Secao id="duvidas" className="border-t border-rule">
         <Reveal>
-          <Eyebrow>O que perguntam antes de fechar</Eyebrow>
+          <Eyebrow><b>Dúvidas</b> · o que perguntam antes de fechar</Eyebrow>
           <h2 className="max-w-[20ch] text-2xl lg:text-3xl">Dúvidas</h2>
         </Reveal>
         <div className="mt-12 max-w-[70ch]">
@@ -388,7 +391,7 @@ export default function Home() {
       <Secao id="contato" className="border-t border-rule">
         <div className="grid gap-14 lg:grid-cols-2 lg:gap-20">
           <Reveal>
-            <Eyebrow>Falar com a gente</Eyebrow>
+            <Eyebrow><b>Contato</b> · resposta no WhatsApp</Eyebrow>
             <h2 className="max-w-[18ch] text-2xl lg:text-3xl">
               Manda a data que a gente confirma
             </h2>

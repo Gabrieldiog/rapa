@@ -48,10 +48,24 @@ A paleta que declara a separação responde à objeção sem escrever uma linha 
 - Gradiente que não esteja declarado aqui. Nenhum está.
 - Mais de **um saturado por seção**. Âmbar não conta como saturado quando é botão.
 
-**Contraste conferido:** `--ambar` sobre `--void` = 11,4:1. `--branco` sobre `--void` = 16,8:1.
-`--void` sobre `--ambar` (texto de botão) = 11,4:1. Todos passam AA e AAA.
-⚠️ `--magenta` sobre `--void` dá 5,1:1 — passa AA para texto grande, **reprova para corpo**.
-Magenta é ambiente, não texto. Ver a restrição dura.
+**Contraste — medido, não estimado** (WCAG 2.x, sRGB):
+
+| Par | Razão | Veredito |
+|---|---|---|
+| `--branco` sobre `--void` | **16,98:1** | AAA |
+| `--void` sobre `--branco` (estado técnico) | **16,98:1** | AAA |
+| `--ambar` sobre `--void` | **9,94:1** | AAA |
+| `--void` sobre `--ambar` (texto de botão) | **9,94:1** | AAA |
+| `--magenta` sobre `--void` | **4,17:1** | ⚠️ passa só para texto grande (≥24px) |
+| `--ambar` sobre `--branco` | **1,71:1** | ❌ **reprova em tudo** |
+
+Duas consequências que não são opcionais:
+
+1. **Magenta a 4,17:1 reprova AA para corpo de texto.** Ele é ambiente, nunca texto corrido.
+   Reforça a restrição dura por um segundo caminho, independente do argumento de venda.
+2. **Âmbar sobre branco a 1,71:1 é ilegível.** No **estado técnico**, que tem fundo branco, o
+   acento vira tinta (`--void`) e o âmbar só sobrevive como **fundo** de botão. Vale para
+   label, código de rider, texto secundário, filete, seleção e foco.
 
 ---
 
