@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { CONTATO, TOTAL_ARTISTAS } from '@/lib/conteudo'
+import { MotionConfig } from 'framer-motion'
 import './globals.css'
 
 const SITE = 'https://rapasound.com.br'
@@ -77,7 +78,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html:
           `document.documentElement.classList.remove('no-js')` }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {/* reducedMotion="user" decide no mount, sem quebrar hidratacao.
+            useReducedMotion() retornaria null no servidor. */}
+        <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      </body>
     </html>
   )
 }

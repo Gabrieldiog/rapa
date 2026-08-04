@@ -658,6 +658,10 @@
   }
   .rev { opacity: 1 !important; transform: none !important; }
   .blackout { display: none; }
+  /* opacity nao esta em positionalKeys, entao o Motion continua
+     animando o chase mesmo com reducedMotion="user". Nove opacidades
+     escalonadas ainda sao movimento percebido — mata-se aqui. */
+  [data-pixel] { opacity: 1 !important; transition: none !important; }
   .luz { display: none; }
   .card:hover, .card:focus-within { transform: none; }
 }

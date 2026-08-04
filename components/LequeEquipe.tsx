@@ -51,6 +51,7 @@ function config(total: number, slot: number) {
 
 export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
   const ref = useRef<HTMLDivElement>(null)
+  const [naTela, setNaTela] = useState(false)
   const animando = useRef(false)
   const entrou = useRef(false)
   const direcao = useRef<'esq' | 'dir' | null>(null)
@@ -76,9 +77,22 @@ export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
     setCentro((p) => (d === 'dir' ? (p + 1) % total : (p - 1 + total) % total))
   }, [total, pagina])
 
+  /* Espera entrar na tela. Sem isto a entrada do leque acontecia na
+     montagem — a pessoa rolava ate a equipe e encontrava tudo ja
+     posicionado, sem ver a animacao. */
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setNaTela(true); io.disconnect() }
+    }, { threshold: 0.15 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   useEffect(() => {
     const cont = ref.current
-    if (!cont || !total) return
+    if (!cont || !total || !naTela) return
 
     const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches
     const els = Array.from(cont.querySelectorAll<HTMLElement>('.leque-card'))
@@ -201,7 +215,7 @@ export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
       window.removeEventListener('resize', onResize)
       if (timer) clearTimeout(timer)
     }
-  }, [centro, total, mapaVisivel, pagina])
+  }, [centro, total, mapaVisivel, pagina, naTela])
 
   if (!total) return null
 

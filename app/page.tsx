@@ -9,6 +9,7 @@ import { CardServico, LinhaServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
 import { MenuLiquido } from '@/components/MenuLiquido'
+import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
 import { Haze } from '@/components/Haze'
 import { Blackout } from '@/components/Blackout'
@@ -463,6 +464,7 @@ export default function Home() {
       </footer>
 
       <MenuLiquido />
+      <NavDesktop />
     </>
   )
 }
