@@ -251,34 +251,18 @@ export default function Home() {
       </Secao>
 
       {/* ══════════════ A VIRADA ══════════════
-          A assinatura. A pagina troca de estado: sai a cor da festa,
-          entra a luz de trabalho. O LED vende a festa; o branco vende
-          os trinta anos. */}
-      <div className="relative border-y border-rule bg-off">
-        <div className="mx-auto w-full max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-          <Reveal>
-            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="lab text-branco">Luz de trabalho</p>
-                <p className="mt-4 max-w-[34ch] font-mono text-sm leading-relaxed text-branco-2">
-                  Daqui para baixo não tem foto bonita. Tem rider, tem
-                  equipamento e tem os trinta anos.
-                </p>
-              </div>
-              <div className="flex items-end gap-3" aria-hidden>
-                {/* a coluna de pixels, deitada: o tubo trocando de estado */}
-                {Array.from({ length: 14 }).map((_, i) => (
-                  <span key={i} className="block h-8 w-[3px]"
-                        style={{ background: i < 5 ? 'var(--color-magenta)'
-                                 : i < 7 ? 'var(--color-congo)' : 'var(--color-branco)',
-                                 opacity: i < 7 ? 0.35 : 1 }} />
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
+          A assinatura. Nao e um fade: e a casa acendendo em SETE
+          DEGRAUS, como um fader com detentes. O steps() e a mesma
+          quantizacao do tubo — LED e pixel, nao lampada.
+          Sem scroll-driven animation, vira corte seco: a faixa branca
+          comeca e pronto. E o que uma mesa de luz faz. */}
+      <div className="virada">
+        <div className="virada__plano" aria-hidden="true" />
+        <p className="virada__nota lab">Houselights · 100%</p>
       </div>
 
+
+      <div className="tecnico">
       {/* ══════════════ ESTADO TÉCNICO · RIDER ══════════════ */}
       <Secao id="rider" className="relative">
         <Tubo cor="var(--color-branco)" aceso />
@@ -464,6 +448,8 @@ export default function Home() {
           </Reveal>
         </div>
       </Secao>
+
+      </div>
 
       <footer className="border-t border-rule py-10">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 lg:flex-row

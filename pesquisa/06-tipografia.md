@@ -288,8 +288,9 @@ O H1 é candidato a LCP. Três garantias:
 1. **`color: var(--color-ambar)` está fora do `@supports`.** Todo browser pinta a palavra na
    primeira passada. O gradiente é acréscimo, nunca pré-condição.
 2. **Nenhuma animação segura paint.** O `@keyframes` interpola uma cor; o glifo já está na tela
-   no frame 1, em âmbar. A animação começa com 240 ms de atraso, ou seja, **depois** da primeira
-   pintura, e termina sozinha em ~5 s.
+   no frame 1, em âmbar. O `animation-delay: 240ms` conta a partir de quando o estilo é aplicado
+   ao elemento — que é depois de ele existir e ser pintado. E a animação **termina sozinha** em
+   ~5 s. Em nenhum momento ela é pré-condição para o texto aparecer.
 3. **Nenhum recurso novo.** Zero requisição, zero JS, zero fonte adicional. `.led` é CSS que já
    vem no bundle que já é crítico.
 
@@ -312,14 +313,24 @@ E `web.dev/articles/stick-to-compositor-only-properties…`:
 **Então sim: esta técnica repinta, na main thread. Ela viola a regra do `IDENTIDADE.md` como
 está escrita.** Não dá para maquiar. O que dá para fazer é dimensionar e escolher.
 
-**O tamanho.** A área repintada é o `<span>` — "LED" a 96 px ≈ **200 × 90 px ≈ 18.000 px²**.
-Num telefone de 390 × 844 (329.000 px²), são **~5,5% da tela**. Não é a página; é uma palavra.
+**O tamanho.** A área repintada é só o `<span>`, e ela é minúscula nos dois cenários:
 
-**A escolha que resolve de verdade:** ligar à rolagem. Um loop `infinite` repinta 60 vezes por
-segundo **com o telefone parado na mesa** — custo puro, benefício zero. Ligado à rolagem, só
-repinta enquanto o dedo se move, e aí o compositor já está trabalhando. **Em repouso: zero.**
-É por isso que o caminho da rolagem é o principal e não um enfeite — e é exatamente o que o
-item 2 do briefing pedia.
+| | H1 | caixa do "LED" | tela | fatia repintada |
+|---|---|---|---|---|
+| Celular 390×844 | ~45 px (§4.1) | ~84 × 45 px | 329.160 px² | **~1,1%** |
+| Desktop 1440×900 | 96 px | ~179 × 96 px | 1.296.000 px² | **~1,3%** |
+
+Cerca de **1% da tela**. Não é a página repintando; é uma palavra de três letras. Foi por isso
+que o critério "palavra curta" apareceu em §1 como bônus técnico — a escolha estética certa é
+também a mais barata.
+
+**A escolha que resolve de verdade: a animação acabar.** Um `infinite` repinta 60 vezes por
+segundo **com o telefone parado na mesa** — custo puro, benefício zero, e é o pior lugar possível
+para gastar bateria num público que está em 4G. Duas passadas gastam ~5 s e depois a conta zera:
+**em repouso, zero repintura, para sempre.**
+
+Note que ligar à rolagem **não** resolveria isso melhor: repintaria a cada frame de scroll, e a
+§3.3 mostra que ainda por cima entregaria o efeito para as pessoas erradas.
 
 ⚠️ Ressalva: `developer.chrome.com/docs/css-ui/scroll-driven-animations` fala em animações
 "running off the main thread". Isso vale para a **condução** da timeline, não para a propriedade
@@ -350,27 +361,52 @@ Confirmado no blog da WebKit, *WebKit Features in Safari 26.0*, 2025-09-15. E o 
 
 Baseline: `limited`. Escores WPT: Chrome 0,878 · Safari 0,865 · **Firefox 0,089**.
 
-> **O que isso muda para este projeto:** o Firefox é o único ausente, e o caso principal aqui é
-> celular em 4G — onde o mundo é Chrome Android e iOS Safari, os dois com suporte. O caminho de
-> rolagem **cobre a maioria esmagadora do tráfego real da Rapa Sound**, não é um luxo para
-> desktop. O fallback do Firefox é só as duas passadas iniciais e descanso em âmbar: perfeitamente
-> apresentável, ninguém percebe que faltou algo.
+> **O que isso muda para este projeto — e é o contrário do que se esperaria.** O Firefox é o único
+> ausente, e o caso principal aqui é celular em 4G, onde o mundo é Chrome Android e iOS Safari:
+> os dois têm suporte. Ou seja, animação de rolagem **está disponível para quase todo o tráfego
+> real da Rapa Sound**. Não é luxo de desktop.
+>
+> Só que disponibilidade não é motivo para usar. **É justamente porque a cobertura é quase total
+> que a versão ligada ao scroll seria um erro aqui** — ela deixaria a palavra parada para quase
+> todo mundo até a pessoa rolar. Ver §3.3.
 
 ### 3.2 Detecção de feature — usar a forma documentada
 
-As duas formas aparecem na literatura, e o MDN e os tutoriais **não usam a mesma**:
+Existem três formas circulando, e **duas delas estão erradas**. Esta é a correção mais
+importante desta seção.
 
-| Forma | Onde aparece |
-|---|---|
-| `@supports not (scroll-timeline: --main-timeline)` | **MDN**, guia *CSS scroll-driven animations* — a forma documentada na referência |
-| `@supports (animation-timeline: scroll())` | **Codrops**, Adam Argyle, 2024-01-17 — "Wrapping animations in `@supports (animation-timeline: scroll())` queries" |
+| Forma | Onde aparece | Veredito |
+|---|---|---|
+| `@supports (animation-timeline: view())` | tutoriais em geral | ⚠️ **insuficiente** |
+| `@supports not (scroll-timeline: --main-timeline)` | **MDN**, guia *CSS scroll-driven animations* | funciona, mas incompleta |
+| `@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%))` | **Bramus**, 2024-09-24 | ✅ **é esta** |
 
-⚠️ Nenhuma fonte normativa diz que uma é preferível. As duas funcionam: `@supports` testa se a
-declaração faz parse, e as duas propriedades entraram juntas em todos os motores.
+**Por quê.** Bramus (Chrome DevRel), em *Feature detecting Scroll-Driven Animations? You want to
+check for animation-range too*:
 
-**O código de §2.3 usa `@supports (scroll-timeline: --t)`** por ser a forma que a *referência*
-documenta, e não só um tutorial. Se preferir ler melhor, `(animation-timeline: scroll())` é
-igualmente válido e tem o Argyle por trás.
+> O Firefox Nightly suporta `animation-timeline` mas **não** suporta `animation-range`.
+
+Ou seja: testar só `animation-timeline` **deixa passar um browser que entra no bloco e executa a
+animação sem respeitar o intervalo** — o efeito roda no lugar errado. Testar `scroll-timeline`
+sozinho tem o mesmo furo. Só o teste composto fecha.
+
+```css
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) { /* … */ }
+```
+
+⚠️ **Isto corrige o que eu mesmo tinha escrito.** A versão anterior deste documento usava
+`@supports (scroll-timeline: --t)`, copiado do MDN. Não está errado por si, mas tem o furo do
+Firefox Nightly. O código de §3.4 já usa a forma composta.
+
+### 3.2.1 Outra pegadinha: `animation-delay` não funciona em timeline de rolagem
+
+Chris Coyier, *Numbers That Fall*, 2025-10-07: numa timeline **baseada em progresso**, e não em
+tempo, `animation-delay` é **ignorado**. Muito tutorial ensina a escalonar com
+`animation-delay: calc(var(--i) * 5%)` — não funciona. O escalonamento correto é por
+`animation-range-start`, ou embutindo o índice no próprio keyframe.
+
+Não afeta o §5 daqui (lá o escalonamento é `transition-delay`, em timeline de **tempo**, onde
+delay funciona normalmente). Fica registrado para não cair nessa se o §5 migrar para rolagem.
 
 ### 3.3 ⚠️ O erro que quase cometi, e por que a rolagem não conduz a varredura
 
@@ -410,7 +446,7 @@ Propriedade separada, sem conflito com a varredura:
 ```css
 @property --led-lavagem { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
 
-@supports (scroll-timeline: --t) {
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
   .led {
     animation: led-varre 2400ms var(--ease-out-cut) 240ms 2 both,   /* continua */
                led-lava  linear both;                                /* soma */
@@ -447,11 +483,26 @@ o meio é fluido.
 
 ```css
 @theme {
-  --text-h1: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);    /*  44 → 96 */
-  --text-h2: clamp(2rem,    1.4rem + 2.8vw, 4rem);    /*  32 → 64 */
-  --text-h3: clamp(1.1875rem, 1.05rem + 0.6vw, 1.5rem); /* 19 → 24 */
+  --text-h1: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);      /*  44 → 96 */
+  --text-h2: clamp(2rem,    1.4rem + 2.8vw, 4rem);      /*  32 → 64 */
+  --text-h3: clamp(1.1875rem, 1.05rem + 0.6vw, 1.5rem); /*  19 → 24 */
 }
 ```
+
+Conferido, H1 resolvido em larguras reais:
+
+| viewport | H1 | linhas do título (estimativa) |
+|---|---|---|
+| 380 px (o teste obrigatório) | **45 px** | ~3 |
+| 390 px | 46 px | ~3 |
+| 768 px | 65 px | 2 |
+| 1024 px | 79 px | 2 |
+| **1354 px ou mais** | **96 px** (trava no teto) | 2 |
+
+Hoje, a 64 px fixos numa tela de 380 px, sobram ~340 px úteis depois do `px-5`; em Zodiak isso dá
+~10 caracteres por linha e os 39 caracteres do título viram **4 linhas**. A 45 px cabem ~15 por
+linha → **3 linhas**. ⚠️ A contagem de linhas é estimada por largura média de caractere, não
+medida em browser — está na lista de §8 para conferir a 380 px de verdade.
 
 ### 4.2 A tabela
 
@@ -630,12 +681,15 @@ browser do usuário, toda vez.
 /** Quebra em palavras no BUILD. Zero JS no cliente.
  *  O texto acessivel nao muda: leitor de tela le a frase inteira. */
 export function PorPalavra({ children }: { children: string }) {
+  const palavras = children.split(' ')
   return (
     <>
-      {children.split(' ').map((p, i) => (
-        <span key={i} className="pal" style={{ ['--i' as string]: i }}>
-          {p}{i < children.split(' ').length - 1 ? ' ' : ''}
-        </span>
+      {palavras.map((p, i) => (
+        <Fragment key={i}>
+          <span className="pal" style={{ ['--i' as string]: i }}>{p}</span>
+          {/* o espaco fica FORA do inline-block — ver nota */}
+          {i < palavras.length - 1 && ' '}
+        </Fragment>
       ))}
     </>
   )
@@ -661,6 +715,29 @@ export function PorPalavra({ children }: { children: string }) {
   .pal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 ```
+
+⚠️ **O espaço tem que ficar fora do `<span>`.** Um espaço *dentro* de um `inline-block` não é
+ponto de quebra de linha válido — o título pararia de quebrar direito e estouraria a caixa no
+celular. É o tipo de erro que só aparece a 380 px. Vai **entre** os spans, como nó de texto irmão.
+(Requer `import { Fragment } from 'react'`.)
+
+> **Isto não é teoria — tem site no ar fazendo exatamente assim.** A **Kraken Industries**
+> (`krakenindustries.co`, Awwwards) revela palavra a palavra em CSS puro, sem biblioteca, com o
+> índice numa custom property, igual ao `--i` daqui:
+> ```css
+> .rv-mask{display:inline-block;overflow:hidden;vertical-align:bottom;
+>          padding-bottom:.04em;margin-bottom:-.04em}
+> .rv-word{display:inline-block;transform:translateY(112%);
+>          transition:transform .7s var(--ease-out-quint);
+>          transition-delay:calc(var(--i,0) * 80ms + var(--base,.15s))}
+> ```
+> **O truque que vale roubar:** `padding-bottom:.04em` + `margin-bottom:-.04em` no elemento que
+> tem `overflow:hidden` — sem isso a máscara **corta as descendentes** (o "p" de "para", o "ç"
+> de "coração"). Só aparece em palavra com perna. Nosso `.pal` não usa `overflow:hidden`, então
+> não precisa; fica anotado para se um dia trocarmos o fade por máscara.
+>
+> Eles usam 80 ms de escalonamento e sem teto. **Mantenho 18 ms e teto de 200 ms**: o título
+> deles tem 4 palavras, os nossos H2 têm até 6, e o briefing proíbe atrasar a leitura.
 
 **As regras que impedem isso de virar o efeito proibido:**
 

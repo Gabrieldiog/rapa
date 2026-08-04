@@ -380,6 +380,96 @@
   /* sem JS a barra ainda leva a tres ancoras que funcionam */
   .no-js .navbar button { display: none; }
 
+  /* ═══════════ A VIRADA — a assinatura ═══════════════════════
+     Nao e um fade: e a casa acendendo em SETE DEGRAUS, com
+     steps(). A mesma quantizacao do tubo — LED e pixel, nao
+     lampada. O estado final e a BASE; a animacao entra por cima
+     so onde existe. Sem ela, corte seco — o que uma mesa de luz
+     faz de verdade, e nao uma versao pior.
+     ========================================================= */
+
+  /* ESTADO TÉCNICO: estatico, sempre, em todo navegador.
+     A casa acesa. Luz de trabalho de verdade — fundo branco. */
+  .tecnico {
+    background: var(--color-branco);
+    color: var(--color-void);
+    --tubo-cor: var(--color-void);
+  }
+  .tecnico .lab { color: color-mix(in srgb, var(--color-void) 58%, transparent); }
+  .tecnico .text-branco-2 { color: color-mix(in srgb, var(--color-void) 62%, transparent); }
+  .tecnico .border-rule { border-color: color-mix(in srgb, var(--color-void) 14%, transparent); }
+  /* ambar sobre branco reprova AA (1,9:1). No estado tecnico o
+     acento vira tinta; o ambar so sobrevive como FUNDO de botao. */
+  .tecnico .text-ambar { color: var(--color-void); }
+  .tecnico .linha__cod { color: color-mix(in srgb, var(--color-void) 72%, transparent); }
+  .tecnico .hover\:text-ambar:hover { color: color-mix(in srgb, var(--color-void) 55%, transparent); }
+  .tecnico ::selection { background: var(--color-void); color: var(--color-branco); }
+  .tecnico :focus-visible { outline-color: var(--color-void); }
+
+  /* CAMINHO BASE — corte seco */
+  .virada {
+    position: relative;
+    display: block;
+    background: var(--color-branco);
+    min-block-size: 40svh;
+    padding-block: 17svh;
+    text-align: center;
+  }
+  .virada__plano { display: none; }
+  .virada__nota { color: color-mix(in srgb, var(--color-void) 48%, transparent); }
+}
+
+@keyframes acender-sala { from { opacity: 0 } to { opacity: 1 } }
+@keyframes acender-nota { from { opacity: 0 } to { opacity: 1 } }
+
+/* @supports nao testa media feature — os dois precisam ser ANINHADOS,
+   nunca combinados no mesmo @supports (seria invalido). */
+@supports ((animation-timeline: view()) and (animation-range: 0% 100%)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .virada {
+      min-block-size: 170svh;
+      padding-block: 0;
+      background: transparent;
+      view-timeline-name: --virada;
+      view-timeline-axis: block;
+    }
+    /* o plano fica preso no topo durante o pivo. margin negativa
+       devolve os 100svh ao fluxo, entao o pai define a distancia. */
+    .virada__plano {
+      display: block;
+      position: sticky;
+      inset-block-start: 0;
+      block-size: 100svh;
+      margin-block-end: -100svh;
+      background: var(--color-branco);
+      pointer-events: none;
+      z-index: 0;
+      /* so longhands: o atalho `animation` reseta animation-timeline */
+      animation-name: acender-sala;
+      animation-duration: 1ms;
+      animation-timing-function: steps(7, jump-none);
+      animation-fill-mode: both;
+      animation-timeline: --virada;
+      /* para um elemento maior que o viewport, `contain` E a janela
+         em que o filho sticky fica preso. Um pin sem GSAP. */
+      animation-range: contain 0% contain 100%;
+    }
+    .virada__nota {
+      position: sticky;
+      inset-block-start: calc(50svh - 0.6em);
+      z-index: 1;
+      animation-name: acender-nota;
+      animation-duration: 1ms;
+      animation-timing-function: steps(4, jump-none);
+      animation-fill-mode: both;
+      animation-timeline: --virada;
+      animation-range: contain 62% contain 100%;
+    }
+  }
+}
+
+@layer components {
+
   /* ---------- REVEAL ----------------------------------------
      Caminho rapido em CSS puro onde animation-timeline existe;
      fallback por IntersectionObserver (~0.4KB) no resto.
@@ -412,6 +502,7 @@
     animation: blackout 400ms var(--ease-out-cut) forwards;
   }
 }
+
 
 /* ============================================================
    prefers-reduced-motion — fallback ESTATICO REAL, nao "mais
