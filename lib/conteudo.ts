@@ -254,8 +254,31 @@ export const FOTOS_EVENTO = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
   h: 690,
 }))
 
-export const FOTOS_EQUIPE = [1, 2, 3, 4, 5, 6].map((n) => ({
-  src: `/img/equipe/${n}.webp`,
-  w: 628,
-  h: 793,
-}))
+/* ============================================================
+   A EQUIPE.
+
+   As imagens do site antigo eram CARDS GRAFICOS, nao fotos: nome e
+   cargo queimados no pixel, sobre o gradiente #FF6600 do tema velho.
+   Era o mesmo defeito que quebrou o resto do site — texto dentro de
+   imagem — e ele voltou porque eu copiei os arquivos sem abrir.
+
+   Corrigido: a faixa de texto foi cortada fora, a cor antiga foi
+   removida (as fotos viraram monocromaticas, coerentes com a luz de
+   trabalho do estado tecnico) e os nomes voltaram como TEXTO REAL.
+
+   Dois deles tambem estao no rider dos 116: Andre Wink e Daniel
+   Souvile sao DJs da casa.
+   ============================================================ */
+
+export type Pessoa = { nome: string; papel: string; src: string }
+
+export const EQUIPE: Pessoa[] = [
+  { nome: 'Leandro Rapa',    papel: 'Idealizador',                 src: '/img/equipe/1.webp' },
+  { nome: 'Dagma',           papel: 'Consultora e produtora',      src: '/img/equipe/2.webp' },
+  { nome: 'Daniel Souvile',  papel: 'Conteúdo audiovisual e VJ',   src: '/img/equipe/3.webp' },
+  { nome: 'Daniel Ribeiro',  papel: 'Pré-produção',                src: '/img/equipe/4.webp' },
+  { nome: 'André Wink',      papel: 'DJ',                          src: '/img/equipe/5.webp' },
+  { nome: 'Marcelo Augusto', papel: 'DJ e produtor',               src: '/img/equipe/6.webp' },
+]
+
+export const FOTOS_EQUIPE = EQUIPE.map((p) => ({ src: p.src, w: 440, h: 635 }))

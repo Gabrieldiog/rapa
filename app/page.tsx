@@ -1,7 +1,7 @@
 import {
   SERVICOS, BLOCOS, DESTAQUE_LED, RIDER, DESTAQUES, TOTAL_ARTISTAS,
   EVENTOS, DEPOIMENTOS, FAQ,
-  CONTATO, FOTOS_EVENTO, FOTOS_EQUIPE, zap,
+  CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
 import { VideoFacade } from '@/components/VideoFacade'
@@ -273,7 +273,8 @@ export default function Home() {
       <div className="tecnico">
       {/* ══════════════ ESTADO TÉCNICO · RIDER ══════════════ */}
       <Secao id="rider" className="relative">
-        <Tubo cor="var(--color-branco)" aceso />
+        {/* no estado tecnico o fundo e branco: o tubo vira tinta */}
+        <Tubo cor="var(--color-void)" aceso />
         <Reveal>
           <Eyebrow><b>Rider técnico</b> · <i>{TOTAL_ARTISTAS}</i> artistas</Eyebrow>
           <h2 className="max-w-[24ch] text-2xl lg:text-3xl">
@@ -351,9 +352,11 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={90}>
-            <LequeEquipe cards={FOTOS_EQUIPE.map((f, i) => ({
-              src: f.src,
-              alt: `Integrante da equipe da Rapa Sound — foto ${i + 1}`,
+            <LequeEquipe cards={EQUIPE.map((p) => ({
+              src: p.src,
+              alt: `${p.nome}, ${p.papel.toLowerCase()} na Rapa Sound`,
+              nome: p.nome,
+              papel: p.papel,
             }))} />
           </Reveal>
         </div>

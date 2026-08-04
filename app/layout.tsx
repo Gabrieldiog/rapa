@@ -63,7 +63,7 @@ const schema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="no-js">
+    <html lang="pt-BR">
       <head>
         {/* a fonte de texto e a primeira a pintar — preload so nela */}
         <link rel="preload" href="/fonts/cabinet-400.woff2" as="font"
@@ -74,9 +74,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
-        {/* anti-FOUC: 0,05KB. Sem JS nada fica invisivel (.no-js .rev). */}
-        <script dangerouslySetInnerHTML={{ __html:
-          `document.documentElement.classList.remove('no-js')` }} />
       </head>
       <body>
         {/* reducedMotion="user" decide no mount, sem quebrar hidratacao.

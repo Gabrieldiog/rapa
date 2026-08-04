@@ -15,7 +15,7 @@ import gsap from 'gsap'
  *  - o hover só liga onde existe ponteiro fino.
  */
 
-export type CardEquipe = { src: string; alt: string }
+export type CardEquipe = { src: string; alt: string; nome: string; papel: string }
 
 const MAX_VISIVEL = 7
 const METADE = 3
@@ -230,11 +230,17 @@ export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
     <div className="flex w-full flex-col items-center">
       <div ref={ref} className="leque relative flex w-full items-center justify-center">
         {cards.map((c, i) => (
-          <div key={i} className="leque-card">
+          <figure key={i} className="leque-card">
             <img src={c.src} alt={c.alt} loading="lazy" decoding="async"
-                 width={628} height={793}
+                 width={440} height={635}
                  className="absolute inset-0 h-full w-full object-cover" />
-          </div>
+            {/* no site antigo isto era pixel queimado na imagem */}
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t
+                                   from-void via-void/85 to-transparent px-4 pb-4 pt-10">
+              <span className="block text-sm font-bold leading-tight text-branco">{c.nome}</span>
+              <span className="lab mt-1 block">{c.papel}</span>
+            </figcaption>
+          </figure>
         ))}
       </div>
 

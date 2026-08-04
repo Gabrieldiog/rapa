@@ -3,11 +3,22 @@
 import { useEffect, useRef, type ReactNode, type ElementType } from 'react'
 
 /**
- * Reveal por IntersectionObserver. ~0,4KB, sem lib.
- * Ver pesquisa/02-motion.md: a stack inteira cabe em ~1,1KB.
+ * Reveal por IntersectionObserver.
  *
- * Sem JS o conteudo aparece normalmente (.no-js .rev no CSS).
- * Com prefers-reduced-motion o CSS neutraliza o transform.
+ * A LEI DA CASA: o estado final é a BASE. A animação entra por cima,
+ * e só onde ela não pode atrapalhar.
+ *
+ * A versão anterior tinha um defeito grave: o HTML era servido com
+ * `class="rev"` (opacity: 0) e um script no <head> removia `no-js`
+ * antes da hidratação. Resultado — 34 blocos ficavam invisíveis da
+ * execução do script até o IntersectionObserver rodar, o que em 4G é
+ * a página em branco por segundos. E se o JS falhasse depois disso,
+ * ficavam invisíveis para sempre.
+ *
+ * Agora o elemento é servido SEM classe nenhuma: nasce visível. Só
+ * depois da montagem, e só se estiver ABAIXO da dobra, ele é escondido
+ * e observado. O que já está na tela nunca chega a sumir — não há nem
+ * flash de um quadro.
  */
 export function Reveal({
   children,
@@ -25,10 +36,15 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.classList.add('rev-on')
-      return
-    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    // já visível? então não esconde. Nunca.
+    const r = el.getBoundingClientRect()
+    if (r.top < window.innerHeight * 0.92) return
+
+    el.classList.add('rev')
+    if (delay) el.style.setProperty('--d', `${delay}ms`)
+
     const io = new IntersectionObserver(
       (entradas) => {
         for (const e of entradas) {
@@ -41,15 +57,7 @@ export function Reveal({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [delay])
 
-  return (
-    <Tag
-      ref={ref}
-      className={`rev ${className}`}
-      style={delay ? ({ ['--d' as string]: `${delay}ms` }) : undefined}
-    >
-      {children}
-    </Tag>
-  )
+  return <Tag ref={ref} className={className || undefined}>{children}</Tag>
 }

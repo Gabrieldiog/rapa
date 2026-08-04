@@ -515,7 +515,6 @@
   }
 
   /* sem JS a barra ainda leva a tres ancoras que funcionam */
-  .no-js .navbar button { display: none; }
 
   /* ═══════════ A VIRADA — a assinatura ═══════════════════════
      Nao e um fade: e a casa acendendo em SETE DEGRAUS, com
@@ -618,8 +617,8 @@
                 transform 320ms var(--ease-tubo);
     transition-delay: var(--d, 0ms);
   }
-  /* sem JS, nada fica invisivel */
-  .no-js .rev { opacity: 1; transform: none; }
+  /* `.rev` so e aplicada por JS, depois da montagem, e apenas em
+     elemento ABAIXO da dobra. O HTML servido nunca esconde nada. */
 
   /* ---------- O BEAT DE BLACKOUT ----------------------------
      ~400ms, UM so na pagina inteira. Nao segura o paint: a foto

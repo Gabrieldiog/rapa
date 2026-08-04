@@ -101,16 +101,17 @@ export function MenuLiquido() {
       {/* ---------- a pílula que morfa ---------- */}
       <motion.div
         className="relative flex flex-col overflow-hidden"
-        initial={{ opacity: 0, y: 20 }}
+        /* initial={false}: o menu nasce pronto no HTML. Com initial
+           animado ele sairia com opacity:0 e so apareceria depois da
+           hidratacao. */
+        initial={false}
         animate={{
-          opacity: 1, y: 0,
           width: aberto ? 268 : 132,
           height: aberto ? 316 : 52,
           borderRadius: aberto ? 24 : 26,
         }}
         transition={{ duration: 0.8, ease,
-                      height: { duration: aberto ? 0.8 : 0.15 },
-                      opacity: { duration: 0.4, ease } }}
+                      height: { duration: aberto ? 0.8 : 0.15 } }}
       >
         {/* fundo âmbar */}
         <span aria-hidden className="absolute inset-0 rounded-[inherit] bg-ambar" />
@@ -185,8 +186,7 @@ export function MenuLiquido() {
                    font-mono text-2xs font-medium uppercase tracking-[0.14em] text-ambar
                    backdrop-blur-md"
         style={{ background: 'color-mix(in srgb, var(--color-void) 82%, transparent)' }}
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1, ease }}
+        initial={false}
         whileTap={{ scale: 0.96 }}
       >
         WhatsApp
