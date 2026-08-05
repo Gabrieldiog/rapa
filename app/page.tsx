@@ -33,11 +33,10 @@ export default function Home() {
 
           overflow-clip e nao hidden: `hidden` cria scroll container. */}
       <header id="conteudo" className="relative overflow-clip">
-        {/* vinheta: escurece as bordas para o texto ter chao proprio
-            sem precisar de caixa nem de sombra. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0"
-             style={{ background:
-               'radial-gradient(78% 62% at 50% 46%, transparent 0%, color-mix(in srgb, var(--color-void) 72%, transparent) 100%)' }} />
+        {/* A vinheta local saiu: ela terminava junto com o <header> e
+            deixava uma EMENDA HORIZONTAL visivel no fim do topo, porque
+            o fundo continua e ela nao. A vinheta agora e do proprio
+            fundo, fixa e sem costura. */}
 
         {/* pb maior que pt no celular: o menu de secoes e fixo no
             rodape e cobria o CTA. O `justify-center` centraliza o que

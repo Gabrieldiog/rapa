@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { CONTATO, TOTAL_ARTISTAS } from '@/lib/conteudo'
 import { MotionConfig } from 'framer-motion'
-import { Particulas } from '@/components/Particulas'
+import { Seda } from '@/components/Seda'
 import './globals.css'
 
 const SITE = 'https://rapasound.com.br'
@@ -86,9 +86,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `fixed`: o campo nao rola junto. Ele e o ar da sala, nao um
             papel de parede colado no documento.
             `-z-10` dentro do body: pinta ACIMA do fundo do body e
-            ABAIXO de todo o conteudo. O body continua opaco em --void,
-            entao nao ha risco de fundo transparente em lugar nenhum. */}
-        <Particulas />
+            ABAIXO de todo o conteudo. */}
+        <Seda />
         {/* reducedMotion="user" decide no mount, sem quebrar hidratacao.
             useReducedMotion() retornaria null no servidor. */}
         <MotionConfig reducedMotion="user">{children}</MotionConfig>

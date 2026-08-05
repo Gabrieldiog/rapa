@@ -117,6 +117,28 @@ separação, e a separação continua lá.
 O fundo mora em `app/layout.tsx`, **uma vez só**, `position: fixed`. Cópia por seção nunca fica
 em fase — idêntico de verdade significa *o mesmo canvas*.
 
+### O fundo é seda, desde 2026-08-05
+
+Trocado do campo de partículas (`back.md`) para o moiré de seda (`back2.md`), a pedido. Ele lê
+como **cetim drapeado** — que é literalmente o material de um vestido de noiva e de debutante,
+então ele trabalha a favor do assunto em vez de ser textura genérica.
+
+**A cor do pico foi medida, não escolhida.** Um fundo com variação de luminância briga com
+texto de cor fixa, e quem tem que ganhar essa briga é o texto:
+
+| Pico da seda | `--branco` | `--branco-2` | `--ambar` |
+|---|---|---|---|
+| `rgb(123,116,129)` — o do componente original | 3,85:1 | **1,43:1** | 2,25:1 |
+| `rgb(88,81,106)` | 6,40:1 | **2,38:1** | 3,75:1 |
+| **`rgb(40,37,48)` — adotado** | 12,83:1 | **4,77:1** | 7,51:1 |
+| chão liso `--void`, para comparar | 16,98:1 | 6,31:1 | 9,94:1 |
+
+O critério 1.4.3 pede 4,5:1 para texto normal. **Só o adotado passa** — com o valor do
+componente original, a página inteira reprovaria, inclusive o texto branco.
+
+Se um dia `--branco-2` ficar mais claro, o pico pode subir junto. Enquanto ele for `#8E9199`,
+`rgb(40,37,48)` é o teto.
+
 A **coluna de pixels** — tira vertical de pontos discretos, com o espaçamento e a queda de
 brilho de um tubo real — é como o estado se manifesta. Ela muda de cor na virada. Nunca é
 decorativa e nunca é uma linha contínua.
