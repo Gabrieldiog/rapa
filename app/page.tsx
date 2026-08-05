@@ -42,29 +42,63 @@ export default function Home() {
              style={{ background:
                'radial-gradient(78% 62% at 50% 46%, transparent 0%, color-mix(in srgb, var(--color-void) 72%, transparent) 100%)' }} />
 
+        {/* pb maior que pt no celular: o menu de secoes e fixo no
+            rodape e cobria o CTA. O `justify-center` centraliza o que
+            sobra, entao o bloco sobe e o botao fica alcancavel. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 py-24 text-center">
+                        items-center justify-center px-5 pt-16
+                        pb-[calc(6.5rem+env(safe-area-inset-bottom))]
+                        text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
               primeiro pico. Depois descansa. */}
           <Logo animar
-                className="w-[min(68vw,21rem)] shrink-0 text-branco" />
+                className="w-[min(52vw,19rem)] shrink-0 text-branco" />
 
-          <div className="mt-9">
+          <div className="mt-7 lg:mt-9">
             <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
           </div>
 
           {/* o H1 NAO pode entrar num <Reveal>: opacity/transform criam
               contexto de empilhamento e o background-clip:text some no
               Chrome. E ele e candidato a LCP. */}
-          <h1 className="max-w-[18ch] text-3xl lg:text-4xl">
-            Som, luz e <span className="led">LED</span> para 15&nbsp;anos e casamento
+          {/* text-xl/2xl e nao 2xl/3xl: sao 76 caracteres. Frase longa
+              pede corpo MENOR, nao maior — a 64px ela ocupava cinco
+              linhas e empurrava os dois CTAs para fora da tela, no
+              desktop e no celular. Manchete curta cresce, manchete
+              comprida encolhe. */}
+          <h1 className="max-w-[24ch] text-xl lg:text-2xl">
+            A melhor escolha para fazer parte dos momentos mais{' '}
+            <span className="led">marcantes</span> de suas vidas
           </h1>
-          <p className="mt-7 max-w-[44ch] text-base text-branco-2">
-            A gente cuida do som, da luz e da estrutura. No dia, tem técnico nosso
-            do começo ao fim — para você não ter que resolver nada.
+
+          {/* Os tres servicos, texto de verdade e nao imagem. Aqui moram
+              as palavras que a mae de debutante e a noiva digitam na
+              busca — o H1 virou a promessa, entao a palavra-chave
+              precisa de um lugar proprio.
+              O separador e o pixel do tubo, nao um bullet. */}
+          <ul className="mt-6 flex flex-wrap lg:mt-8 items-center justify-center gap-x-4 gap-y-2">
+            {['Casamentos', 'Festas de 15 anos', 'Eventos corporativos'].map((s, i) => (
+              <li key={s} className="flex items-center gap-4">
+                {i > 0 && (
+                  <span aria-hidden
+                        className="block h-1 w-1 shrink-0 rounded-[1px] bg-ambar" />
+                )}
+                <span className="lab text-branco">{s}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Encurtado de tres linhas para duas no celular. Nao foi
+              estilo: com tres, o link do rider caia atras do menu fixo
+              do rodape — e quando o conteudo passa do min-h, o
+              `justify-center` para de ajudar e a caixa so cresce.
+              Altura tem que sair do conteudo. */}
+          <p className="mt-6 max-w-[38ch] text-base text-branco-2 lg:mt-8">
+            Som, luz e <span className="led">LED</span>. Técnico nosso do começo
+            ao fim, para você não resolver nada.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:mt-10">
             <Zap texto="Oi! Quero um orçamento de som e luz. Meu evento é:">
               Falar no WhatsApp
             </Zap>

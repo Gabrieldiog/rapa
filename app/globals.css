@@ -203,7 +203,14 @@
          em 240ms e rodava ATRAS da cortina — que e exatamente por que
          o cliente do projeto disse que "o LED nao tem a animacao".
          Ele nunca chegou a ver. */
-      animation: led-varre 3600ms linear 1200ms infinite;
+      /* 7200ms: o cliente do projeto achou 3600 rapido demais. Uma
+         varredura de palco atravessa devagar — a pressa e o que
+         denuncia efeito de template.
+         As duas palavras varridas usam a MESMA duracao e o mesmo
+         atraso de proposito: fora de fase elas competiriam pela
+         atencao e o topo viraria pisca-pisca. Em fase, lê como uma
+         luz so passando pelo bloco inteiro. */
+      animation: led-varre 7200ms linear 1200ms infinite;
     }
     /* Contínua, como pedido. A ressalva de bateria continua de pe —
        background-clip:text repinta na main thread, nao vai para o
