@@ -77,17 +77,45 @@ passa a ser a **expressão** dela.
 
 A assinatura é a **transição estrutural entre dois estados da página**:
 
-| | `ESTADO FESTA` | `ESTADO TÉCNICO` |
+| | `ESTADO FESTA` | `REGISTRO TÉCNICO` |
 |---|---|---|
-| Cor | magenta (15 anos) · congo (casamento) | `--branco` puro, sem cor |
+| Cor de ambiente | magenta (15 anos) · congo (casamento) | **nenhuma** |
+| Tubo | magenta ou congo | `--branco`, luz de trabalho |
 | O que mostra | foto sangrada, vídeo, emoção | rider, 116 artistas, sonorização, 30 anos |
-| Tipografia | display | monoespaçada |
+| Tipografia | display | monoespaçada, tracking `0.18em` |
+| Filete | `--rule` cheio | `--rule` a 70%, a grade é que organiza |
 | Movimento | reveals | nenhum |
 | Fala com | mãe de debutante, noiva | produtora, casa de show, prefeitura |
 
-O LED vende a festa. O branco de trabalho vende os trinta anos. **A virada entre os dois é a
-coisa pela qual a página será lembrada** — e é ela que resolve o buraco da sonorização, que
-era o defeito real da direção.
+O LED vende a festa. O registro técnico vende os trinta anos — e é ele que resolve o buraco da
+sonorização, que era o defeito real da direção.
+
+### ⚠️ O fundo branco morreu, em 2026-08-05
+
+**Decisão do cliente do projeto:** o campo de partículas do `back.md` vale para a **página
+inteira**, idêntico em todo lugar. O estado técnico tinha `background: var(--color-branco)`, e
+isso é incompatível com "mesmo fundo em tudo".
+
+O cliente olhou a seção do rider no branco e disse que estava feia. Ele viu a página; eu tinha
+a teoria. Ganhou ele.
+
+**O que morreu junto:**
+
+- `.virada` — 170 svh de rolagem que acendiam a sala em sete degraus até o branco. Sem o branco
+  ela vira tela vazia pedindo rolagem por nada. Foram os `@keyframes acender-sala` e
+  `acender-nota`.
+- Todo o bloco de correção de contraste de `.tecnico`. Ele existia só porque o fundo invertia;
+  sem inversão, as razões voltam a ser as da página — branco sobre void, 16,98:1.
+- `.sobre-escuro`, a ilha escura que impedia os cargos da equipe de sumirem no branco.
+
+**O que sobreviveu, e é o ponto:** os dois estados continuam existindo. O registro técnico
+deixou de se declarar por **cor de chão** e passou a se declarar por **tipografia e disciplina
+de cor** — monoespaçada, zero magenta, tubo branco, filete mais seco. A tese "são duas luzes
+diferentes e saber separá-las é o que a empresa vende" não dependia do branco. Dependia da
+separação, e a separação continua lá.
+
+O fundo mora em `app/layout.tsx`, **uma vez só**, `position: fixed`. Cópia por seção nunca fica
+em fase — idêntico de verdade significa *o mesmo canvas*.
 
 A **coluna de pixels** — tira vertical de pontos discretos, com o espaçamento e a queda de
 brilho de um tubo real — é como o estado se manifesta. Ela muda de cor na virada. Nunca é

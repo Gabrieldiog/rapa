@@ -10,8 +10,6 @@ import { Palco } from '@/components/Palco'
 import { MenuLiquido } from '@/components/MenuLiquido'
 import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
-import { Haze } from '@/components/Haze'
-import { Particulas } from '@/components/Particulas'
 import { Logo } from '@/components/Logo'
 import { PausaLed } from '@/components/PausaLed'
 import { Blackout } from '@/components/Blackout'
@@ -35,7 +33,6 @@ export default function Home() {
 
           overflow-clip e nao hidden: `hidden` cria scroll container. */}
       <header id="conteudo" className="relative overflow-clip">
-        <Particulas />
         {/* vinheta: escurece as bordas para o texto ter chao proprio
             sem precisar de caixa nem de sombra. */}
         <div aria-hidden className="pointer-events-none absolute inset-0"
@@ -245,7 +242,6 @@ export default function Home() {
           o scrollport dos `lg:sticky` la embaixo — os cinco cabecalhos de
           bloco nunca grudavam. `clip` recorta sem criar o container. */}
       <Secao id="servicos" className="relative overflow-clip">
-        <Haze />
         <LuzCursor seletor="#servicos" />
         <Reveal>
           <Eyebrow><b>Serviços</b> · <i>13</i>, monta junto ou separado</Eyebrow>
@@ -306,23 +302,21 @@ export default function Home() {
         </div>
       </Secao>
 
-      {/* ══════════════ A VIRADA ══════════════
-          A assinatura. Nao e um fade: e a casa acendendo em SETE
-          DEGRAUS, como um fader com detentes. O steps() e a mesma
-          quantizacao do tubo — LED e pixel, nao lampada.
-          Sem scroll-driven animation, vira corte seco: a faixa branca
-          comeca e pronto. E o que uma mesa de luz faz. */}
-      <div className="virada">
-        <div className="virada__plano" aria-hidden="true" />
-        <p className="virada__nota lab">Houselights · 100%</p>
-      </div>
+      {/* A VIRADA foi removida.
+          Ela era 170svh de rolagem cujo unico proposito era acender a
+          sala em sete degraus ate o branco — e o branco acabou. Sem o
+          estado que ela introduzia, ficaria uma tela vazia pedindo
+          para o visitante rolar por nada.
+          O que ela defendia continua vivo, so que por tipografia:
+          da secao do rider para baixo a pagina fica monoespacada, sem
+          cor de ambiente, com o tubo branco. Ver IDENTIDADE.md. */}
 
-
-      <div className="tecnico">
+      <div className="registro">
       {/* ══════════════ ESTADO TÉCNICO · RIDER ══════════════ */}
       <Secao id="rider" className="relative">
-        {/* no estado tecnico o fundo e branco: o tubo vira tinta */}
-        <Tubo cor="var(--color-void)" aceso />
+        {/* branco puro: no registro tecnico o tubo e luz de trabalho,
+            nunca cor de ambiente. */}
+        <Tubo cor="var(--color-branco)" aceso />
         <Reveal>
           <Eyebrow><b>Rider técnico</b> · <i>{TOTAL_ARTISTAS}</i> artistas</Eyebrow>
           <h2 className="max-w-[24ch] text-2xl lg:text-3xl">
@@ -361,7 +355,6 @@ export default function Home() {
           {RIDER.map((cat, i) => (
             <Reveal key={cat.categoria} delay={Math.min(i, 3) * 60}>
               <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[minmax(0,15rem)_1fr]">
-                {/* sem text-branco: dentro de .tecnico o fundo E branco */}
                 <h3 className="lab flex items-baseline gap-3 lg:sticky lg:top-8 lg:self-start">
                   <b>{cat.categoria}</b>
                   <span className="tabular-nums opacity-60">{cat.nomes.length}</span>

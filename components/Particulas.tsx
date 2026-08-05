@@ -184,7 +184,11 @@ export function Particulas({ quantidade = 2000 }: { quantidade?: number }) {
   }, [quantidade])
 
   return (
+    /* `fixed` e nao `absolute`: o campo cobre o viewport e nao rola
+       junto com a pagina — ele e o ar da sala, nao papel de parede.
+       Efeito colateral bom: o canvas mede sempre o viewport, entao a
+       resolucao nao cresce com o comprimento do documento. */
     <canvas ref={ref} aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full" />
+            className="pointer-events-none fixed inset-0 -z-10 h-full w-full" />
   )
 }

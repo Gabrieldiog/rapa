@@ -288,9 +288,6 @@
     transition: color 200ms var(--ease-out-cut), border-color 200ms var(--ease-out-cut);
   }
   .leque-seta:hover { color: var(--color-ambar); border-color: var(--color-ambar); }
-  .tecnico .leque-seta { background: transparent; color: var(--color-void); }
-  .tecnico .leque-seta:hover { color: var(--color-void);
-    border-color: color-mix(in srgb, var(--color-void) 45%, transparent); }
 
   /* ---------- EYEBROW ---------------------------------------
      Marcador de pixel na cor do tubo + contraste de valor na
@@ -318,8 +315,6 @@
   .eyebrow b { font-weight: 500; color: var(--color-branco); }
   .eyebrow i { font-style: normal; font-variant-numeric: tabular-nums;
                color: var(--color-ambar); }
-  .tecnico .eyebrow b { color: var(--color-void); }
-  .tecnico .eyebrow i { color: color-mix(in srgb, var(--color-void) 75%, transparent); }
 
   /* ---------- A COLUNA DE PIXELS ----------------------------
      A expressao da assinatura. Pontos DISCRETOS, nunca linha
@@ -595,76 +590,15 @@
 
   /* sem JS a barra ainda leva a tres ancoras que funcionam */
 
-  /* ═══════════ A VIRADA — a assinatura ═══════════════════════
-     Nao e um fade: e a casa acendendo em SETE DEGRAUS, com
-     steps(). A mesma quantizacao do tubo — LED e pixel, nao
-     lampada. O estado final e a BASE; a animacao entra por cima
-     so onde existe. Sem ela, corte seco — o que uma mesa de luz
-     faz de verdade, e nao uma versao pior.
-     ========================================================= */
-
-
-  /* CAMINHO BASE — corte seco */
-  .virada {
-    position: relative;
-    display: block;
-    background: var(--color-branco);
-    min-block-size: 40svh;
-    padding-block: 17svh;
-    text-align: center;
-  }
-  .virada__plano { display: none; }
-  .virada__nota { color: color-mix(in srgb, var(--color-void) 48%, transparent); }
+  /* A VIRADA saiu.
+     Eram 170svh de rolagem para acender a sala em sete degraus ate o
+     branco. O branco acabou — o mesmo fundo vale para a pagina
+     inteira — entao ela virava tela vazia pedindo rolagem por nada.
+     Foram junto os keyframes acender-sala e acender-nota.
+     A tese sobrevive por tipografia, no bloco .registro. */
 }
 
-@keyframes acender-sala { from { opacity: 0 } to { opacity: 1 } }
-@keyframes acender-nota { from { opacity: 0 } to { opacity: 1 } }
 
-/* @supports nao testa media feature — os dois precisam ser ANINHADOS,
-   nunca combinados no mesmo @supports (seria invalido). */
-@supports ((animation-timeline: view()) and (animation-range: 0% 100%)) {
-  @media (prefers-reduced-motion: no-preference) {
-    .virada {
-      min-block-size: 170svh;
-      padding-block: 0;
-      background: transparent;
-      view-timeline-name: --virada;
-      view-timeline-axis: block;
-    }
-    /* o plano fica preso no topo durante o pivo. margin negativa
-       devolve os 100svh ao fluxo, entao o pai define a distancia. */
-    .virada__plano {
-      display: block;
-      position: sticky;
-      inset-block-start: 0;
-      block-size: 100svh;
-      margin-block-end: -100svh;
-      background: var(--color-branco);
-      pointer-events: none;
-      z-index: 0;
-      /* so longhands: o atalho `animation` reseta animation-timeline */
-      animation-name: acender-sala;
-      animation-duration: 1ms;
-      animation-timing-function: steps(7, jump-none);
-      animation-fill-mode: both;
-      animation-timeline: --virada;
-      /* para um elemento maior que o viewport, `contain` E a janela
-         em que o filho sticky fica preso. Um pin sem GSAP. */
-      animation-range: contain 0% contain 100%;
-    }
-    .virada__nota {
-      position: sticky;
-      inset-block-start: calc(50svh - 0.6em);
-      z-index: 1;
-      animation-name: acender-nota;
-      animation-duration: 1ms;
-      animation-timing-function: steps(4, jump-none);
-      animation-fill-mode: both;
-      animation-timeline: --virada;
-      animation-range: contain 62% contain 100%;
-    }
-  }
-}
 
 @layer components {
 
@@ -703,40 +637,36 @@
 
 
 /* ============================================================
-   ESTADO TÉCNICO — FORA DE @layer, DE PROPOSITO.
+   O REGISTRO TÉCNICO — FORA DE @layer, DE PROPOSITO.
 
    O Tailwind v4 emite `@layer theme, base, components, utilities`.
    Regra dentro de `components` PERDE para utilitario, por camada e
-   nao por especificidade. Enquanto este bloco esteve em @layer, TODA
-   a correcao de cor daqui era inerte: `text-branco-2` computava
-   #8E9199 sobre #ECEDEF = 2,69:1, e o `+` do FAQ ficava em 1,71:1.
+   nao por especificidade. CSS sem camada vence CSS em camada, e por
+   isso este bloco mora aqui.
 
-   CSS sem camada vence CSS em camada. Por isso o bloco mora aqui.
+   O QUE MUDOU: ele NAO pinta mais o chao de branco.
+   O cliente do projeto pediu o mesmo fundo na pagina inteira, entao o
+   estado tecnico perdeu a cor de chao — mas nao perdeu a funcao. Da
+   secao do rider para baixo a pagina fala com produtor, casa de show e
+   prefeitura, e continua se declarando: monoespacada em tudo que e
+   rotulo, ZERO cor de ambiente, tubo branco, filete mais seco.
+
+   Nao ha mais nenhuma correcao de contraste aqui porque nao ha mais
+   inversao de fundo. As razoes voltam a ser as da pagina: branco sobre
+   void, 16,98:1.
    ============================================================ */
-.tecnico {
-  background: var(--color-branco);
-  color: var(--color-void);
-  --tubo-cor: var(--color-void);
+.registro {
+  /* luz de trabalho: o tubo desta metade nunca e magenta nem congo */
+  --tubo-cor: var(--color-branco);
 }
-.tecnico .lab,
-.tecnico .eyebrow            { color: color-mix(in srgb, var(--color-void) 62%, transparent); }
-.tecnico .text-branco-2      { color: color-mix(in srgb, var(--color-void) 66%, transparent); }
-.tecnico .text-branco        { color: var(--color-void); }
-.tecnico .border-rule        { border-color: color-mix(in srgb, var(--color-void) 16%, transparent); }
-/* ambar sobre branco da 1,71:1 e reprova em tudo. Aqui o acento vira
-   tinta; o ambar so sobrevive como FUNDO de botao. */
-.tecnico .text-ambar         { color: var(--color-void); }
-.tecnico .linha__cod         { color: color-mix(in srgb, var(--color-void) 74%, transparent); }
-.tecnico .hover\:text-ambar:hover { color: color-mix(in srgb, var(--color-void) 58%, transparent); }
-.tecnico ::selection         { background: var(--color-void); color: var(--color-branco); }
-.tecnico :focus-visible      { outline-color: var(--color-void); }
 
-/* A legenda da equipe vive sobre um gradiente ESCURO dentro do estado
-   tecnico — e a unica ilha escura la dentro. Sem isto, `.tecnico .lab`
-   pintava o cargo de preto sobre preto e os seis cargos sumiam. */
-.tecnico .sobre-escuro .lab   { color: var(--color-branco-2); }
-.tecnico .sobre-escuro .text-branco,
-.tecnico .sobre-escuro        { color: var(--color-branco); }
+/* O rotulo do registro e mais seco que o do resto da pagina: sem o
+   viés azul do --branco-2, e com o tracking um degrau maior. E o mesmo
+   texto de uma etiqueta de flight case. */
+.registro .lab { letter-spacing: 0.18em; }
+
+/* Filete mais discreto: aqui a grade e que organiza, nao a linha. */
+.registro .border-rule { border-color: color-mix(in srgb, var(--color-rule) 70%, transparent); }
 
 /* ============================================================
    prefers-reduced-motion — fallback ESTATICO REAL, nao "mais
