@@ -93,15 +93,46 @@ export function Palco({ videos }: { videos: Video[] }) {
                  sizes="(min-width: 1024px) 60rem, 100vw"
                  alt="" width={1280} height={720}
                  loading="lazy" decoding="async"
-                 className="absolute inset-0 h-full w-full object-cover opacity-75
+                 /* subiu de 75 para 90: quem escurece o miolo agora e o
+                    gradiente radial abaixo, entao a foto nao precisa mais
+                    pagar por isso na imagem inteira. */
+                 className="absolute inset-0 h-full w-full object-cover opacity-90
                             transition-opacity duration-300 group-hover:opacity-100" />
-            {/* o play é um segmento aceso do tubo. Âmbar, nunca magenta. */}
+            {/* O play era uma barrinha vertical de 3px dentro de uma placa
+                âmbar no canto. A ideia era "um segmento aceso do tubo",
+                mas 3px de largura não lê como play — lê como cursor de
+                texto, ou como metade de um pause. E a placa no canto
+                inferior esquerdo não tinha razão de estar ali.
+                Agora é centralizado e legível: disco âmbar, triângulo de
+                verdade, e o anel que abre é o facho saindo do refletor. */}
+
+            {/* escurecimento só no miolo, para o disco ter contraste
+                sobre qualquer capa. Não é um véu na foto inteira. */}
+            <span aria-hidden className="absolute inset-0"
+                  style={{ background:
+                    'radial-gradient(40% 48% at 50% 47%, color-mix(in srgb, var(--color-void) 58%, transparent) 0%, transparent 100%)' }} />
+
             <span aria-hidden
-                  className="absolute bottom-5 left-5 flex h-12 items-center gap-3
-                             rounded-[var(--radius-botao)] bg-ambar px-5 text-void
-                             transition-transform duration-300 group-hover:translate-x-1">
-              <span className="block h-3.5 w-[3px] rounded-[1px] bg-void" />
-              <span className="font-mono text-2xs font-medium uppercase tracking-[0.14em]">
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+              <span className="relative flex h-16 w-16 items-center justify-center
+                               rounded-full bg-ambar transition-transform duration-300
+                               ease-[var(--ease-out-cut)] group-hover:scale-105
+                               motion-reduce:transition-none motion-reduce:group-hover:scale-100
+                               sm:h-20 sm:w-20">
+                {/* o facho: anel que abre e some. transform + opacity só. */}
+                <span className="absolute inset-0 rounded-full border border-ambar
+                                 transition duration-700 ease-[var(--ease-out-cut)]
+                                 group-hover:scale-[1.45] group-hover:opacity-0
+                                 motion-reduce:hidden" />
+                {/* ml-[3px] porque triângulo centralizado geometricamente
+                    parece torto para a esquerda. É correção óptica. */}
+                <svg viewBox="0 0 24 24"
+                     className="ml-[3px] h-6 w-6 fill-void sm:h-7 sm:w-7">
+                  <path d="M8 4.8v14.4L19.4 12z" />
+                </svg>
+              </span>
+              <span className="font-mono text-2xs font-medium uppercase tracking-[0.18em]
+                               text-branco">
                 Assistir
               </span>
             </span>
