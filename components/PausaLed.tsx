@@ -15,17 +15,22 @@ import { useEffect } from 'react'
  */
 export function PausaLed() {
   useEffect(() => {
-    const led = document.querySelector<HTMLElement>('.led')
-    if (!led) return
+    /* querySelectorAll e nao querySelector: sao DUAS palavras varridas
+       no topo. Com o singular, a segunda nunca pausava e ficava
+       repintando na main thread com a pagina rolada la embaixo. */
+    const alvos = document.querySelectorAll<HTMLElement>('.led')
+    if (!alvos.length) return
 
     const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) led.removeAttribute('data-fora')
-        else led.setAttribute('data-fora', '')
+      (entradas) => {
+        for (const e of entradas) {
+          if (e.isIntersecting) e.target.removeAttribute('data-fora')
+          else e.target.setAttribute('data-fora', '')
+        }
       },
       { threshold: 0 },
     )
-    io.observe(led)
+    for (const a of alvos) io.observe(a)
     return () => io.disconnect()
   }, [])
 

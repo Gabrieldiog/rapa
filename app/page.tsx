@@ -10,8 +10,6 @@ import { Palco } from '@/components/Palco'
 import { MenuLiquido } from '@/components/MenuLiquido'
 import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
-import { Haze } from '@/components/Haze'
-import { Particulas } from '@/components/Particulas'
 import { Logo } from '@/components/Logo'
 import { PausaLed } from '@/components/PausaLed'
 import { Blackout } from '@/components/Blackout'
@@ -35,36 +33,68 @@ export default function Home() {
 
           overflow-clip e nao hidden: `hidden` cria scroll container. */}
       <header id="conteudo" className="relative overflow-clip">
-        <Particulas />
         {/* vinheta: escurece as bordas para o texto ter chao proprio
             sem precisar de caixa nem de sombra. */}
         <div aria-hidden className="pointer-events-none absolute inset-0"
              style={{ background:
                'radial-gradient(78% 62% at 50% 46%, transparent 0%, color-mix(in srgb, var(--color-void) 72%, transparent) 100%)' }} />
 
+        {/* pb maior que pt no celular: o menu de secoes e fixo no
+            rodape e cobria o CTA. O `justify-center` centraliza o que
+            sobra, entao o bloco sobe e o botao fica alcancavel. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 py-24 text-center">
+                        items-center justify-center px-5 pt-16
+                        pb-[calc(6.5rem+env(safe-area-inset-bottom))]
+                        text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
               primeiro pico. Depois descansa. */}
+          {/* Cresceu de 52vw/19rem porque o paragrafo saiu e liberou
+              altura. A marca e o primeiro argumento do topo agora. */}
           <Logo animar
-                className="w-[min(68vw,21rem)] shrink-0 text-branco" />
+                className="w-[min(74vw,27rem)] shrink-0 text-branco" />
 
-          <div className="mt-9">
+          <div className="mt-7 lg:mt-9">
             <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
           </div>
 
           {/* o H1 NAO pode entrar num <Reveal>: opacity/transform criam
               contexto de empilhamento e o background-clip:text some no
               Chrome. E ele e candidato a LCP. */}
-          <h1 className="max-w-[18ch] text-3xl lg:text-4xl">
-            Som, luz e <span className="led">LED</span> para 15&nbsp;anos e casamento
+          {/* text-xl/2xl e nao 2xl/3xl: sao 76 caracteres. Frase longa
+              pede corpo MENOR, nao maior — a 64px ela ocupava cinco
+              linhas e empurrava os dois CTAs para fora da tela, no
+              desktop e no celular. Manchete curta cresce, manchete
+              comprida encolhe. */}
+          <h1 className="max-w-[24ch] text-xl lg:text-2xl">
+            A melhor escolha para fazer parte dos momentos mais{' '}
+            <span className="led">marcantes</span> de suas vidas
           </h1>
-          <p className="mt-7 max-w-[44ch] text-base text-branco-2">
-            A gente cuida do som, da luz e da estrutura. No dia, tem técnico nosso
-            do começo ao fim — para você não ter que resolver nada.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+
+          {/* Os tres servicos, texto de verdade e nao imagem. Aqui moram
+              as palavras que a mae de debutante e a noiva digitam na
+              busca — o H1 virou a promessa, entao a palavra-chave
+              precisa de um lugar proprio.
+              O separador e o pixel do tubo, nao um bullet. */}
+          <ul className="mt-6 flex flex-wrap lg:mt-8 items-center justify-center gap-x-4 gap-y-2">
+            {['Casamentos', 'Festas de 15 anos', 'Eventos corporativos'].map((s, i) => (
+              <li key={s} className="flex items-center gap-4">
+                {i > 0 && (
+                  <span aria-hidden
+                        className="block h-1 w-1 shrink-0 rounded-[1px] bg-ambar" />
+                )}
+                <span className="lab text-branco">{s}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* O paragrafo "Som, luz e LED. Tecnico nosso do comeco ao
+              fim" saiu daqui a pedido. Com ele foi embora a segunda
+              palavra varrida — sobra so "marcantes".
+              As palavras som/luz/LED continuam no <title>, na meta
+              description e na secao de servicos, entao a busca nao
+              perde nada. */}
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:mt-11">
             <Zap texto="Oi! Quero um orçamento de som e luz. Meu evento é:">
               Falar no WhatsApp
             </Zap>
@@ -212,7 +242,6 @@ export default function Home() {
           o scrollport dos `lg:sticky` la embaixo — os cinco cabecalhos de
           bloco nunca grudavam. `clip` recorta sem criar o container. */}
       <Secao id="servicos" className="relative overflow-clip">
-        <Haze />
         <LuzCursor seletor="#servicos" />
         <Reveal>
           <Eyebrow><b>Serviços</b> · <i>13</i>, monta junto ou separado</Eyebrow>
@@ -273,23 +302,21 @@ export default function Home() {
         </div>
       </Secao>
 
-      {/* ══════════════ A VIRADA ══════════════
-          A assinatura. Nao e um fade: e a casa acendendo em SETE
-          DEGRAUS, como um fader com detentes. O steps() e a mesma
-          quantizacao do tubo — LED e pixel, nao lampada.
-          Sem scroll-driven animation, vira corte seco: a faixa branca
-          comeca e pronto. E o que uma mesa de luz faz. */}
-      <div className="virada">
-        <div className="virada__plano" aria-hidden="true" />
-        <p className="virada__nota lab">Houselights · 100%</p>
-      </div>
+      {/* A VIRADA foi removida.
+          Ela era 170svh de rolagem cujo unico proposito era acender a
+          sala em sete degraus ate o branco — e o branco acabou. Sem o
+          estado que ela introduzia, ficaria uma tela vazia pedindo
+          para o visitante rolar por nada.
+          O que ela defendia continua vivo, so que por tipografia:
+          da secao do rider para baixo a pagina fica monoespacada, sem
+          cor de ambiente, com o tubo branco. Ver IDENTIDADE.md. */}
 
-
-      <div className="tecnico">
+      <div className="registro">
       {/* ══════════════ ESTADO TÉCNICO · RIDER ══════════════ */}
       <Secao id="rider" className="relative">
-        {/* no estado tecnico o fundo e branco: o tubo vira tinta */}
-        <Tubo cor="var(--color-void)" aceso />
+        {/* branco puro: no registro tecnico o tubo e luz de trabalho,
+            nunca cor de ambiente. */}
+        <Tubo cor="var(--color-branco)" aceso />
         <Reveal>
           <Eyebrow><b>Rider técnico</b> · <i>{TOTAL_ARTISTAS}</i> artistas</Eyebrow>
           <h2 className="max-w-[24ch] text-2xl lg:text-3xl">
@@ -328,7 +355,6 @@ export default function Home() {
           {RIDER.map((cat, i) => (
             <Reveal key={cat.categoria} delay={Math.min(i, 3) * 60}>
               <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[minmax(0,15rem)_1fr]">
-                {/* sem text-branco: dentro de .tecnico o fundo E branco */}
                 <h3 className="lab flex items-baseline gap-3 lg:sticky lg:top-8 lg:self-start">
                   <b>{cat.categoria}</b>
                   <span className="tabular-nums opacity-60">{cat.nomes.length}</span>

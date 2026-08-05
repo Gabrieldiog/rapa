@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { CONTATO, TOTAL_ARTISTAS } from '@/lib/conteudo'
 import { MotionConfig } from 'framer-motion'
+import { Particulas } from '@/components/Particulas'
 import './globals.css'
 
 const SITE = 'https://rapasound.com.br'
@@ -76,6 +77,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        {/* O FUNDO, UMA VEZ SO, ATRAS DA PAGINA INTEIRA.
+            Ele mora aqui e nao dentro de cada secao por dois motivos.
+            O pedido foi "identico em todo o sistema", e a unica forma
+            de ser identico de verdade e ser o MESMO canvas — copia por
+            secao nunca fica em fase. E custa um canvas em lugar de N:
+            cada instancia era um rAF e um campo de particulas proprio.
+            `fixed`: o campo nao rola junto. Ele e o ar da sala, nao um
+            papel de parede colado no documento.
+            `-z-10` dentro do body: pinta ACIMA do fundo do body e
+            ABAIXO de todo o conteudo. O body continua opaco em --void,
+            entao nao ha risco de fundo transparente em lugar nenhum. */}
+        <Particulas />
         {/* reducedMotion="user" decide no mount, sem quebrar hidratacao.
             useReducedMotion() retornaria null no servidor. */}
         <MotionConfig reducedMotion="user">{children}</MotionConfig>

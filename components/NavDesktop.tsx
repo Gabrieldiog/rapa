@@ -58,7 +58,10 @@ export function NavDesktop() {
           <a href="#conteudo" aria-label="Rapa Sound — ir para o topo"
              className="block shrink-0 text-branco transition-opacity duration-200
                         hover:opacity-80">
-            <Logo className="h-7 w-auto" />
+            {/* h-9 e nao h-7: o logo tem tres andares (wordmark, "Sound"
+                e a forma de onda). A 28px de altura total o "Sound"
+                ficava com ~5px e virava borrao. */}
+            <Logo className="h-9 w-auto" />
           </a>
 
           <ul className="ml-auto flex items-center gap-7">

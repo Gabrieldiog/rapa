@@ -112,11 +112,28 @@ export function Particulas({ quantidade = 2000 }: { quantidade?: number }) {
     const rodando = () => naTela && comFoco
 
     const quadro = () => {
-      // rastro: limpa com o void translucido, nao apaga
-      ctx.fillStyle = 'rgba(9, 9, 11, 0.12)'
+      /* Rastro: limpa com o void translucido, nao apaga.
+         0.07 e nao os 0.12 do original PORQUE a particula ficou mais
+         lenta. O comprimento do risco e velocidade x quadros ate
+         sumir. Com alfa 0.12 um ponto some em ~36 quadros; a 2px por
+         quadro isso dava um risco de ~72px. Baixando a velocidade para
+         1.1 e mantendo 0.12, o risco cairia para ~40px e o fundo
+         mudaria de aparencia — o cliente do projeto disse que gostou
+         de como esta, so quer mais devagar.
+         0.07 leva o ponto a ~65 quadros, e 1.1 x 65 da os mesmos
+         ~72px. Mesmo desenho, metade da pressa. */
+      ctx.fillStyle = 'rgba(9, 9, 11, 0.07)'
       ctx.fillRect(0, 0, w, h)
 
-      const t = performance.now() * 0.0001
+      /* VELOCIDADE — os dois numeros abaixo sao os unicos que saem do
+         original de proposito, a pedido do cliente do projeto: "deixa
+         as linhas correrem um pouco mais lento".
+         `0.00004` (era 0.0001) faz o CAMPO de ruido girar mais devagar,
+         entao as linhas mudam de direcao com menos pressa.
+         `1.1` (era 2) e a velocidade da particula no proprio quadro.
+         Sao coisas diferentes: mexer so na velocidade deixaria as
+         particulas lentas fazendo curva rapida, que fica nervoso. */
+      const t = performance.now() * 0.00004
       for (const p of parts) {
         p.vida += 1
         if (p.vida > p.max) {
@@ -126,8 +143,8 @@ export function Particulas({ quantidade = 2000 }: { quantidade?: number }) {
         }
         const op = Math.sin((p.vida / p.max) * Math.PI) * 0.15
         const a = ruido(p.x * 0.003, p.y * 0.003, t) * Math.PI * 4
-        p.x += Math.cos(a) * 2
-        p.y += Math.sin(a) * 2
+        p.x += Math.cos(a) * 1.1
+        p.y += Math.sin(a) * 1.1
         if (p.x < 0) p.x = w
         if (p.x > w) p.x = 0
         if (p.y < 0) p.y = h
@@ -167,7 +184,11 @@ export function Particulas({ quantidade = 2000 }: { quantidade?: number }) {
   }, [quantidade])
 
   return (
+    /* `fixed` e nao `absolute`: o campo cobre o viewport e nao rola
+       junto com a pagina — ele e o ar da sala, nao papel de parede.
+       Efeito colateral bom: o canvas mede sempre o viewport, entao a
+       resolucao nao cresce com o comprimento do documento. */
     <canvas ref={ref} aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full" />
+            className="pointer-events-none fixed inset-0 -z-10 h-full w-full" />
   )
 }
