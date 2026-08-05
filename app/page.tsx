@@ -52,8 +52,10 @@ export default function Home() {
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
               primeiro pico. Depois descansa. */}
+          {/* Cresceu de 52vw/19rem porque o paragrafo saiu e liberou
+              altura. A marca e o primeiro argumento do topo agora. */}
           <Logo animar
-                className="w-[min(52vw,19rem)] shrink-0 text-branco" />
+                className="w-[min(74vw,27rem)] shrink-0 text-branco" />
 
           <div className="mt-7 lg:mt-9">
             <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
@@ -89,16 +91,13 @@ export default function Home() {
             ))}
           </ul>
 
-          {/* Encurtado de tres linhas para duas no celular. Nao foi
-              estilo: com tres, o link do rider caia atras do menu fixo
-              do rodape — e quando o conteudo passa do min-h, o
-              `justify-center` para de ajudar e a caixa so cresce.
-              Altura tem que sair do conteudo. */}
-          <p className="mt-6 max-w-[38ch] text-base text-branco-2 lg:mt-8">
-            Som, luz e <span className="led">LED</span>. Técnico nosso do começo
-            ao fim, para você não resolver nada.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:mt-10">
+          {/* O paragrafo "Som, luz e LED. Tecnico nosso do comeco ao
+              fim" saiu daqui a pedido. Com ele foi embora a segunda
+              palavra varrida — sobra so "marcantes".
+              As palavras som/luz/LED continuam no <title>, na meta
+              description e na secao de servicos, entao a busca nao
+              perde nada. */}
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:mt-11">
             <Zap texto="Oi! Quero um orçamento de som e luz. Meu evento é:">
               Falar no WhatsApp
             </Zap>
