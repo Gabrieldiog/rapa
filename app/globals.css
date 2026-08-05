@@ -524,23 +524,6 @@
      faz de verdade, e nao uma versao pior.
      ========================================================= */
 
-  /* ESTADO TÉCNICO: estatico, sempre, em todo navegador.
-     A casa acesa. Luz de trabalho de verdade — fundo branco. */
-  .tecnico {
-    background: var(--color-branco);
-    color: var(--color-void);
-    --tubo-cor: var(--color-void);
-  }
-  .tecnico .lab { color: color-mix(in srgb, var(--color-void) 58%, transparent); }
-  .tecnico .text-branco-2 { color: color-mix(in srgb, var(--color-void) 62%, transparent); }
-  .tecnico .border-rule { border-color: color-mix(in srgb, var(--color-void) 14%, transparent); }
-  /* ambar sobre branco reprova AA (1,9:1). No estado tecnico o
-     acento vira tinta; o ambar so sobrevive como FUNDO de botao. */
-  .tecnico .text-ambar { color: var(--color-void); }
-  .tecnico .linha__cod { color: color-mix(in srgb, var(--color-void) 72%, transparent); }
-  .tecnico .hover\:text-ambar:hover { color: color-mix(in srgb, var(--color-void) 55%, transparent); }
-  .tecnico ::selection { background: var(--color-void); color: var(--color-branco); }
-  .tecnico :focus-visible { outline-color: var(--color-void); }
 
   /* CAMINHO BASE — corte seco */
   .virada {
@@ -639,6 +622,42 @@
   }
 }
 
+
+/* ============================================================
+   ESTADO TÉCNICO — FORA DE @layer, DE PROPOSITO.
+
+   O Tailwind v4 emite `@layer theme, base, components, utilities`.
+   Regra dentro de `components` PERDE para utilitario, por camada e
+   nao por especificidade. Enquanto este bloco esteve em @layer, TODA
+   a correcao de cor daqui era inerte: `text-branco-2` computava
+   #8E9199 sobre #ECEDEF = 2,69:1, e o `+` do FAQ ficava em 1,71:1.
+
+   CSS sem camada vence CSS em camada. Por isso o bloco mora aqui.
+   ============================================================ */
+.tecnico {
+  background: var(--color-branco);
+  color: var(--color-void);
+  --tubo-cor: var(--color-void);
+}
+.tecnico .lab,
+.tecnico .eyebrow            { color: color-mix(in srgb, var(--color-void) 62%, transparent); }
+.tecnico .text-branco-2      { color: color-mix(in srgb, var(--color-void) 66%, transparent); }
+.tecnico .text-branco        { color: var(--color-void); }
+.tecnico .border-rule        { border-color: color-mix(in srgb, var(--color-void) 16%, transparent); }
+/* ambar sobre branco da 1,71:1 e reprova em tudo. Aqui o acento vira
+   tinta; o ambar so sobrevive como FUNDO de botao. */
+.tecnico .text-ambar         { color: var(--color-void); }
+.tecnico .linha__cod         { color: color-mix(in srgb, var(--color-void) 74%, transparent); }
+.tecnico .hover\:text-ambar:hover { color: color-mix(in srgb, var(--color-void) 58%, transparent); }
+.tecnico ::selection         { background: var(--color-void); color: var(--color-branco); }
+.tecnico :focus-visible      { outline-color: var(--color-void); }
+
+/* A legenda da equipe vive sobre um gradiente ESCURO dentro do estado
+   tecnico — e a unica ilha escura la dentro. Sem isto, `.tecnico .lab`
+   pintava o cargo de preto sobre preto e os seis cargos sumiam. */
+.tecnico .sobre-escuro .lab   { color: var(--color-branco-2); }
+.tecnico .sobre-escuro .text-branco,
+.tecnico .sobre-escuro        { color: var(--color-branco); }
 
 /* ============================================================
    prefers-reduced-motion — fallback ESTATICO REAL, nao "mais

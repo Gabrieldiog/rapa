@@ -17,8 +17,15 @@ const PIXELS = 9
    a varredura na saída. Com variantes, `from: 'last'` inverte. */
 const ENTRA = [0.22, 1, 0.36, 1] as const
 
+/* NAO existe mais variante `oculto` com opacity 0.
+   O Motion SERIALIZA o `initial` no HTML do `output: 'export'` — e
+   comportamento documentado, nao configuracao errada. Com
+   `initial="oculto"` os tres cards e seus 27 pixels iam para o disco
+   com `style="opacity:0"` e so apareciam quando o bundle chegasse.
+   Em 4G a secao de servicos mostrava o titulo e um buraco.
+   E o mesmo defeito que ja tinha sido corrigido no Reveal e que eu
+   nao vi aqui. O estado servido agora e o estado assentado. */
 const pixelVar: Variants = {
-  oculto: { opacity: 0 },
   'tubo-apagado': { opacity: 0.24, transition: { duration: 0.12 } },
   'tubo-aceso': { opacity: 1, transition: { duration: 0.12, ease: steps(2, 'end') } },
 }
@@ -49,16 +56,15 @@ export function CardServico({ servico, i, foto }:
       data-zap
       className="card group flex h-full scroll-mt-24 flex-col"
       style={{ ['--tubo-cor' as string]: cor }}
-      /* três estados: entra escondido, assenta apagado, acende no gesto.
-         Sem o estado intermediário o card saltaria ao receber o ponteiro. */
-      initial="oculto"
-      whileInView="tubo-apagado"
+      /* `initial={false}`: o card nasce pronto no HTML e nunca e servido
+         escondido. A entrada por rolagem volta na etapa de scroll, feita
+         em CSS scroll-driven, que nao passa pelo SSR do Motion. */
+      initial={false}
+      animate="tubo-apagado"
       whileHover="tubo-aceso"
       whileFocus="tubo-aceso"
       whileTap="tubo-aceso"
-      viewport={{ once: true, amount: 0.25 }}
       variants={{
-        oculto: { opacity: 0, y: 16 },
         'tubo-apagado': {
           opacity: 1, y: 0,
           transition: { duration: 0.5, delay: i * 0.08, ease: ENTRA,
@@ -108,15 +114,22 @@ export function CardServico({ servico, i, foto }:
  * LED-T) substitui a numeração 01/02/03, que é proibida e além disso
  * mentirosa — serviço não tem ordem.
  */
-export function LinhaServico({ servico }: { servico: Servico }) {
+export function LinhaServico({ servico, paraSecao }:
+  { servico: Servico; paraSecao?: boolean }) {
   const cor = corDoTubo(servico)
+  /* `quinze-anos` e `casamento` ja SAO secoes da pagina. Repetir o id
+     aqui criaria ancora duplicada e o 301 de /emocoes-15-anos/ pararia
+     na segunda ocorrencia. Nesses dois a linha aponta para a secao. */
+  const interno = paraSecao
   return (
     <a
-      id={servico.ancora}
-      href={zap(`Oi! Quero orçamento de ${servico.nome.toLowerCase()}.`)}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-zap
+      id={interno ? undefined : servico.ancora}
+      href={interno
+        ? `#${servico.ancora}`
+        : zap(`Oi! Quero orçamento de ${servico.nome.toLowerCase()}.`)}
+      target={interno ? undefined : '_blank'}
+      rel={interno ? undefined : 'noopener noreferrer'}
+      data-zap={interno ? undefined : ''}
       className="linha scroll-mt-24"
       style={{ ['--tubo-cor' as string]: cor }}
     >
@@ -126,7 +139,9 @@ export function LinhaServico({ servico }: { servico: Servico }) {
         <span className="block text-sm font-bold">{servico.nome}</span>
         <span className="mt-1 block max-w-[52ch] text-xs text-branco-2">{servico.desc}</span>
       </span>
-      <span className="linha__seta lab text-ambar" aria-hidden>→</span>
+      <span className="linha__seta lab text-ambar" aria-hidden>
+        {interno ? '↓' : '→'}
+      </span>
     </a>
   )
 }

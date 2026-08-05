@@ -235,7 +235,7 @@ export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
                  width={440} height={635}
                  className="absolute inset-0 h-full w-full object-cover" />
             {/* no site antigo isto era pixel queimado na imagem */}
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t
+            <figcaption className="sobre-escuro absolute inset-x-0 bottom-0 bg-gradient-to-t
                                    from-void via-void/85 to-transparent px-4 pb-4 pt-10">
               <span className="block text-sm font-bold leading-tight text-branco">{c.nome}</span>
               <span className="lab mt-1 block">{c.papel}</span>

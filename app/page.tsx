@@ -4,7 +4,6 @@ import {
   CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
-import { VideoFacade } from '@/components/VideoFacade'
 import { CardServico, LinhaServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
@@ -37,7 +36,6 @@ export default function Home() {
             decoding="async"
             className="h-full w-full object-cover object-center opacity-45"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-void via-void/70 to-void/30" />
         </div>
 
         <div className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl
@@ -97,20 +95,6 @@ export default function Home() {
           </Reveal>
         </div>
 
-        <Reveal className="mt-20">
-          <Eyebrow cor="var(--color-magenta)"><b>Depoimentos</b> · <i>4</i> em vídeo</Eyebrow>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {DEPOIMENTOS.map((v) => (
-              <figure key={v.id}>
-                <VideoFacade video={v} />
-                <figcaption className="mt-3">
-                  <p className="text-xs">{v.titulo}</p>
-                  <p className="lab mt-1">{v.tipo}</p>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </Reveal>
       </Secao>
 
       {/* ══════════════ ESTADO FESTA · CASAMENTO ══════════════
@@ -198,7 +182,10 @@ export default function Home() {
           cards para o que vende, indice para o resto, em cinco blocos
           de tamanho desigual. A assimetria vira informacao: o bloco LED
           e o maior porque e o que a empresa faz de diferente. */}
-      <Secao id="servicos" className="relative overflow-hidden">
+      {/* overflow-CLIP, nao hidden: `hidden` cria scroll container e vira
+          o scrollport dos `lg:sticky` la embaixo — os cinco cabecalhos de
+          bloco nunca grudavam. `clip` recorta sem criar o container. */}
+      <Secao id="servicos" className="relative overflow-clip">
         <Haze />
         <LuzCursor seletor="#servicos" />
         <Reveal>
@@ -237,7 +224,10 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="lg:pl-4">
-                    {itens.map((s) => <LinhaServico key={s.ancora} servico={s} />)}
+                    {itens.map((s) => (
+                      <LinhaServico key={s.ancora} servico={s}
+                                    paraSecao={b.id === 'pacotes'} />
+                    ))}
                   </div>
                 </div>
               </Reveal>
@@ -247,8 +237,7 @@ export default function Home() {
       </Secao>
 
       {/* ══════════════ EVENTOS EM VÍDEO ══════════════ */}
-      <Secao id="eventos" className="relative overflow-hidden">
-        <Haze densidade={650} />
+      <Secao id="eventos">
         <Reveal>
           <Eyebrow><b>Acervo</b> · <i>10</i> vídeos de festas que aconteceram</Eyebrow>
           <h2 className="max-w-[20ch] text-2xl lg:text-3xl">Veja como fica</h2>
@@ -313,9 +302,10 @@ export default function Home() {
           {RIDER.map((cat, i) => (
             <Reveal key={cat.categoria} delay={Math.min(i, 3) * 60}>
               <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[minmax(0,15rem)_1fr]">
-                <h3 className="lab flex items-baseline gap-3 text-branco lg:sticky lg:top-8 lg:self-start">
-                  {cat.categoria}
-                  <span className="text-branco-2 tabular-nums">{cat.nomes.length}</span>
+                {/* sem text-branco: dentro de .tecnico o fundo E branco */}
+                <h3 className="lab flex items-baseline gap-3 lg:sticky lg:top-8 lg:self-start">
+                  <b>{cat.categoria}</b>
+                  <span className="tabular-nums opacity-60">{cat.nomes.length}</span>
                 </h3>
                 <ul className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-branco-2
                                lg:border-l lg:border-rule lg:pl-10">

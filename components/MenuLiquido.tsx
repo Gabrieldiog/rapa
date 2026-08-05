@@ -17,7 +17,10 @@ import { zap } from '@/lib/conteudo'
  *  - fechava só em `mousedown`, o que ignora toque. Agora é `pointerdown`;
  *  - os itens não tinham href — viraram <a> de verdade, para funcionar
  *    sem JS e para o Google seguir as âncoras;
- *  - cor e fonte estavam fixas no componente; agora vêm dos tokens.
+ *  - cor e fonte estavam fixas no componente; agora vêm dos tokens;
+ *  - o "rolar de letra" saiu: disparava em `mouseenter` dentro de um
+ *    componente `lg:hidden`. No desktop não existe, no celular
+ *    `mouseenter` não dispara. Era código morto para 100% do público.
  *
  * O WhatsApp fica FORA do morph, sempre visível: é a única conversão da
  * página e não pode depender de abrir menu.
@@ -35,36 +38,6 @@ const SECOES = [
   { href: '#duvidas', label: 'Dúvidas' },
   { href: '#contato', label: 'Contato' },
 ]
-
-/** Rolar de letra: cada caractere sobe e o clone toma o lugar. */
-function Rolar({ texto }: { texto: string }) {
-  const [sobre, setSobre] = useState(false)
-  const chars = [...texto]
-  return (
-    <span className="inline-flex" onMouseEnter={() => setSobre(true)}
-          onMouseLeave={() => setSobre(false)}>
-      {chars.map((c, i) => (
-        <span key={i} className="inline-block overflow-hidden" style={{ height: '1em' }}>
-          <span className="flex flex-col"
-                style={{
-                  transitionProperty: 'transform',
-                  transitionDuration: sobre ? '760ms' : '0ms',
-                  transitionDelay: sobre ? `${28 * i}ms` : '0ms',
-                  transform: sobre ? 'translateY(-50%)' : 'translateY(0%)',
-                  transitionTimingFunction: 'cubic-bezier(0.22,1,0.36,1)',
-                }}>
-            <span className="block" style={{ height: '1em', lineHeight: '1em' }}>
-              {c === ' ' ? ' ' : c}
-            </span>
-            <span className="block" aria-hidden style={{ height: '1em', lineHeight: '1em' }}>
-              {c === ' ' ? ' ' : c}
-            </span>
-          </span>
-        </span>
-      ))}
-    </span>
-  )
-}
 
 export function MenuLiquido() {
   const [aberto, setAberto] = useState(false)
@@ -95,9 +68,11 @@ export function MenuLiquido() {
   }, [aberto, fechar])
 
   return (
+    /* inset-x com folga em vez de left-1/2 + translate: a 380px a raiz
+       media 393px e cortava a pilula de WhatsApp nos dois lados. */
     <div ref={raiz}
-         className="fixed left-1/2 z-[100] flex -translate-x-1/2 items-end gap-3
-                    bottom-[max(1.25rem,env(safe-area-inset-bottom))] lg:hidden">
+         className="fixed inset-x-3 z-[100] flex items-end justify-center gap-2.5
+                    bottom-[max(1rem,env(safe-area-inset-bottom))] lg:hidden">
       {/* ---------- a pílula que morfa ---------- */}
       <motion.div
         className="relative flex flex-col overflow-hidden"
@@ -106,7 +81,7 @@ export function MenuLiquido() {
            hidratacao. */
         initial={false}
         animate={{
-          width: aberto ? 268 : 132,
+          width: aberto ? 'min(17rem, calc(100vw - 1.5rem))' : 124,
           height: aberto ? 316 : 52,
           borderRadius: aberto ? 24 : 26,
         }}
@@ -163,13 +138,13 @@ export function MenuLiquido() {
               {SECOES.map((s, i) => (
                 <motion.a
                   key={s.href} href={s.href} onClick={fechar}
-                  className="flex h-[30px] items-center overflow-hidden text-branco
+                  className="flex h-[30px] items-center text-branco
                              font-[family-name:var(--font-display)] text-base leading-none"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.4 + i * 0.045, ease }}
                 >
-                  <Rolar texto={s.label} />
+                  {s.label}
                 </motion.a>
               ))}
             </motion.div>
@@ -182,7 +157,7 @@ export function MenuLiquido() {
         href={zap('Oi! Quero um orçamento. Meu evento é:')}
         target="_blank" rel="noopener noreferrer" data-zap
         aria-label="Falar com a Rapa Sound no WhatsApp"
-        className="flex h-13 items-center rounded-[26px] border border-ambar px-5
+        className="flex h-13 shrink-0 items-center rounded-[26px] border border-ambar px-4
                    font-mono text-2xs font-medium uppercase tracking-[0.14em] text-ambar
                    backdrop-blur-md"
         style={{ background: 'color-mix(in srgb, var(--color-void) 82%, transparent)' }}

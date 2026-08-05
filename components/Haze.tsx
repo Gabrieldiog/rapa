@@ -97,7 +97,9 @@ export function Haze({ densidade = 900 }: { densidade?: number }) {
     }))
 
     let id = 0
-    let visivel = true
+    let naTela = true      // esta no viewport?
+    let comFoco = true     // a aba esta em primeiro plano?
+    const rodando = () => naTela && comFoco
 
     const quadro = () => {
       // rastro: limpa com preto translúcido em vez de apagar
@@ -132,24 +134,24 @@ export function Haze({ densidade = 900 }: { densidade?: number }) {
         ctx.arc(p.x, p.y, p.s * 0.8, 0, Math.PI * 2)
         ctx.fill()
       }
-      if (visivel) id = requestAnimationFrame(quadro)
+      if (rodando()) id = requestAnimationFrame(quadro)
     }
 
     // só desenha quando está na tela e a aba está em foco
+    /* Duas condicoes INDEPENDENTES. Antes elas estavam colapsadas numa
+       variavel so, entao ao voltar da aba `visivel` ja era false e a
+       expressao nunca conseguia religar: o haze congelava. */
+    const religa = () => {
+      cancelAnimationFrame(id)
+      if (rodando()) id = requestAnimationFrame(quadro)
+    }
     const io = new IntersectionObserver(([e]) => {
-      const antes = visivel
-      visivel = e.isIntersecting && !document.hidden
-      if (visivel && !antes) id = requestAnimationFrame(quadro)
-      if (!visivel) cancelAnimationFrame(id)
+      naTela = e.isIntersecting
+      religa()
     }, { threshold: 0 })
     io.observe(canvas)
 
-    const onVis = () => {
-      const antes = visivel
-      visivel = !document.hidden && visivel
-      if (!document.hidden && !antes) id = requestAnimationFrame(quadro)
-      if (document.hidden) cancelAnimationFrame(id)
-    }
+    const onVis = () => { comFoco = !document.hidden; religa() }
     document.addEventListener('visibilitychange', onVis)
 
     const ro = new ResizeObserver(medir)

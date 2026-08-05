@@ -142,8 +142,15 @@ Alvo de toque mínimo: **44px**, sem exceção.
 
 ## Motion
 
-Teto: **60 KB gzipped** de JS de animação. O orçamento medido da stack é **~1,1 KB** — a folga
-é para gastar em qualidade, não em quantidade.
+**Teto de 60 KB suspenso pelo cliente do projeto em 2026-08-04** ("pode esquecer esse trem
+de teto, vamos fazer negócio bonito"), para usar os componentes de `melhorias/`.
+
+Orçamento real hoje, medido: **gsap 28,0 KB + framer-motion 49,3 KB ≈ 77 KB gzipped**, contra
+o teto original de 60 KB. First Load JS da página: **189 KB**.
+
+Para comparar: o site antigo entregava **4.516 KB em 77 requisições**. A decisão é defensável,
+mas está registrada como decisão, não como acidente — e se um dia o LCP em 4G reprovar, é aqui
+que se corta primeiro.
 
 - Durações: `160ms` micro · `320ms` reveal · `400ms` o beat de blackout
 - Curvas: `linear()` — já é Baseline, custo zero. Nada de `ease-in-out` padrão.

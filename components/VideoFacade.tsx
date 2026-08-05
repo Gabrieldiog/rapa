@@ -8,7 +8,9 @@ import type { Video } from '@/lib/conteudo'
  * custa ~1,2MB e destroi o LCP e o INP. Aqui so a capa carrega, e o
  * iframe entra no clique. ~0,6KB.
  *
- * A capa vem do proprio YouTube (i.ytimg.com) — nao ha copia local.
+ * A capa e local (`/img/capas/`), nao do i.ytimg.com: o hqdefault que
+ * estava aqui e 480x360, ou seja 4:3 com tarja preta em cima e embaixo
+ * de todo video 16:9. A copia local ja vem recortada.
  */
 export function VideoFacade({ video, prioridade = false }: { video: Video; prioridade?: boolean }) {
   const [ligado, setLigado] = useState(false)
@@ -35,10 +37,10 @@ export function VideoFacade({ video, prioridade = false }: { video: Video; prior
       aria-label={`Assistir: ${video.titulo}`}
     >
       <img
-        src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+        src={`/img/capas/${video.id}-p.webp`}
         alt=""
-        width={480}
-        height={360}
+        width={400}
+        height={225}
         loading={prioridade ? 'eager' : 'lazy'}
         decoding="async"
         className="absolute inset-0 h-full w-full object-cover opacity-70

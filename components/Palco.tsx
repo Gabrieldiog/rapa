@@ -14,9 +14,17 @@ import type { Video } from '@/lib/conteudo'
  * tabindex brigaria com um trilho rolável.
  */
 
-const CAPA_MINI = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
-const CAPA_PALCO = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`
-const CAPA_FALL = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+/* As capas moram AQUI, nao no i.ytimg.com.
+   Motivo medido: `maxresdefault.jpg` responde 404 em SETE dos dez
+   videos — inclusive no primeiro do filtro "tudo". O onError existia,
+   mas o navegador ja tinha desenhado o icone de imagem quebrada. Era
+   o "..." cinza no lugar do video.
+   Agora cada capa e a melhor resolucao que o YouTube tinha (maxres
+   onde existe, sddefault no resto), com a tarja preta 4:3 do sddefault
+   recortada fora, servida do proprio dominio. Zero requisicao a
+   terceiro, zero 404, e o corte e nosso. */
+const CAPA_PALCO = (id: string) => `/img/capas/${id}-g.webp`
+const CAPA_MINI = (id: string) => `/img/capas/${id}-p.webp`
 
 export function Palco({ videos }: { videos: Video[] }) {
   const [filtro, setFiltro] = useState<string>('tudo')
@@ -81,7 +89,8 @@ export function Palco({ videos }: { videos: Video[] }) {
                   className="group absolute inset-0 block w-full text-left"
                   aria-label={`Assistir: ${v.titulo}`}>
             <img key={v.id} src={CAPA_PALCO(v.id)}
-                 onError={(e) => { e.currentTarget.src = CAPA_FALL(v.id) }}
+                 srcSet={`${CAPA_MINI(v.id)} 400w, ${CAPA_PALCO(v.id)} 1280w`}
+                 sizes="(min-width: 1024px) 60rem, 100vw"
                  alt="" width={1280} height={720}
                  loading="lazy" decoding="async"
                  className="absolute inset-0 h-full w-full object-cover opacity-75
