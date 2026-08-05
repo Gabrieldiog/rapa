@@ -378,8 +378,12 @@ export default function Home() {
 
       {/* ══════════════ ESTADO TÉCNICO · SOBRE E EQUIPE ══════════════ */}
       <Secao id="sobre" className="border-t border-rule">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
-          <Reveal>
+        {/* minmax(0,1fr) e nao 1fr: coluna de grid nasce com
+            `min-width: auto` e nao encolhe abaixo do conteudo. Sem isto
+            o trilho da equipe esticava a coluna inteira — medido em
+            1140px alem da borda a 380px. */}
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
+          <Reveal className="min-w-0">
             <Eyebrow><b>A casa</b> · quase <i>30</i> anos</Eyebrow>
             <h2 className="max-w-[18ch] text-2xl lg:text-3xl">Quase 30 anos</h2>
             <p className="mt-6 text-base text-branco-2">
@@ -392,7 +396,7 @@ export default function Home() {
               sabe onde pendurar o refletor para a foto sair boa.
             </p>
           </Reveal>
-          <Reveal delay={90}>
+          <Reveal delay={90} className="min-w-0">
             <LequeEquipe cards={EQUIPE.map((p) => ({
               src: p.src,
               alt: `${p.nome}, ${p.papel.toLowerCase()} na Rapa Sound`,

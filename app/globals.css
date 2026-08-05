@@ -98,6 +98,15 @@
   to   { background-position: 0% 0; }
 }
 
+/* Os cards do leque sobem do baixo e assentam no arco. So opacity e
+   translate: escala ja vem do proprio --esc do card. */
+@keyframes equipe-entra {
+  from { opacity: 0; transform:
+    translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem + 3rem), 0)
+    rotate(var(--rot)) scale(calc(var(--esc) * 0.9)); }
+  to   { opacity: 1; }
+}
+
 /* O segmento do VU meter acendendo: sobe do escuro e assenta.
    Sem escala e sem deslocamento — um LED nao se move, ele liga. */
 @keyframes vu-acende {
@@ -289,49 +298,191 @@
     }
   }
 
-  /* ---------- O LEQUE DA EQUIPE -----------------------------
-     Geometria de melhorias/card.md, acabamento da direcao TUBO.
+  /* ---------- A EQUIPE: TRILHO E LEQUE ----------------------
+     Um DOM, duas geometrias. Ate 1023px e trilho com encaixe; de
+     1024px para cima os cards saem do fluxo e viram arco.
+
+     A geometria do arco veio de melhorias/card.md. O que mudou e
+     quem a aplica: era GSAP escrevendo transform inline a cada
+     quadro, agora e uma variavel por card e o CSS resolve.
      --------------------------------------------------------- */
-  .leque { height: 22rem; }
-  @media (min-width: 480px) { .leque { height: 26rem; } }
-  @media (min-width: 640px) { .leque { height: 28rem; } }
-  @media (min-width: 768px) { .leque { height: 34rem; } }
-  @media (min-width: 1024px){ .leque { height: 38rem; } }
 
-  .leque-card {
-    position: absolute;
-    width: 11rem;
-    aspect-ratio: 628 / 793;
-    border-radius: var(--radius-card);
+  /* ---- comum aos dois ---- */
+  .equipe__figura {
+    position: relative;
+    display: block;
+    block-size: 100%;
     overflow: hidden;
-    will-change: transform;
-    /* o mesmo aro de dois tons dos cards de servico */
-    border: 1px solid transparent;
-    background:
-      var(--color-off) padding-box,
-      linear-gradient(175deg,
-        color-mix(in srgb, var(--color-branco) 34%, var(--color-rule)) 0%,
-        var(--color-rule) 26%,
-        var(--color-rule) 62%,
-        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
-    box-shadow:
-      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 8%, transparent),
-      0 24px 50px -30px var(--color-void);
-  }
-  @media (min-width: 768px) { .leque-card { width: 14rem; } }
-  @media (min-width: 1024px){ .leque-card { width: 16rem; } }
-
-  /* controle de painel, nao pilula de vidro */
-  .leque-seta {
-    display: flex; align-items: center; justify-content: center;
-    width: 3rem; height: 3rem;
-    border-radius: var(--radius-botao);
+    border-radius: var(--radius-card);
     border: 1px solid var(--color-rule);
     background: var(--color-off);
-    color: var(--color-branco-2);
-    transition: color 200ms var(--ease-out-cut), border-color 200ms var(--ease-out-cut);
+    isolation: isolate;   /* segura o mix-blend-mode da tinta */
   }
-  .leque-seta:hover { color: var(--color-ambar); border-color: var(--color-ambar); }
+  .equipe__foto {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    /* As fotos vem em cinza puro, que o IDENTIDADE.md proibe. O
+       grayscale aqui normaliza a base para a tinta ambar pintar por
+       cima de forma igual nas seis. */
+    filter: grayscale(1) contrast(1.06);
+  }
+  /* `color` mantem a luminancia da foto e troca so o matiz: duotone
+     ambar de verdade, e nao um veu laranja por cima do rosto. */
+  .equipe__tinta {
+    position: absolute;
+    inset: 0;
+    background: var(--color-ambar);
+    mix-blend-mode: color;
+    opacity: 0.42;
+    pointer-events: none;
+  }
+  .equipe__legenda {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    padding: 2.5rem 1rem 1rem;
+    background: linear-gradient(to top,
+      var(--color-void) 0%,
+      color-mix(in srgb, var(--color-void) 82%, transparent) 55%,
+      transparent 100%);
+    color: var(--color-branco);
+  }
+
+  /* ---- ate 1023px: TRILHO ---- */
+  /* min-inline-size: 0 nos dois. Item de grid e de flex nasce com
+     `min-width: auto`, que o impede de encolher abaixo do proprio
+     conteudo — entao o trilho empurrava a COLUNA DE GRID para a largura
+     somada dos seis cards. Medido: 1160px alem da borda a 380px.
+     `overflow-x: auto` sozinho nao resolve, porque quem estoura nao e o
+     trilho dentro do pai, e o PAI sendo esticado pelo trilho. */
+  /* `container-type: inline-size` faz o arco medir A COLUNA, e nao a
+     janela. Era o defeito do leque de GSAP, que usava
+     `window.innerWidth` vivendo dentro de `lg:grid-cols-2`: sangrava
+     359px para fora a 1280px. Com `cqi` a geometria acompanha a caixa
+     em qualquer largura, de graca. */
+  .equipe { container-type: inline-size; }
+  .equipe, .equipe > [role="group"] { min-inline-size: 0; }
+  .equipe__trilho {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* OS DOIS, com o mesmo valor. `scroll-snap-align: start` encaixa
+       pela optimal viewing region, que e definida pela SCROLL-padding.
+       So com padding-inline-start o navegador rola para 20 e come o
+       respiro — era a causa do "primeiro item cortado". */
+    padding-inline: 1.25rem;
+    scroll-padding-inline: 1.25rem;
+    padding-block-end: 0.5rem;
+    margin-inline: -1.25rem;   /* sangra ate a borda da secao */
+    scrollbar-width: none;
+    /* nao impede o gesto de voltar do iOS (bug WebKit 240183, aberto
+       desde 2022), mas evita o encadeamento para a pagina */
+    overscroll-behavior-x: contain;
+  }
+  .equipe__trilho::-webkit-scrollbar { display: none; }
+  .equipe__card {
+    flex: none;
+    scroll-snap-align: start;
+    /* 68vw deixa ~108px do proximo a mostra a 380px — o sinal mais
+       forte de "tem mais coisa" segundo a NN/g. */
+    inline-size: min(68vw, 15rem);
+    aspect-ratio: 380 / 548;
+  }
+
+  /* ---- 1024px para cima: LEQUE ---- */
+  @media (min-width: 1024px) {
+    .equipe__trilho {
+      display: block;
+      position: relative;
+      block-size: 30rem;
+      overflow: visible;
+      padding: 0;
+      scroll-padding: 0;
+      margin-inline: 0;
+      scroll-snap-type: none;
+    }
+    .equipe__card {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: 50%;
+      /* 42cqi = 42% da coluna. Com teto em rem para nao virar poster
+         numa tela larga. */
+      inline-size: min(13rem, 38cqi);
+      /* Centralizacao por `translate` e nao por margem negativa.
+         `margin-inline-start: min(-6.5rem, -21cqi)` parecia certo e
+         estava errado: min() de dois NEGATIVOS escolhe o mais negativo,
+         entao a 1024px o card media 185px e a margem valia -104. A
+         porcentagem do translate se refere ao proprio elemento e acerta
+         sempre. */
+      z-index: var(--z);
+      transform-origin: 50% 120%;
+      /* O arco. `--x` e `--y` sao numeros puros para poder multiplicar
+         por rem aqui e nao no JS — assim o arco acompanha o zoom de
+         texto em vez de ficar preso a pixel. */
+      /* 0.68cqi por unidade. A conta tem que incluir o GIRO: um card
+         de 20 graus ocupa `l*cos20 + a*sin20` de largura, nao `l`.
+         A 1024px — a largura onde a coluna e mais estreita — sao 167px
+         de card, 239px de caixa girada, 119px de meia caixa, e o card
+         externo para a 93px do centro: 212 dentro dos 220 disponiveis.
+         Com 0.9cqi sangrava 16px, e o print nao mostrava porque a
+         sobra ficava atras da borda da secao. */
+      transform:
+        translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem), 0)
+        rotate(var(--rot)) scale(var(--esc));
+      transition: transform 520ms var(--ease-tubo);
+    }
+    /* entrada: sobem do baixo, em cascata, quando a secao aparece */
+    .equipe__card { opacity: 0; }
+    [data-natela] .equipe__card {
+      opacity: 1;
+      animation: equipe-entra 720ms var(--ease-out-cut) both;
+      animation-delay: calc(var(--i) * 70ms);
+    }
+    /* realce: so onde ha ponteiro fino. Em touchpad de laptop tambem
+       vale, mas em tela de toque `hover` mente e o card ficava preso
+       levantado depois do primeiro toque. */
+    @media (hover: hover) and (pointer: fine) {
+      .equipe__trilho:hover .equipe__card { opacity: 0.72; }
+      .equipe__card:hover {
+        opacity: 1;
+        z-index: 20;
+        transform:
+          translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem - 1.6rem), 0)
+          rotate(calc(var(--rot) * 0.35)) scale(calc(var(--esc) + 0.08));
+      }
+    }
+  }
+
+  /* ---- as setas ---- */
+  .equipe__setas {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-block-start: 1.25rem;
+  }
+  .equipe__seta {
+    /* 44px e o minimo da casa e do criterio 2.5.8 da WCAG 2.2 */
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-botao);
+    border: 1px solid var(--color-rule);
+    color: var(--color-branco-2);
+    transition: color 200ms var(--ease-out-cut),
+                border-color 200ms var(--ease-out-cut);
+  }
+  .equipe__seta:hover:not(:disabled) {
+    color: var(--color-ambar);
+    border-color: var(--color-ambar);
+  }
+  .equipe__seta:disabled { opacity: 0.32; cursor: default; }
 
   /* ---------- EYEBROW ---------------------------------------
      Marcador de pixel na cor do tubo + contraste de valor na

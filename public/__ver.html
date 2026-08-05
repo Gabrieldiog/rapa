@@ -35,6 +35,10 @@
 
   f.addEventListener('load', () => setTimeout(() => {
     const d = f.contentDocument
+    /* REVELA ANTES DE ROLAR. Na ordem inversa o print caia na secao
+       errada: revelar os blocos muda a altura do documento, e a posicao
+       de rolagem ja calculada deixa de apontar para o alvo. */
+    for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
     const el = d.getElementById(q.get('s') || 'servicos')
     if (el) el.scrollIntoView()
     /* Os blocos abaixo da dobra sao escondidos apos a montagem e
@@ -42,8 +46,18 @@
        programatico o observer pode nao ter reagido antes do print,
        entao aqui eles sao revelados a mao — o objetivo e ver o LAYOUT,
        nao a animacao de entrada. */
+    /* Rola VARIAS vezes. Imagem com loading=lazy so reserva altura
+       quando entra na tela, entao cada rolagem muda o documento e a
+       posicao anterior deixa de apontar para o alvo. Repetir converge. */
+    /* ?rolar=N rola por PIXEL, e e o caminho confiavel. Rolar por
+       ancora nao converge: imagem com loading=lazy so reserva altura ao
+       entrar na tela, entao cada rolagem muda o documento e a posicao
+       anterior deixa de apontar para o alvo. */
+    const rolar = Number(q.get('rolar') || 0)
+    const ir = () => rolar ? f.contentWindow.scrollTo(0, rolar)
+                           : (el && el.scrollIntoView())
+    for (const ms of [80, 300, 700, 1200]) setTimeout(ir, ms)
     setTimeout(() => {
-      for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
       /* ?clique=<seletor> aperta um botao antes do print. Serve para
          fotografar estado aberto — menu, <details>, modal. */
       const sel = q.get('clique')

@@ -1,263 +1,175 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import gsap from 'gsap'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
- * LEQUE DA EQUIPE — adaptado de melhorias/card.md (21st.dev), com a
- * geometria original preservada e o estilo trazido para a direção TUBO.
+ * A EQUIPE — leque no desktop, trilho no celular. UM DOM só.
  *
- * O que mudou em relação ao arquivo de origem:
- *  - o aro de dois tons e o raio da escala entram no card;
- *  - as setas deixam de ser pílula de vidro e viram controle de painel;
- *  - o marcador de posição vira a coluna de pixels, não bolinha;
- *  - respeita prefers-reduced-motion: sem reduced, leque estático;
- *  - o hover só liga onde existe ponteiro fino.
+ * O PROBLEMA QUE ISTO RESOLVE
+ * A versão anterior era leque de GSAP em qualquer largura. Seis fotos
+ * abertas em arco a 380px deixavam três à mostra e cortavam as das
+ * pontas: não dava para ver a equipe inteira. E ela posicionava os cards
+ * com `window.innerWidth`, mas vive dentro de uma coluna de grid MENOR
+ * que a janela — sangrava para fora do container.
+ *
+ * Arco não cabe em telefone. Não é ajuste de número, é geometria: seis
+ * cards em leque pedem largura que 380px não tem. Abaixo de 1024px vira
+ * trilho, com setas, começando no primeiro. De 1024px para cima o leque
+ * continua, porque lá ele cabe e é bonito.
+ *
+ * O GSAP SAIU, e com ele 28 KB — era o único consumidor no projeto.
+ * Toda a máquina de paginação dele era CÓDIGO MORTO: são 6 cards para 7
+ * posições, então `total > MAX_VISIVEL` nunca foi verdade e as setas
+ * jamais renderizaram. O que sobrou de real — arco, entrada e realce no
+ * hover — é `transform` e `opacity`, que o CSS faz sozinho e na
+ * compositor thread.
+ *
+ * AS ARMADILHAS DO TRILHO, todas medidas na pesquisa:
+ *
+ *  - `scroll-snap-align: start` alinha pela **scroll-padding**, não pela
+ *    padding. Com só `padding-inline-start` o navegador rola de volta e
+ *    come exatamente o respiro criado. Os dois precisam existir, com o
+ *    MESMO valor. É a causa raiz do "primeiro item cortado".
+ *  - o `-1` na detecção de fim não é gambiarra: `scrollWidth` e
+ *    `clientWidth` voltam arredondados para inteiro e `scrollLeft` é
+ *    fracionário, então a igualdade exata nunca fecha.
+ *  - `scrollend` não serve sozinho: iOS Safari só ganhou em 26.2. O
+ *    estado das setas anda no `scroll` mesmo, amortecido por rAF.
+ *  - `tabindex="0"` no container rolável é exigência de acessibilidade —
+ *    o Safari nunca o adiciona sozinho, e sem ele não há rolagem por
+ *    teclado.
+ *  - nada de `role="carousel"`, que não existe na especificação. É
+ *    `role="group"` com rótulo, e a `<ul>` por dentro fica sem role para
+ *    não destruir a semântica de lista.
  */
 
 export type CardEquipe = { src: string; alt: string; nome: string; papel: string }
 
-const MAX_VISIVEL = 7
-const METADE = 3
-
-/** as sete posições do leque, do arquivo original */
-const LEQUE = [
-  { rot: -21, escala: 0.7756, x: -30, y: 7.3, z: 1 },
-  { rot: -14, escala: 0.8498, x: -22, y: 4.0, z: 2 },
-  { rot: -7,  escala: 0.9346, x: -11, y: 1.3, z: 3 },
-  { rot: 0,   escala: 1.0,    x: 0,   y: 0.0, z: 10 },
-  { rot: 7,   escala: 0.9346, x: 11,  y: 1.3, z: 3 },
-  { rot: 14,  escala: 0.8498, x: 22,  y: 4.0, z: 2 },
-  { rot: 21,  escala: 0.7756, x: 30,  y: 7.3, z: 1 },
+/** As posições do arco, herdadas de melhorias/card.md. São seis porque
+ *  a equipe tem seis — com total par não existe card no centro. */
+const ARCO = [
+  { rot: -20, esc: 0.80, x: -31,  y: 6.6, z: 1 },
+  { rot: -12, esc: 0.88, x: -19,  y: 2.6, z: 2 },
+  { rot: -4,  esc: 0.97, x: -6.5, y: 0.3, z: 3 },
+  { rot: 4,   esc: 0.97, x: 6.5,  y: 0.3, z: 3 },
+  { rot: 12,  esc: 0.88, x: 19,   y: 2.6, z: 2 },
+  { rot: 20,  esc: 0.80, x: 31,   y: 6.6, z: 1 },
 ]
 
-const multLargura = (w: number) =>
-  w < 480 ? 0.28 : w < 640 ? 0.38 : w < 768 ? 0.5 : w < 1024 ? 0.75 : 1
-
-function multAltura(w: number) {
-  const ideal = w < 480 ? 352 : w < 640 ? 416 : w < 768 ? 448 : w < 1024 ? 544 : 608
-  const disp = window.innerHeight * 0.7
-  return disp >= ideal ? 1 : disp / ideal
-}
-
-function config(total: number, slot: number) {
-  if (total >= MAX_VISIVEL) return LEQUE[slot]
-  const centro = total >> 1
-  const d = total > 1 ? (slot - centro) / centro : 0
-  const ad = Math.abs(d)
-  return { rot: d * 21, escala: 1 - 0.2244 * ad * ad, x: d * 30, y: ad * ad * 7.3,
-           z: 10 - Math.abs(slot - centro) }
-}
-
 export function LequeEquipe({ cards }: { cards: CardEquipe[] }) {
-  const ref = useRef<HTMLDivElement>(null)
+  const trilho = useRef<HTMLUListElement>(null)
   const [naTela, setNaTela] = useState(false)
-  const animando = useRef(false)
-  const entrou = useRef(false)
-  const direcao = useRef<'esq' | 'dir' | null>(null)
-  const visivelAntes = useRef<Set<number>>(new Set())
+  const [pos, setPos] = useState({ inicio: true, fim: true })
 
-  const total = cards.length
-  const pagina = total > MAX_VISIVEL
-  const [centro, setCentro] = useState(pagina ? METADE : total >> 1)
-
-  const mapaVisivel = useCallback((c: number) => {
-    const m = new Map<number, number>()
-    if (!pagina) { cards.forEach((_, i) => m.set(i, i)); return m }
-    for (let s = 0; s < MAX_VISIVEL; s++) {
-      m.set((((c + s - METADE) % total) + total) % total, s)
-    }
-    return m
-  }, [total, pagina, cards])
-
-  const girar = useCallback((d: 'esq' | 'dir') => {
-    if (animando.current || !pagina) return
-    animando.current = true
-    direcao.current = d
-    setCentro((p) => (d === 'dir' ? (p + 1) % total : (p - 1 + total) % total))
-  }, [total, pagina])
-
-  /* Espera entrar na tela. Sem isto a entrada do leque acontecia na
-     montagem — a pessoa rolava ate a equipe e encontrava tudo ja
-     posicionado, sem ver a animacao. */
+  /* A entrada só dispara quando a seção aparece: animar o que ninguém
+     está vendo é gastar quadro à toa. */
   useEffect(() => {
-    const el = ref.current
+    const el = trilho.current
     if (!el) return
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) { setNaTela(true); io.disconnect() }
-    }, { threshold: 0.15 })
+    }, { threshold: 0.12 })
     io.observe(el)
     return () => io.disconnect()
   }, [])
 
+  const medir = useCallback(() => {
+    const el = trilho.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setPos({
+      inicio: el.scrollLeft <= 1,
+      fim: max <= 1 || el.scrollLeft >= max - 1,
+    })
+  }, [])
+
   useEffect(() => {
-    const cont = ref.current
-    if (!cont || !total || !naTela) return
-
-    const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches
-    const els = Array.from(cont.querySelectorAll<HTMLElement>('.leque-card'))
-    if (!els.length) return
-
-    const visiveis = mapaVisivel(centro)
-    const antes = visivelAntes.current
-    const d = direcao.current
-    const primeiro = !entrou.current
-    const mw = multLargura(window.innerWidth)
-    const mh = multAltura(window.innerWidth)
-    const slots = pagina ? MAX_VISIVEL : total
-    const cfg = (s: number) => config(slots, s)
-
-    if (primeiro) animando.current = true
-    let feitos = 0
-    const pronto = () => {
-      if (++feitos >= visiveis.size) {
-        animando.current = false
-        if (primeiro) entrou.current = true
-      }
+    const el = trilho.current
+    if (!el) return
+    let pedido = 0
+    const onScroll = () => {
+      if (pedido) return
+      pedido = requestAnimationFrame(() => { pedido = 0; medir() })
     }
-
-    els.forEach((el, i) => {
-      const slot = visiveis.get(i)
-      const eraVisivel = antes.has(i)
-
-      if (slot !== undefined) {
-        const { x, y, rot, escala, z } = cfg(slot)
-        const alvo = { x: `${x * mw}rem`, y: `${y * mh}rem`, rotation: rot,
-                       scale: escala, opacity: 1, zIndex: z }
-        if (reduzido) { gsap.set(el, alvo); pronto(); return }
-
-        if (primeiro) {
-          gsap.set(el, { x: 0, y: `${12 * mh}rem`, rotation: 0, scale: 0.5, opacity: 0 })
-          gsap.to(el, { ...alvo, duration: 1.2, ease: 'elastic.out(1.05,.78)',
-                        delay: 0.2 + slot * 0.06, onComplete: pronto })
-        } else if (!eraVisivel) {
-          const ex = d === 'dir' ? 40 : -40
-          gsap.set(el, { x: `${ex}rem`, y: `${y * mh}rem`,
-                         rotation: d === 'dir' ? 30 : -30, scale: 0.5, opacity: 0 })
-          gsap.to(el, { ...alvo, duration: 0.6, ease: 'power2.out', onComplete: pronto })
-        } else {
-          gsap.to(el, { ...alvo, duration: 0.5, ease: 'power2.out', onComplete: pronto })
-        }
-      } else if (eraVisivel) {
-        const sx = d === 'dir' ? -40 : 40
-        gsap.to(el, { x: `${sx}rem`, opacity: 0, scale: 0.5,
-                      rotation: d === 'dir' ? -30 : 30, duration: 0.4,
-                      ease: 'power2.in', zIndex: 0 })
-      } else if (primeiro) {
-        gsap.set(el, { opacity: 0, scale: 0.3, x: 0, y: 0, zIndex: 0 })
-      }
-    })
-
-    visivelAntes.current = new Set(visiveis.keys())
-
-    // hover: só onde existe ponteiro fino, e nunca com reduced-motion
-    if (reduzido || !matchMedia('(hover: hover) and (pointer: fine)').matches) return
-
-    const entradas: { el: HTMLElement; slot: number }[] = []
-    els.forEach((el, i) => {
-      const s = visiveis.get(i)
-      if (s !== undefined) entradas.push({ el, slot: s })
-    })
-    entradas.sort((a, b) => a.slot - b.slot)
-
-    let ativo: number | null = null
-    let timer: ReturnType<typeof setTimeout> | null = null
-    const slotCentral = entradas.length >> 1
-
-    const rearranjar = (sobre: number | null) => {
-      const mw2 = multLargura(window.innerWidth)
-      const mh2 = multAltura(window.innerWidth)
-      entradas.forEach(({ el, slot }) => {
-        const b = cfg(slot)
-        let tx = b.x * mw2, ty = b.y * mh2, tr = b.rot, te = b.escala, atraso = 0
-        if (sobre !== null) {
-          const dist = Math.abs(slot - sobre)
-          atraso = dist * 0.02
-          if (slot === sobre) { ty -= 2.5 * mh2; te *= 1.08 }
-          else {
-            const nrm = slotCentral > 0 ? (slot - slotCentral) / slotCentral : 0
-            const empurra = 8 * (1 - Math.abs(nrm)) * (1 + 0.2 * Math.max(0, 3 - dist))
-            if (slot < sobre) { tx -= empurra * mw2; tr -= 3 / (dist + 1) }
-            else { tx += empurra * mw2; tr += 3 / (dist + 1) }
-            if (slot === entradas.length - 1 && sobre < slotCentral) ty -= mh2
-            if (slot === 0 && sobre > slotCentral) ty -= mh2
-          }
-        } else atraso = Math.abs(slot - slotCentral) * 0.02
-        gsap.to(el, { x: `${tx}rem`, y: `${ty}rem`, rotation: tr, scale: te,
-                      duration: 0.5, delay: atraso, ease: 'elastic.out(1,.75)',
-                      overwrite: 'auto' })
-        gsap.set(el, { zIndex: b.z })
-      })
-    }
-
-    const handlers = entradas.map(({ el, slot }) => {
-      const h = () => {
-        if (animando.current) return
-        if (timer) { clearTimeout(timer); timer = null }
-        if (ativo !== slot) { ativo = slot; rearranjar(slot) }
-      }
-      el.addEventListener('mouseenter', h)
-      return { el, h }
-    })
-
-    const sair = () => {
-      if (animando.current) return
-      if (timer) clearTimeout(timer)
-      timer = setTimeout(() => { ativo = null; rearranjar(null) }, 50)
-    }
-    cont.addEventListener('mouseleave', sair)
-    const onResize = () => { if (!animando.current) rearranjar(ativo) }
-    window.addEventListener('resize', onResize)
-
+    el.addEventListener('scroll', onScroll, { passive: true })
+    /* ResizeObserver e nao `resize` da janela: no desktop o leque zera a
+       rolagem, e quem muda e a CAIXA — que pode mudar sem a janela
+       mudar, por exemplo quando a coluna de grid troca de tamanho. */
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    medir()
     return () => {
-      handlers.forEach(({ el, h }) => el.removeEventListener('mouseenter', h))
-      cont.removeEventListener('mouseleave', sair)
-      window.removeEventListener('resize', onResize)
-      if (timer) clearTimeout(timer)
+      cancelAnimationFrame(pedido)
+      el.removeEventListener('scroll', onScroll)
+      ro.disconnect()
     }
-  }, [centro, total, mapaVisivel, pagina, naTela])
+  }, [medir])
 
-  if (!total) return null
+  const andar = useCallback((dir: 1 | -1) => {
+    const el = trilho.current
+    if (!el) return
+    const item = el.querySelector<HTMLElement>('li')
+    // largura do card + o vao: a seta anda um card exato, nao "uma tela"
+    const passo = item ? item.getBoundingClientRect().width + 12 : el.clientWidth * 0.7
+    el.scrollBy({ left: passo * dir, behavior: 'smooth' })
+  }, [])
 
-  const seta = (d: 'esq' | 'dir') => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-         strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
-      <polyline points={d === 'esq' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
-    </svg>
-  )
+  if (!cards.length) return null
+  const semRolagem = pos.inicio && pos.fim
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <div ref={ref} className="leque relative flex w-full items-center justify-center">
-        {cards.map((c, i) => (
-          <figure key={i} className="leque-card">
-            <img src={c.src} alt={c.alt} loading="lazy" decoding="async"
-                 width={440} height={635}
-                 className="absolute inset-0 h-full w-full object-cover" />
-            {/* no site antigo isto era pixel queimado na imagem */}
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t
-                                   from-void via-void/85 to-transparent px-4 pb-4 pt-10">
-              <span className="block text-sm font-bold leading-tight text-branco">{c.nome}</span>
-              <span className="lab mt-1 block">{c.papel}</span>
-            </figcaption>
-          </figure>
-        ))}
+    <div className="equipe">
+      <div role="group" aria-label="A equipe da Rapa Sound">
+        <ul ref={trilho} tabIndex={0}
+            data-natela={naTela ? '' : undefined}
+            className="equipe__trilho">
+          {cards.map((c, i) => (
+            <li key={c.src} className="equipe__card"
+                style={{
+                  ['--i' as string]: i,
+                  ['--rot' as string]: `${ARCO[i]?.rot ?? 0}deg`,
+                  ['--esc' as string]: ARCO[i]?.esc ?? 1,
+                  ['--x' as string]: ARCO[i]?.x ?? 0,
+                  ['--y' as string]: ARCO[i]?.y ?? 0,
+                  ['--z' as string]: ARCO[i]?.z ?? 1,
+                }}>
+              <figure className="equipe__figura">
+                <img src={c.src} alt={c.alt} width={380} height={548}
+                     loading="lazy" decoding="async" className="equipe__foto" />
+                {/* Camada âmbar em `mix-blend-mode: color` sobre a foto em
+                    cinza: dá duotone quente. As fotos estavam em cinza
+                    puro, que o IDENTIDADE.md proíbe — e âmbar é
+                    exatamente a cor que a restrição dura manda usar perto
+                    de rosto. */}
+                <span aria-hidden className="equipe__tinta" />
+                <figcaption className="equipe__legenda">
+                  <span className="block text-sm font-bold leading-tight">{c.nome}</span>
+                  <span className="lab mt-1 block">{c.papel}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {total > MAX_VISIVEL && (
-        <div className="mt-8 flex items-center gap-5">
-          <button type="button" onClick={() => girar('esq')} aria-label="Anterior"
-                  className="leque-seta">{seta('esq')}</button>
-          {/* marcador: a coluna de pixels deitada, nao bolinha */}
-          <div className="flex items-center gap-1.5" aria-hidden>
-            {cards.map((_, i) => (
-              <span key={i}
-                    className={`block h-3 w-[3px] rounded-[1px] transition-all duration-300
-                                ${i === centro ? 'bg-ambar' : 'bg-rule'}`} />
-            ))}
-          </div>
-          <button type="button" onClick={() => girar('dir')} aria-label="Próximo"
-                  className="leque-seta">{seta('dir')}</button>
+      {/* As setas somem sozinhas quando não há o que rolar — que é
+          exatamente o caso do leque, onde os seis já estão à vista. */}
+      {!semRolagem && (
+        <div className="equipe__setas">
+          <button type="button" className="equipe__seta" onClick={() => andar(-1)}
+                  disabled={pos.inicio} aria-label="Ver a pessoa anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button type="button" className="equipe__seta" onClick={() => andar(1)}
+                  disabled={pos.fim} aria-label="Ver a próxima pessoa">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
