@@ -151,6 +151,36 @@ Chama atenção que Tiradentes fica a ~400 km de Uberlândia: eles atendem fora 
 
 ---
 
+## 🔴 P12 — O FAQ promete coisas que o cliente ainda não confirmou
+
+**Assumido:** as respostas estão no ar em `lib/conteudo.ts`, cada uma marcada com
+`confirmar: true`. **Não publicar antes do aceite do cliente.**
+
+A pesquisa levantou as objeções reais em fóruns e blogs do setor, e redigiu respostas com a
+melhor prática. O problema é que essas respostas **afirmam compromissos operacionais da Rapa
+Sound que vieram de norma do setor, não do cliente**:
+
+| Resposta afirma | Precisa confirmar |
+|---|---|
+| "tem técnico nosso do início ao fim" | vocês deixam operador na festa inteira? |
+| "levamos equipamento reserva — microfone, mesa e as peças críticas" | existe kit reserva? |
+| "todo orçamento vem com a lista dos equipamentos, modelo e quantidade" | o orçamento é assim hoje? |
+| "fazemos visita técnica no espaço" | é praxe? é cobrada? |
+| "luz quente entre 2.700K e 3.200K nos momentos que vão para a foto" | é assim que vocês operam? |
+| "mandamos o projeto de luz para o seu fotógrafo revisar" | topam fazer isso? |
+| "som ambiente e pista com controle separado por setor" | o equipamento permite? |
+
+Isso não é texto de marketing — **é promessa contratual**. Se o site diz que tem técnico a
+festa inteira e não tem, o problema deixa de ser de copy.
+
+As faixas de preço da pesquisa (R$ 2.500–7.000) **já removi** da resposta publicada: são médias
+de mercado de outras praças e não valem como preço da Rapa Sound.
+
+Duas perguntas não precisam de confirmação (`confirmar: false`) porque só usam fato já provado:
+cobertura em Araguari e Tiradentes, e "quase 30 anos" com os 116 artistas.
+
+---
+
 ## Decisões já tomadas (não são pendência)
 
 | Tema | Decisão | Quem decidiu |

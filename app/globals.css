@@ -1,0 +1,690 @@
+@import "tailwindcss";
+
+/* ============================================================
+   FONTES — self-hosted, sem CDN. Ver IDENTIDADE.md.
+   Display atras de --font-display: a troca e uma linha.
+   ============================================================ */
+@font-face{font-family:Zodiak;src:url(/fonts/zodiak-400.woff2)format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Zodiak;src:url(/fonts/zodiak-700.woff2)format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:Cabinet;src:url(/fonts/cabinet-400.woff2)format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Cabinet;src:url(/fonts/cabinet-700.woff2)format("woff2");font-weight:700;font-style:normal;font-display:swap}
+/* Chivo Mono e variavel: os arquivos 400 e 500 servidos pelo Google
+   tinham MD5 IDENTICO — o peso 500 nao existe como arquivo separado.
+   Uma declaracao com faixa de peso, 26 KB a menos. */
+@font-face{font-family:ChivoMono;src:url(/fonts/chivomono-400.woff2)format("woff2");font-weight:400 500;font-style:normal;font-display:swap}
+
+@theme {
+  /* --- COR ---------------------------------------------------
+     RESTRICAO DURA: magenta e congo colorem ambiente, fundo e
+     foto de pista. Ambar colore botao, dado e qualquer elemento
+     proximo a um rosto. Magenta nunca toca um rosto nem um botao.
+     Nao e preferencia estetica: e o argumento de venda.
+     ---------------------------------------------------------- */
+  --color-void:     #09090B;  /* o preto entre pixels */
+  --color-off:      #191A1F;  /* o difusor do tubo sem sinal */
+  --color-ambar:    #FFA300;  /* LED 590nm — acento, botao, pessoa */
+  --color-magenta:  #D81E7E;  /* ambiente — 15 anos */
+  --color-congo:    #21105C;  /* Lee 181 — ambiente, casamento */
+  --color-branco:   #ECEDEF;  /* LED branco 100% — texto, estado tecnico */
+  --color-branco-2: #8E9199;  /* texto secundario */
+  --color-rule:     #26272D;  /* filete */
+
+  /* --- TIPOGRAFIA --- */
+  --font-display: Zodiak, ui-serif, Georgia, serif;
+  --font-sans:    Cabinet, ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    ChivoMono, ui-monospace, SFMono-Regular, monospace;
+
+  /* escala: 12 14 16 19 24 32 44 64 96 */
+  --text-2xs: 0.75rem;  --text-xs: 0.875rem; --text-sm: 1rem;
+  --text-base: 1.1875rem; --text-lg: 1.5rem;  --text-xl: 2rem;
+  --text-2xl: 2.75rem;  --text-3xl: 4rem;    --text-4xl: 6rem;
+
+  /* --- ACABAMENTO ---------------------------------------------
+     Raio em escala, nao igual em tudo — border-radius identico em
+     tudo e um dos sinais de pagina gerada. O raio cresce com a
+     superficie, como em equipamento de verdade: um botao tem canto
+     mais fechado que um rack.
+     ---------------------------------------------------------- */
+  --radius-cut:   2px;   /* filete, tag, chip */
+  --radius-botao: 6px;   /* CTA, controle */
+  --radius-card:  14px;  /* card, painel */
+  --radius-placa: 22px;  /* bloco grande, media */
+
+  /* --- MOTION --- */
+  --ease-tubo: linear(0,.11 3.3%,.4 8.6%,.83 15.5%,1.02 19.6%,1.06 22.7%,1.03 28%,1 34.6%,1);
+  --ease-out-cut: linear(0,.53 12%,.79 25%,.92 38%,.98 55%,1);
+}
+
+/* Permite animar a cor do tubo de verdade (transicao de custom
+   property so funciona se ela for registrada). */
+@property --tubo-cor {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #FFA300;
+}
+
+/* ============================================================
+   A PALAVRA "LED" — a banda de cor varrendo tres pixels.
+
+   Por que LED e nao "luz": e a UNICA palavra da linha que a
+   restricao dura autoriza a receber magenta. Neste negocio luz
+   e o que cai no rosto, e a pagina inteira defende que isso tem
+   que ser ambar 2.700-3.200K — pintar "luz" de magenta seria o
+   site desmentindo o proprio argumento de venda. Um tubo de LED
+   e ambiente, entao pode.
+
+   De quebra: 3 letras caixa-alta = 3 pixels de um tubo em chase.
+   ============================================================ */
+@property --led-varredura {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -60%;   /* fora da palavra: descansa 100% ambar */
+}
+
+@keyframes led-varre {
+  0%, 10%   { --led-varredura: -60%; }
+  90%, 100% { --led-varredura: 160%; }
+}
+
+@layer base {
+  :root { color-scheme: dark; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--color-void);
+    color: var(--color-branco);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2 { font-family: var(--font-display); font-weight: 700;
+           line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance; }
+  h3     { font-family: var(--font-sans); font-weight: 700;
+           line-height: 1.15; text-wrap: balance; }
+
+  ::selection { background: var(--color-ambar); color: var(--color-void); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ambar);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* alvo de toque minimo 44px — sem excecao */
+  a, button { touch-action: manipulation; }
+
+  img { max-width: 100%; height: auto; }
+}
+
+@layer components {
+  /* ---------- label utilitaria: o registro tecnico ---------- */
+  .lab {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+  }
+
+  /* ---------- A PALAVRA LED --------------------------------
+     ARMADILHA: background-clip:text quebra em contexto de
+     empilhamento no Chrome (bug 1500148) — com text-fill-color
+     transparente, a palavra SOME. Entao no .led nunca entra
+     position, transform, opacity<1, filter, isolation,
+     will-change, mix-blend-mode nem contain:paint.
+     Consequencia: o H1 nao pode entrar num <Reveal>.
+     --------------------------------------------------------- */
+  .led { color: var(--color-ambar); }
+
+  /* As duas condicoes no MESMO @supports de proposito: se
+     `in oklab` nao fizer parse, o background-image inteiro cai e
+     o text-fill-color transparente sozinho apagaria a palavra. */
+  @supports ((-webkit-background-clip: text) or (background-clip: text))
+        and (background-image: linear-gradient(in oklab, red, blue)) {
+    .led {
+      display: inline-block;
+      background-image: linear-gradient(95deg in oklab,
+        var(--color-ambar)   calc(var(--led-varredura) - 55%),
+        var(--color-magenta) calc(var(--led-varredura) - 18%),
+        /* congo puro da 1,23:1 e some. Levantado com branco: 5,26:1.
+           Justificado como feixe, nao como swatch. */
+        color-mix(in oklab, var(--color-congo) 50%, var(--color-branco))
+                             calc(var(--led-varredura) + 12%),
+        var(--color-ambar)   calc(var(--led-varredura) + 50%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      /* DUAS passadas e para. Nunca infinite: a tecnica repinta na
+         main thread, e loop eterno custa bateria com o telefone
+         parado na mesa. O jeito de nao ter animacao eterna e nao
+         fazer uma — o tubo descansa aceso em ambar. */
+      animation: led-varre 2400ms var(--ease-out-cut) 240ms 2 both;
+    }
+  }
+
+  /* ---------- O LEQUE DA EQUIPE -----------------------------
+     Geometria de melhorias/card.md, acabamento da direcao TUBO.
+     --------------------------------------------------------- */
+  .leque { height: 22rem; }
+  @media (min-width: 480px) { .leque { height: 26rem; } }
+  @media (min-width: 640px) { .leque { height: 28rem; } }
+  @media (min-width: 768px) { .leque { height: 34rem; } }
+  @media (min-width: 1024px){ .leque { height: 38rem; } }
+
+  .leque-card {
+    position: absolute;
+    width: 11rem;
+    aspect-ratio: 628 / 793;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    will-change: transform;
+    /* o mesmo aro de dois tons dos cards de servico */
+    border: 1px solid transparent;
+    background:
+      var(--color-off) padding-box,
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--color-branco) 34%, var(--color-rule)) 0%,
+        var(--color-rule) 26%,
+        var(--color-rule) 62%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 8%, transparent),
+      0 24px 50px -30px var(--color-void);
+  }
+  @media (min-width: 768px) { .leque-card { width: 14rem; } }
+  @media (min-width: 1024px){ .leque-card { width: 16rem; } }
+
+  /* controle de painel, nao pilula de vidro */
+  .leque-seta {
+    display: flex; align-items: center; justify-content: center;
+    width: 3rem; height: 3rem;
+    border-radius: var(--radius-botao);
+    border: 1px solid var(--color-rule);
+    background: var(--color-off);
+    color: var(--color-branco-2);
+    transition: color 200ms var(--ease-out-cut), border-color 200ms var(--ease-out-cut);
+  }
+  .leque-seta:hover { color: var(--color-ambar); border-color: var(--color-ambar); }
+  .tecnico .leque-seta { background: transparent; color: var(--color-void); }
+  .tecnico .leque-seta:hover { color: var(--color-void);
+    border-color: color-mix(in srgb, var(--color-void) 45%, transparent); }
+
+  /* ---------- EYEBROW ---------------------------------------
+     Marcador de pixel na cor do tubo + contraste de valor na
+     propria linha: termo em branco, qualificador apagado,
+     numeral em ambar. Nao e so uppercase com tracking.
+     --------------------------------------------------------- */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+  }
+  .eyebrow::before {
+    content: "";
+    flex: none;
+    width: 3px;
+    height: 12px;
+    border-radius: var(--radius-cut);
+    background: var(--tubo-cor);
+  }
+  .eyebrow b { font-weight: 500; color: var(--color-branco); }
+  .eyebrow i { font-style: normal; font-variant-numeric: tabular-nums;
+               color: var(--color-ambar); }
+  .tecnico .eyebrow b { color: var(--color-void); }
+  .tecnico .eyebrow i { color: color-mix(in srgb, var(--color-void) 75%, transparent); }
+
+  /* ---------- A COLUNA DE PIXELS ----------------------------
+     A expressao da assinatura. Pontos DISCRETOS, nunca linha
+     continua: um tubo de LED de perto e um conjunto de pontos.
+     Sem glow — glow e o default de IA para "neon".
+     --------------------------------------------------------- */
+  .tubo {
+    --tubo-cor: var(--color-ambar);
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    background-image: linear-gradient(
+      to bottom,
+      var(--tubo-cor) 0 4px,
+      transparent 4px 10px
+    );
+    background-size: 100% 10px;
+    background-repeat: repeat-y;
+    opacity: 0.28;
+    transition: opacity 320ms var(--ease-out-cut),
+                --tubo-cor 320ms linear;
+  }
+  .tubo-aceso { opacity: 1; }
+
+  /* ---------- CARD DE SERVICO -------------------------------
+     Animado em duas camadas: o reveal na entrada (stagger por
+     indice) e o acender do tubo no hover/foco. So transform e
+     opacity — nunca width/height/top/left.
+     --------------------------------------------------------- */
+  /* O ARO DE DOIS TONS — o que separa "painel" de "<div> com contorno".
+     Duas camadas no mesmo background: superficie em padding-box, aro em
+     border-box. A de cima cobre o miolo, entao a de baixo so aparece no
+     1px da borda. Zero DOM, zero JS. */
+  .card {
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: var(--radius-card);
+    padding: 1.75rem 1.5rem 1.5rem 2.25rem;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-branco) 4%, var(--color-off)) 0%,
+        var(--color-off) 38%) padding-box,
+      /* claro em cima (pega a luz), filete no meio, sombra na base */
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--color-branco) 30%, var(--color-rule)) 0%,
+        var(--color-rule) 26%,
+        var(--color-rule) 62%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    /* bisel: 1px de luz no topo, 1px de sombra na base. Filete, nao elevacao. */
+    box-shadow:
+      inset 0  1px 0 0 color-mix(in srgb, var(--color-branco)  7%, transparent),
+      inset 0 -1px 0 0 color-mix(in srgb, var(--color-void)   55%, transparent);
+    transition: transform 320ms var(--ease-tubo),
+                box-shadow 260ms var(--ease-out-cut),
+                background 260ms var(--ease-out-cut);
+  }
+  .card::after {
+    /* a luz que o tubo joga na superficie — nasce do proprio tubo */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      120% 100% at 0% 50%,
+      color-mix(in srgb, var(--tubo-cor) 18%, transparent) 0%,
+      transparent 62%
+    );
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out-cut);
+  }
+  /* no hover/foco o aro incorpora a cor do tubo, sem trocar de estrutura */
+  .card:hover, .card:focus-within {
+    transform: translateY(-3px);
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-branco) 5%, var(--color-off)) 0%,
+        var(--color-off) 38%) padding-box,
+      linear-gradient(175deg,
+        color-mix(in srgb, var(--tubo-cor) 46%, var(--color-rule)) 0%,
+        color-mix(in srgb, var(--tubo-cor) 22%, var(--color-rule)) 30%,
+        var(--color-rule) 70%,
+        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 10%, transparent),
+      0 18px 40px -24px color-mix(in srgb, var(--tubo-cor) 55%, transparent);
+  }
+  .card:hover::after, .card:focus-within::after { opacity: 1; }
+  .card:hover .tubo, .card:focus-within .tubo { opacity: 1; }
+
+  /* o tubo acompanha o raio do card em que vive */
+  .card .tubo {
+    inset-block: 0.9rem;
+    inset-inline-start: 0.85rem;
+    border-radius: var(--radius-cut);
+  }
+
+  /* ---------- O FACHO QUE ACENDE OS PIXELS -------------------
+     O cursor nao soma brilho por cima: ele revela a matriz de LEDs
+     que esta sob o difusor. Disco de tamanho FIXO movido so por
+     translate3d — a mascara e estatica em relacao a ele, entao
+     viaja junto sem repintar. Compositor puro.
+     --------------------------------------------------------- */
+  .luz {
+    position: absolute;
+    top: 0; left: 0;
+    width: 15rem;
+    aspect-ratio: 1;
+    margin: -7.5rem 0 0 -7.5rem;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    /* pontos discretos, mesma gramatica do .tubo — nunca luz continua */
+    background-image: radial-gradient(circle at center,
+      var(--tubo-cor) 0 1.1px, transparent 1.5px);
+    background-size: 7px 7px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
+            mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
+    mix-blend-mode: screen;
+    transform: translate3d(var(--mx, 50%), var(--my, 35%), 0);
+    transition: opacity 260ms var(--ease-out-cut);
+  }
+  /* so onde existe ponteiro fino. Em touch nem chega a ser pintado. */
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .luz { opacity: .85; }
+  }
+  .card > :not(.luz) { position: relative; z-index: 1; }
+
+  /* ---------- A LINHA DE ÍNDICE ------------------------------
+     13 e primo: nao existe grade de colunas iguais sem orfao.
+     A saida e parar de tratar os 13 como iguais. Sem caixa, sem
+     sombra — so filete e ritmo.
+     --------------------------------------------------------- */
+  .linha {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem 1fr auto;
+    align-items: baseline;
+    gap: 0 1.25rem;
+    min-height: 4.5rem;          /* alvo de toque com folga */
+    padding-block: 1.15rem;
+    border-block-start: 1px solid var(--color-rule);
+    transition: background-color 220ms var(--ease-out-cut);
+  }
+  .bloco .linha:last-child { border-block-end: 1px solid var(--color-rule); }
+
+  /* o codigo de rider. E dado, logo ambar. Nao e 01/02/03. */
+  .linha__cod {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: .12em;
+    color: color-mix(in srgb, var(--color-ambar) 78%, var(--color-branco-2));
+    font-variant-numeric: tabular-nums;
+  }
+  .linha__px {
+    position: absolute;
+    inset-inline-start: -1rem;
+    inset-block-start: 1.6rem;
+    width: 3px; height: 12px;
+    border-radius: var(--radius-cut);
+    background: var(--tubo-cor);
+    opacity: .26;
+    transition: opacity 220ms var(--ease-out-cut);
+  }
+  .linha:hover, .linha:focus-within {
+    background-color: color-mix(in srgb, var(--tubo-cor) 5%, transparent);
+  }
+  .linha:hover .linha__px, .linha:focus-within .linha__px { opacity: 1; }
+  .linha__seta {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    transition: transform 220ms var(--ease-tubo), opacity 220ms var(--ease-out-cut);
+  }
+  .linha:hover .linha__seta, .linha:focus-within .linha__seta {
+    transform: translate3d(4px, 0, 0); opacity: 1;
+  }
+  /* em touch a seta e permanente — hover nao existe la */
+  @media (hover: none) { .linha__seta { opacity: 1; } }
+
+  /* ---------- TRILHO DO PALCO ------------------------------- */
+  .trilho { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
+  .trilho::-webkit-scrollbar { height: 3px; }
+  .trilho::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 2px; }
+
+  .mini img { opacity: .45; }
+  .mini:hover img, .mini:focus-visible img { opacity: .8; }
+  .mini[aria-current] img { opacity: 1; }
+
+  /* o tubo da miniatura: pixels discretos, so acende no item em exibicao */
+  .mini-tubo {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 3px;
+    background-image: linear-gradient(to right,
+      var(--color-ambar) 0 4px, transparent 4px 10px);
+    background-size: 10px 100%;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out-cut);
+  }
+  .mini[aria-current] .mini-tubo { opacity: 1; }
+
+  /* ---------- NAV INFERIOR ----------------------------------
+     Quatro alvos no polegar. O botao flutuante de WhatsApp foi
+     absorvido como quarto slot — nao ha mais sobreposicao.
+     svh e nao vh: a barra de endereco do iOS muda o vh.
+     max() no inset porque o Safari zera o safe-area quando
+     esconde a toolbar.
+     --------------------------------------------------------- */
+  .navbar {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: color-mix(in srgb, var(--color-void) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-block-start: 1px solid var(--color-rule);
+    padding-block-end: max(env(safe-area-inset-bottom), .5rem);
+  }
+  .navbar__alvo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    padding-block: .6rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+    text-align: center;
+    transition: color 180ms var(--ease-out-cut);
+  }
+  .navbar__alvo:hover { color: var(--color-branco); }
+  .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
+  .navbar__zap:hover { color: var(--color-void); }
+
+  /* a ancora nao pode parar atras do menu flutuante */
+  @media (max-width: 1023px) {
+    html { scroll-padding-block-end: 6rem; }
+    body { padding-block-end: 6rem; }
+  }
+
+  /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
+  .folha {
+    margin: 0 0 auto;
+    inset-block-start: auto;
+    inset-block-end: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 72svh;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-branco);
+  }
+  .folha::backdrop { background: color-mix(in srgb, var(--color-void) 72%, transparent); }
+  .folha__corpo {
+    background: var(--color-off);
+    border-block-start: 1px solid var(--color-rule);
+    border-start-start-radius: var(--radius-placa);
+    border-start-end-radius: var(--radius-placa);
+    padding: 1.5rem 1.25rem max(env(safe-area-inset-bottom), 1.5rem);
+    max-height: 72svh;
+    overflow-y: auto;
+  }
+
+  /* sem JS a barra ainda leva a tres ancoras que funcionam */
+
+  /* ═══════════ A VIRADA — a assinatura ═══════════════════════
+     Nao e um fade: e a casa acendendo em SETE DEGRAUS, com
+     steps(). A mesma quantizacao do tubo — LED e pixel, nao
+     lampada. O estado final e a BASE; a animacao entra por cima
+     so onde existe. Sem ela, corte seco — o que uma mesa de luz
+     faz de verdade, e nao uma versao pior.
+     ========================================================= */
+
+
+  /* CAMINHO BASE — corte seco */
+  .virada {
+    position: relative;
+    display: block;
+    background: var(--color-branco);
+    min-block-size: 40svh;
+    padding-block: 17svh;
+    text-align: center;
+  }
+  .virada__plano { display: none; }
+  .virada__nota { color: color-mix(in srgb, var(--color-void) 48%, transparent); }
+}
+
+@keyframes acender-sala { from { opacity: 0 } to { opacity: 1 } }
+@keyframes acender-nota { from { opacity: 0 } to { opacity: 1 } }
+
+/* @supports nao testa media feature — os dois precisam ser ANINHADOS,
+   nunca combinados no mesmo @supports (seria invalido). */
+@supports ((animation-timeline: view()) and (animation-range: 0% 100%)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .virada {
+      min-block-size: 170svh;
+      padding-block: 0;
+      background: transparent;
+      view-timeline-name: --virada;
+      view-timeline-axis: block;
+    }
+    /* o plano fica preso no topo durante o pivo. margin negativa
+       devolve os 100svh ao fluxo, entao o pai define a distancia. */
+    .virada__plano {
+      display: block;
+      position: sticky;
+      inset-block-start: 0;
+      block-size: 100svh;
+      margin-block-end: -100svh;
+      background: var(--color-branco);
+      pointer-events: none;
+      z-index: 0;
+      /* so longhands: o atalho `animation` reseta animation-timeline */
+      animation-name: acender-sala;
+      animation-duration: 1ms;
+      animation-timing-function: steps(7, jump-none);
+      animation-fill-mode: both;
+      animation-timeline: --virada;
+      /* para um elemento maior que o viewport, `contain` E a janela
+         em que o filho sticky fica preso. Um pin sem GSAP. */
+      animation-range: contain 0% contain 100%;
+    }
+    .virada__nota {
+      position: sticky;
+      inset-block-start: calc(50svh - 0.6em);
+      z-index: 1;
+      animation-name: acender-nota;
+      animation-duration: 1ms;
+      animation-timing-function: steps(4, jump-none);
+      animation-fill-mode: both;
+      animation-timeline: --virada;
+      animation-range: contain 62% contain 100%;
+    }
+  }
+}
+
+@layer components {
+
+  /* ---------- REVEAL ----------------------------------------
+     Caminho rapido em CSS puro onde animation-timeline existe;
+     fallback por IntersectionObserver (~0.4KB) no resto.
+     --------------------------------------------------------- */
+  .rev { opacity: 0; transform: translateY(14px); }
+  .rev-on {
+    opacity: 1; transform: none;
+    transition: opacity 320ms var(--ease-out-cut),
+                transform 320ms var(--ease-tubo);
+    transition-delay: var(--d, 0ms);
+  }
+  /* `.rev` so e aplicada por JS, depois da montagem, e apenas em
+     elemento ABAIXO da dobra. O HTML servido nunca esconde nada. */
+
+  /* ---------- O BEAT DE BLACKOUT ----------------------------
+     ~400ms, UM so na pagina inteira. Nao segura o paint: a foto
+     do hero e pintada primeiro e a cortina sai por cima dela.
+     --------------------------------------------------------- */
+  @keyframes blackout {
+    0%   { opacity: 1; }
+    58%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .blackout {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: var(--color-void);
+    pointer-events: none;
+    animation: blackout 400ms var(--ease-out-cut) forwards;
+  }
+}
+
+
+/* ============================================================
+   ESTADO TÉCNICO — FORA DE @layer, DE PROPOSITO.
+
+   O Tailwind v4 emite `@layer theme, base, components, utilities`.
+   Regra dentro de `components` PERDE para utilitario, por camada e
+   nao por especificidade. Enquanto este bloco esteve em @layer, TODA
+   a correcao de cor daqui era inerte: `text-branco-2` computava
+   #8E9199 sobre #ECEDEF = 2,69:1, e o `+` do FAQ ficava em 1,71:1.
+
+   CSS sem camada vence CSS em camada. Por isso o bloco mora aqui.
+   ============================================================ */
+.tecnico {
+  background: var(--color-branco);
+  color: var(--color-void);
+  --tubo-cor: var(--color-void);
+}
+.tecnico .lab,
+.tecnico .eyebrow            { color: color-mix(in srgb, var(--color-void) 62%, transparent); }
+.tecnico .text-branco-2      { color: color-mix(in srgb, var(--color-void) 66%, transparent); }
+.tecnico .text-branco        { color: var(--color-void); }
+.tecnico .border-rule        { border-color: color-mix(in srgb, var(--color-void) 16%, transparent); }
+/* ambar sobre branco da 1,71:1 e reprova em tudo. Aqui o acento vira
+   tinta; o ambar so sobrevive como FUNDO de botao. */
+.tecnico .text-ambar         { color: var(--color-void); }
+.tecnico .linha__cod         { color: color-mix(in srgb, var(--color-void) 74%, transparent); }
+.tecnico .hover\:text-ambar:hover { color: color-mix(in srgb, var(--color-void) 58%, transparent); }
+.tecnico ::selection         { background: var(--color-void); color: var(--color-branco); }
+.tecnico :focus-visible      { outline-color: var(--color-void); }
+
+/* A legenda da equipe vive sobre um gradiente ESCURO dentro do estado
+   tecnico — e a unica ilha escura la dentro. Sem isto, `.tecnico .lab`
+   pintava o cargo de preto sobre preto e os seis cargos sumiam. */
+.tecnico .sobre-escuro .lab   { color: var(--color-branco-2); }
+.tecnico .sobre-escuro .text-branco,
+.tecnico .sobre-escuro        { color: var(--color-branco); }
+
+/* ============================================================
+   prefers-reduced-motion — fallback ESTATICO REAL, nao "mais
+   lento". Nada se move, nada pisca, e nada fica invisivel.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .led {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: var(--color-ambar);
+  }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .rev { opacity: 1 !important; transform: none !important; }
+  .blackout { display: none; }
+  /* opacity nao esta em positionalKeys, entao o Motion continua
+     animando o chase mesmo com reducedMotion="user". Nove opacidades
+     escalonadas ainda sao movimento percebido — mata-se aqui. */
+  [data-pixel] { opacity: 1 !important; transition: none !important; }
+  .luz { display: none; }
+  .card:hover, .card:focus-within { transform: none; }
+}
+
+/* Windows High Contrast: o gradiente sai, a cor do sistema entra. */
+@media (forced-colors: active) {
+  .led { background-image: none; -webkit-text-fill-color: currentColor; }
+}
