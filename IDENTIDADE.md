@@ -93,6 +93,36 @@ A **coluna de pixels** — tira vertical de pontos discretos, com o espaçamento
 brilho de um tubo real — é como o estado se manifesta. Ela muda de cor na virada. Nunca é
 decorativa e nunca é uma linha contínua.
 
+### ❗ A coluna de pixels não foi inventada aqui
+
+**Descoberto em 2026-08-05, ao recuperar o logo.** O "p" de *Rapa* no logo da empresa **é um
+VU meter de segmentos empilhados** — duas colunas de oito, vermelho, laranja, amarelo e verde,
+dois de cada. Medido pixel a pixel no arquivo original.
+
+A assinatura que eu tinha derivado das fotos e apresentado como decisão de direção **já estava
+na marca**. Isso muda o argumento: a coluna de pixels deixa de ser uma escolha estética que o
+cliente precisa aceitar e passa a ser **extração da identidade que ele já tem**.
+
+Consequência prática: onde couber, a coluna de pixels deve ter oito segmentos e a mesma
+proporção de segmento e vão do logo, não uma quantidade arbitrária.
+
+Uma coincidência que vale registrar: o amarelo do medidor é `#FCCC2F` e o laranja é `#F48B3C`.
+O âmbar `#FFA300`, que foi derivado das fotos do acervo sem olhar o logo, **cai exatamente
+entre os dois**.
+
+### O arquivo
+
+`public/rapa-sound.svg` · 9,0 KB · traçado com `potrace` a partir de
+`rapasound.com.br/wp-content/uploads/2024/09/Rapa-Sound_logo-PNG-1.webp` (1427×733, 53,3 KB).
+
+O componente `components/Logo.tsx` é o mesmo desenho inline, para que **cada segmento seja um
+elemento animável**. É o que permite o medidor acender.
+
+- As quatro cores do medidor são as únicas exceções autorizadas à paleta, e só dentro do logo.
+- Em tamanho pequeno (nav), o medidor pode ir para uma cor só. Recolorir a marca fora disso, não.
+- O logo original é branco com sombra preta chapada no pixel. Sobre `--void` a sombra some
+  limpa — foi testado por composição antes de entrar.
+
 ⚠️ **Testar a assinatura a 380px de largura antes de fechar.** Se a virada não se lê num
 aparelho estreito, ela não existe — porque é lá que o público está.
 
