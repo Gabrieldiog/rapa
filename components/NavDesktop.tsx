@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import { zap } from '@/lib/conteudo'
+import { Logo } from './Logo'
 
 /**
  * NAV DESKTOP — o par do MenuLiquido, que é lg:hidden.
@@ -34,21 +35,30 @@ export function NavDesktop() {
   })
 
   return (
+    /* `display:none` e nao `opacity:0`.
+       Antes ela ia para o disco com style="opacity:0" — um fantasma
+       invisivel dentro do documento, que leitor de tela e busca ainda
+       enxergam. Agora, enquanto nao ha rolagem, a classe e so `hidden`:
+       o elemento nao e exibido em largura nenhuma. Quando aparece,
+       `lg:block` entra junto.
+       NAO da para usar o atributo `hidden` aqui: `.lg\:block` e estilo
+       de autor e ganha do `[hidden]` da folha do navegador. */
     <motion.nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 top-0 z-[90] hidden lg:block"
+      className={`fixed inset-x-0 top-0 z-[90] ${visivel ? 'hidden lg:block' : 'hidden'}`}
       initial={false}
-      animate={{ y: visivel ? 0 : -80, opacity: visivel ? 1 : 0 }}
+      animate={{ y: visivel ? 0 : -80 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ pointerEvents: visivel ? 'auto' : 'none' }}
     >
       <div className="border-b border-rule backdrop-blur-xl"
            style={{ background: 'color-mix(in srgb, var(--color-void) 82%, transparent)' }}>
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-8 px-8">
-          <a href="#conteudo"
-             className="font-[family-name:var(--font-display)] text-base leading-none
-                        text-branco">
-            Rapa Sound
+          {/* a marca, nao o nome escrito em serif. O SVG carrega o VU
+              meter, que e o detalhe que a pagina inteira desenvolve. */}
+          <a href="#conteudo" aria-label="Rapa Sound — ir para o topo"
+             className="block shrink-0 text-branco transition-opacity duration-200
+                        hover:opacity-80">
+            <Logo className="h-7 w-auto" />
           </a>
 
           <ul className="ml-auto flex items-center gap-7">

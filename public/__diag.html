@@ -1,0 +1,175 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>diag</title>
+<!--
+  FERRAMENTA DE DIAGNOSTICO, NAO FAZ PARTE DO SITE.
+  Existe porque o Chrome headless trava a janela em 500px de largura
+  minima: pedir --window-size=380 devolve innerWidth=500, e o print de
+  380px sai um RECORTE de um render de 500. Isso me fez ler estouro
+  horizontal onde nao havia.
+  Um iframe de mesma origem tem viewport proprio de verdade, entao aqui
+  o layout responde a 380px como responderia num aparelho.
+  Apagar antes de publicar.
+-->
+<style>
+  html,body { margin:0; background:#2a2a2e; color:#eee;
+              font:12px ui-monospace,monospace }
+  #wrap { display:flex; gap:12px; padding:12px }
+  iframe { border:0; background:#000; flex:none }
+  #out { white-space:pre; overflow:auto; max-height:96vh }
+</style>
+<div id="wrap">
+  <iframe id="f" src="/" title="alvo"></iframe>
+  <pre id="out">medindo...</pre>
+</div>
+<script>
+  const larguraAlvo = Number(new URLSearchParams(location.search).get('w') || 380)
+  const alturaAlvo  = Number(new URLSearchParams(location.search).get('h') || 840)
+  const f = document.getElementById('f')
+  f.style.width  = larguraAlvo + 'px'
+  f.style.height = alturaAlvo + 'px'
+
+  /* ?seek=2400 adianta o relogio das animacoes CSS e congela.
+     Necessario porque --virtual-time-budget do Chrome headless NAO
+     avanca a linha do tempo de animacao: com 20s de orcamento o
+     currentTime fica em 500ms, e todo print sai no primeiro quadro.
+     Com a Web Animations API da para pular para onde interessa. */
+  const seek = Number(new URLSearchParams(location.search).get('seek') || 0)
+
+  /* ?vr=-40 cancela a animacao e crava --led-varredura no valor pedido.
+     E o unico jeito honesto de descobrir a janela util: o mapeamento
+     entre o valor e o que aparece na tela depende do angulo do
+     gradiente e da caixa, e nao vale a pena deduzir quando da para
+     medir. */
+  const vr = new URLSearchParams(location.search).get('vr')
+
+  f.addEventListener('load', () => setTimeout(() => {
+    const d0 = f.contentDocument
+    if (seek) {
+      for (const el of d0.querySelectorAll('*'))
+        for (const a of el.getAnimations()) { a.pause(); a.currentTime = seek }
+    }
+    if (vr !== null) {
+      const led = d0.querySelector('.led')
+      if (led) {
+        for (const a of led.getAnimations()) a.cancel()
+        led.style.setProperty('--led-varredura', vr + '%')
+      }
+    }
+    medir()
+  }, 2500))
+
+  function medir() {
+    const d = f.contentDocument, w = f.contentWindow
+    const vw = d.documentElement.clientWidth
+    const linhas = []
+    linhas.push('viewport do iframe : ' + vw + ' x ' + d.documentElement.clientHeight)
+    linhas.push('scrollWidth do doc : ' + d.documentElement.scrollWidth)
+    linhas.push('scrollWidth do body : ' + d.body.scrollWidth)
+    /* scrollWidth mente em alguns casos (elemento fixed largo, por
+       exemplo, nao gera rolagem de verdade). O teste honesto e TENTAR
+       rolar: se scrollLeft nao sai do zero, nao ha rolagem horizontal,
+       por mais que scrollWidth diga o contrario. */
+    const antes = w.scrollX
+    w.scrollTo(99999, w.scrollY)
+    const rolouAte = w.scrollX
+    w.scrollTo(antes, w.scrollY)
+    linhas.push(rolouAte > 1
+      ? 'ROLA DE LADO DE VERDADE: ' + rolouAte + 'px'
+      : 'nao rola de lado (scrollWidth era falso alarme)')
+    linhas.push('')
+
+    /* Quem passa da borda direita — DESCONTANDO quem tem ancestral que
+       recorta. Sem esse desconto o trilho de video domina a lista com
+       falso positivo: os itens dele passam da borda de proposito,
+       porque estao dentro de um `overflow-x: auto`. Um elemento so
+       estoura a PAGINA se nenhum ancestral o contem. */
+    const contido = (el) => {
+      for (let p = el.parentElement; p && p !== d.documentElement; p = p.parentElement) {
+        const ox = w.getComputedStyle(p).overflowX
+        if (ox !== 'visible') return true
+      }
+      return false
+    }
+    const culpados = []
+    for (const el of d.querySelectorAll('*')) {
+      const r = el.getBoundingClientRect()
+      if (r.width === 0 && r.height === 0) continue
+      if (contido(el)) continue
+      const excede = Math.round(Math.max(r.right - vw, -r.left))
+      if (excede > 1) {
+        const est = w.getComputedStyle(el)
+        culpados.push({ excede, tag: el.tagName.toLowerCase(),
+          id: el.id, cls: (el.className.baseVal ?? el.className ?? '').toString().slice(0,70),
+          pos: est.position, ov: est.overflowX })
+      }
+    }
+    culpados.sort((a,b) => b.excede - a.excede)
+    linhas.push('ELEMENTOS QUE PASSAM DA BORDA (' + culpados.length + ')')
+    for (const c of culpados.slice(0, 25))
+      linhas.push('  +' + String(c.excede).padStart(4) + 'px  ' + c.tag +
+                  (c.id ? '#' + c.id : '') + '  [' + c.pos + ']  .' + c.cls)
+    linhas.push('')
+
+    // alvo de toque abaixo de 44px
+    const pequenos = []
+    for (const el of d.querySelectorAll('a,button,summary,input,select')) {
+      const r = el.getBoundingClientRect()
+      if (r.width === 0 && r.height === 0) continue
+      if (r.height < 44 || r.width < 44)
+        pequenos.push(Math.round(r.width) + 'x' + Math.round(r.height) + '  ' +
+                      el.tagName.toLowerCase() + ' "' +
+                      (el.textContent || '').trim().slice(0, 34) + '"')
+    }
+    linhas.push('ALVOS DE TOQUE MENORES QUE 44px (' + pequenos.length + ')')
+    for (const p of pequenos.slice(0, 20)) linhas.push('  ' + p)
+    linhas.push('')
+
+    /* Invisiveis. Separa o que e ESPERADO do que e defeito:
+       `.rev` sem `.rev-on` e um bloco abaixo da dobra esperando o
+       IntersectionObserver — por desenho, e some assim que entra na
+       tela. Invisivel FORA disso e defeito de verdade. */
+    let aguardando = 0
+    const semExplicacao = []
+    for (const el of d.querySelectorAll('body *')) {
+      const est = w.getComputedStyle(el)
+      if (parseFloat(est.opacity) !== 0) continue
+      if (est.display === 'none' || est.visibility === 'hidden') continue
+      if (!(el.textContent || '').trim()) continue
+      if (el.closest('.rev:not(.rev-on)')) { aguardando++; continue }
+      /* animacao dirigida por rolagem: a opacidade e funcao da posicao
+         do scroll, entao 0 fora da faixa e o estado correto, nao
+         defeito. Sem isto a `.virada__nota` aparece como falso
+         positivo eterno. */
+      const tl = est.animationTimeline
+      if (tl && tl !== 'auto' && tl !== 'none') { aguardando++; continue }
+      semExplicacao.push(el.tagName.toLowerCase() + ' .' +
+        (el.className.baseVal ?? el.className ?? '').toString().slice(0, 60))
+    }
+    linhas.push('INVISIVEIS esperando o observer (ok): ' + aguardando)
+    linhas.push('INVISIVEIS SEM EXPLICACAO (defeito): ' + semExplicacao.length)
+    for (const s of semExplicacao.slice(0, 12)) linhas.push('  ' + s)
+
+    // estado da palavra LED
+    const led = d.querySelector('.led')
+    linhas.push('')
+    linhas.push('PALAVRA LED')
+    if (!led) linhas.push('  NAO ENCONTRADA')
+    else {
+      const e = w.getComputedStyle(led)
+      linhas.push('  animation-name       : ' + e.animationName)
+      linhas.push('  animation-play-state : ' + e.animationPlayState)
+      linhas.push('  data-fora            : ' + led.hasAttribute('data-fora'))
+      linhas.push('  -webkit-text-fill    : ' + e.webkitTextFillColor)
+      linhas.push('  background-clip      : ' + (e.webkitBackgroundClip || e.backgroundClip))
+      linhas.push('  --led-varredura      : ' + e.getPropertyValue('--led-varredura'))
+      linhas.push('  background-image     : ' + e.backgroundImage.slice(0, 220))
+      linhas.push('  animacoes ativas     : ' + led.getAnimations().length)
+      for (const a of led.getAnimations())
+        linhas.push('    ' + a.animationName + ' estado=' + a.playState +
+                    ' tempo=' + Math.round(a.currentTime || 0) + 'ms')
+    }
+
+    document.getElementById('out').textContent = 'DIAG\n' + linhas.join('\n')
+  }
+</script>

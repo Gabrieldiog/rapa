@@ -11,6 +11,9 @@ import { MenuLiquido } from '@/components/MenuLiquido'
 import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
 import { Haze } from '@/components/Haze'
+import { Particulas } from '@/components/Particulas'
+import { Logo } from '@/components/Logo'
+import { PausaLed } from '@/components/PausaLed'
 import { Blackout } from '@/components/Blackout'
 import { Tubo, Zap, Secao, Eyebrow } from '@/components/ui'
 
@@ -24,38 +27,53 @@ export default function Home() {
         Pular para o conteúdo
       </a>
 
-      {/* ══════════════ HERO ══════════════ */}
-      <header id="conteudo" className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={FOTOS_EVENTO[0].src}
-            width={FOTOS_EVENTO[0].w}
-            height={FOTOS_EVENTO[0].h}
-            alt="Debutante erguida pelas convidadas no meio da pista, com arcos de luz ao fundo"
-            fetchPriority="high"
-            decoding="async"
-            className="h-full w-full object-cover object-center opacity-45"
-          />
-        </div>
+      {/* ══════════════ HERO ══════════════
+          O topo era a foto de uma festa sangrada a 45% de opacidade.
+          Agora e o campo de particulas do back.md com a marca no meio,
+          como pedido. A foto nao foi jogada fora: ela desce e abre a
+          secao de 15 anos, que e onde ela prova alguma coisa.
 
-        <div className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl
-                        flex-col justify-end px-5 pb-16 pt-28 lg:px-8 lg:pb-24">
-          <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
+          overflow-clip e nao hidden: `hidden` cria scroll container. */}
+      <header id="conteudo" className="relative overflow-clip">
+        <Particulas />
+        {/* vinheta: escurece as bordas para o texto ter chao proprio
+            sem precisar de caixa nem de sombra. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0"
+             style={{ background:
+               'radial-gradient(78% 62% at 50% 46%, transparent 0%, color-mix(in srgb, var(--color-void) 72%, transparent) 100%)' }} />
+
+        <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
+                        items-center justify-center px-5 py-24 text-center">
+          {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
+              vez, na entrada — e o que um medidor faz quando pega o
+              primeiro pico. Depois descansa. */}
+          <Logo animar
+                className="w-[min(68vw,21rem)] shrink-0 text-branco" />
+
+          <div className="mt-9">
+            <Eyebrow><b>Uberlândia</b> · quase <i>30</i> anos</Eyebrow>
+          </div>
+
           {/* o H1 NAO pode entrar num <Reveal>: opacity/transform criam
               contexto de empilhamento e o background-clip:text some no
               Chrome. E ele e candidato a LCP. */}
-          <h1 className="max-w-[16ch] text-3xl lg:text-4xl">
+          <h1 className="max-w-[18ch] text-3xl lg:text-4xl">
             Som, luz e <span className="led">LED</span> para 15&nbsp;anos e casamento
           </h1>
-          <p className="mt-7 max-w-[46ch] text-base text-branco-2">
+          <p className="mt-7 max-w-[44ch] text-base text-branco-2">
             A gente cuida do som, da luz e da estrutura. No dia, tem técnico nosso
             do começo ao fim — para você não ter que resolver nada.
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
             <Zap texto="Oi! Quero um orçamento de som e luz. Meu evento é:">
               Falar no WhatsApp
             </Zap>
-            <a href="#rider" className="lab underline decoration-rule underline-offset-8
+            {/* inline-flex + min-h-11: como <a> inline a area de toque
+                media 171x19. A regra da casa e 44px sem excecao, e o
+                criterio 2.5.8 da WCAG 2.2 pede 24x24 no minimo — 19px
+                de altura reprova nos dois. */}
+            <a href="#rider" className="lab inline-flex min-h-11 items-center underline
+                                        decoration-rule underline-offset-8
                                         transition-colors hover:text-branco">
               Ver o rider técnico
             </a>
@@ -84,6 +102,14 @@ export default function Home() {
             </Zap>
           </Reveal>
           <Reveal delay={90}>
+            {/* a foto que saiu do topo abre aqui, grande e sem veu: e a
+                unica prova visual de que a festa aconteceu de verdade.
+                fetchPriority alto porque agora ela e a candidata a LCP. */}
+            <img src={FOTOS_EVENTO[0].src} width={FOTOS_EVENTO[0].w}
+                 height={FOTOS_EVENTO[0].h} fetchPriority="high" decoding="async"
+                 alt="Debutante erguida pelas convidadas no meio da pista, com arcos de luz ao fundo"
+                 className="mb-2 aspect-16/10 w-full rounded-[var(--radius-card)]
+                            object-cover" />
             <div className="grid grid-cols-2 gap-2">
               {FOTOS_EVENTO.slice(1, 5).map((f, i) => (
                 <img key={f.src} src={f.src} width={f.w} height={f.h} loading="lazy"
@@ -406,16 +432,18 @@ export default function Home() {
               </div>
               <div>
                 <dt className="lab">Telefone fixo</dt>
-                <dd className="mt-2 font-mono text-xs">
-                  <a href={`tel:${CONTATO.fixoLink}`} className="hover:text-ambar">
+                <dd className="font-mono text-xs">
+                  <a href={`tel:${CONTATO.fixoLink}`}
+                     className="inline-flex min-h-11 items-center hover:text-ambar">
                     {CONTATO.fixo}
                   </a>
                 </dd>
               </div>
               <div>
                 <dt className="lab">E-mail</dt>
-                <dd className="mt-2 font-mono text-xs break-all">
-                  <a href={`mailto:${CONTATO.email}`} className="hover:text-ambar">
+                <dd className="font-mono text-xs break-all">
+                  <a href={`mailto:${CONTATO.email}`}
+                     className="inline-flex min-h-11 items-center hover:text-ambar">
                     {CONTATO.email}
                   </a>
                 </dd>
@@ -431,11 +459,11 @@ export default function Home() {
               </div>
               <div className="sm:col-span-2">
                 <dt className="lab">Redes</dt>
-                <dd className="mt-3 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs">
+                <dd className="mt-1 flex flex-wrap gap-x-6 font-mono text-xs">
                   {Object.entries(CONTATO.redes).map(([nome, url]) => (
                     <a key={nome} href={url} target="_blank" rel="noopener noreferrer"
-                       className="capitalize underline decoration-rule underline-offset-4
-                                  hover:text-ambar">
+                       className="inline-flex min-h-11 items-center capitalize underline
+                                  decoration-rule underline-offset-4 hover:text-ambar">
                       {nome}
                     </a>
                   ))}
@@ -458,6 +486,7 @@ export default function Home() {
 
       <MenuLiquido />
       <NavDesktop />
+      <PausaLed />
     </>
   )
 }

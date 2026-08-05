@@ -37,7 +37,18 @@
   /* escala: 12 14 16 19 24 32 44 64 96 */
   --text-2xs: 0.75rem;  --text-xs: 0.875rem; --text-sm: 1rem;
   --text-base: 1.1875rem; --text-lg: 1.5rem;  --text-xl: 2rem;
-  --text-2xl: 2.75rem;  --text-3xl: 4rem;    --text-4xl: 6rem;
+  /* Os tres tamanhos de display sao FLUIDOS. Eram fixos, e 4rem num
+     aparelho de 380px sao 64px onde so ha 340px de conteudo — o H1
+     estourava a largura da pagina.
+     Cada clamp foi derivado para o valor de baixo a 380px e o de cima
+     a 1024px (ou 1536px no 4xl). O termo variavel SEMPRE tem uma
+     parcela em `rem`: com `vw` puro o zoom de texto nao move nada e
+     reprova o criterio 1.4.4 da WCAG.
+     Razao max/min <= 1,5: o Firefox trava o zoom em 300%, entao o
+     limite seguro e menor do que o que se cita por ai. */
+  --text-2xl: clamp(2rem, 1.5575rem + 1.863vw, 2.75rem);   /* 32 -> 44 */
+  --text-3xl: clamp(2.625rem, 1.814rem + 3.416vw, 4rem);   /* 42 -> 64 */
+  --text-4xl: clamp(4rem, 6.25vw, 6rem);                   /* 64 -> 96 */
 
   /* --- ACABAMENTO ---------------------------------------------
      Raio em escala, nao igual em tudo — border-radius identico em
@@ -75,15 +86,23 @@
 
    De quebra: 3 letras caixa-alta = 3 pixels de um tubo em chase.
    ============================================================ */
-@property --led-varredura {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: -60%;   /* fora da palavra: descansa 100% ambar */
+/* O gradiente e fixo e quem anda e o background-position sobre um
+   background maior que a caixa. 100% -> 0% faz a banda apagada
+   atravessar da esquerda para a direita.
+   Nao ha @property aqui de proposito: background-position ja e
+   animavel nativamente, e a versao com custom property registrada
+   dependia da geometria do gradiente de um jeito que nao dava para
+   prever — foi medida e nao funcionava. */
+@keyframes led-varre {
+  from { background-position: 100% 0; }
+  to   { background-position: 0% 0; }
 }
 
-@keyframes led-varre {
-  0%, 10%   { --led-varredura: -60%; }
-  90%, 100% { --led-varredura: 160%; }
+/* O segmento do VU meter acendendo: sobe do escuro e assenta.
+   Sem escala e sem deslocamento — um LED nao se move, ele liga. */
+@keyframes vu-acende {
+  from { opacity: 0.08; }
+  to   { opacity: 1; }
 }
 
 @layer base {
@@ -140,29 +159,82 @@
      --------------------------------------------------------- */
   .led { color: var(--color-ambar); }
 
-  /* As duas condicoes no MESMO @supports de proposito: se
-     `in oklab` nao fizer parse, o background-image inteiro cai e
-     o text-fill-color transparente sozinho apagaria a palavra. */
-  @supports ((-webkit-background-clip: text) or (background-clip: text))
-        and (background-image: linear-gradient(in oklab, red, blue)) {
+  /* ---------- A PALAVRA LED, A VARREDURA -------------------
+     A versao anterior posicionava os stops do gradiente com
+     calc(--led-varredura +/- N%). Nao funcionava, e o motivo foi
+     MEDIDO, nao suposto: com 95deg sobre uma caixa larga e baixa, a
+     relacao entre o valor e o que aparece na tela e imprevisivel — a
+     banda escura cruzava a palavra em 400ms de um ciclo de 3200ms e
+     ficava parada o resto. Quem olhava jurava que nao havia animacao.
+
+     Aqui o gradiente e FIXO e quem anda e o background-position sobre
+     um background-size maior que a caixa. Porcentagem de
+     background-position tem definicao exata (0% = borda esquerda
+     alinhada, 100% = borda direita), entao o resultado e o mesmo em
+     qualquer largura de palavra, em qualquer idioma, em qualquer
+     tamanho de fonte. E nao precisa de @property.
+     --------------------------------------------------------- */
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
     .led {
       display: inline-block;
-      background-image: linear-gradient(95deg in oklab,
-        var(--color-ambar)   calc(var(--led-varredura) - 55%),
-        var(--color-magenta) calc(var(--led-varredura) - 18%),
-        /* congo puro da 1,23:1 e some. Levantado com branco: 5,26:1.
-           Justificado como feixe, nao como swatch. */
-        color-mix(in oklab, var(--color-congo) 50%, var(--color-branco))
-                             calc(var(--led-varredura) + 12%),
-        var(--color-ambar)   calc(var(--led-varredura) + 50%));
+      background-image: linear-gradient(100deg,
+        var(--color-ambar) 0%,
+        var(--color-ambar) 32%,
+        /* O APAGADO. Nao e preto puro: preto puro sobre o void faz a
+           letra sumir de vez e a palavra pisca fora de existencia.
+           16% de ambar sobre o void e o vermelho residual de um LED
+           que acabou de desligar — a letra continua legivel e a
+           impressao e de apagar. */
+        color-mix(in srgb, var(--color-ambar) 16%, var(--color-void)) 45%,
+        color-mix(in srgb, var(--color-ambar) 16%, var(--color-void)) 55%,
+        var(--color-ambar) 68%,
+        var(--color-ambar) 100%);
+      background-size: 320% 100%;
+      background-repeat: no-repeat;
+      background-position: 100% 0;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      /* DUAS passadas e para. Nunca infinite: a tecnica repinta na
-         main thread, e loop eterno custa bateria com o telefone
-         parado na mesa. O jeito de nao ter animacao eterna e nao
-         fazer uma — o tubo descansa aceso em ambar. */
-      animation: led-varre 2400ms var(--ease-out-cut) 240ms 2 both;
+      /* linear: uma luz que varre um palco anda em velocidade
+         constante. Curva com overshoot faria a banda "voltar" no fim
+         de cada ciclo e leria como travada.
+         1200ms de atraso: o blackout da entrada dura 460ms e o VU
+         meter da marca acende ate ~925ms. Antes a varredura comecava
+         em 240ms e rodava ATRAS da cortina — que e exatamente por que
+         o cliente do projeto disse que "o LED nao tem a animacao".
+         Ele nunca chegou a ver. */
+      animation: led-varre 3600ms linear 1200ms infinite;
+    }
+    /* Contínua, como pedido. A ressalva de bateria continua de pe —
+       background-clip:text repinta na main thread, nao vai para o
+       compositor — entao a animacao PARA quando o hero sai da tela.
+       Quem marca e o PausaLed, por IntersectionObserver. Loop eterno
+       so enquanto alguem esta olhando. */
+    .led[data-fora] { animation-play-state: paused; }
+  }
+
+  /* ---------- O VU METER DA MARCA ---------------------------
+     O logo tem 16 segmentos em duas colunas de oito. `--linha` vai
+     de 0 (embaixo) a 7 (em cima), entao o medidor enche de baixo
+     para cima — que e o que um VU meter faz.
+     Acende UMA vez, na entrada, e descansa. Um equalizador que
+     pula para sempre le como enfeite de player, nao como marca.
+     --------------------------------------------------------- */
+  /* As cores sao as da marca, medidas pixel a pixel no logo original.
+     Ficam AQUI e nao no atributo `fill` do JSX porque assim o medidor
+     pode mudar de cor quando o estado da pagina mudar — e porque sem
+     fill declarado o SVG cai no preto padrao, que foi exatamente o que
+     aconteceu na primeira montagem. */
+  .vu[data-tier="vermelho"] { fill: #EB373D; }
+  .vu[data-tier="laranja"]  { fill: #F48B3C; }
+  .vu[data-tier="amarelo"]  { fill: #FCCC2F; }
+  .vu[data-tier="verde"]    { fill: #A9CF48; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-animar] .vu {
+      animation: vu-acende 620ms var(--ease-out-cut) both;
+      /* comeca depois do blackout de 460ms, senao acende atras da cortina */
+      animation-delay: calc(560ms + var(--linha) * 52ms);
     }
   }
 

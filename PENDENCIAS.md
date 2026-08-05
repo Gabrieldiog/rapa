@@ -181,6 +181,28 @@ cobertura em Araguari e Tiradentes, e "quase 30 anos" com os 116 artistas.
 
 ---
 
+---
+
+## P13 · Apagar `public/__diag.html` antes de publicar
+
+**Bloqueia publicação. Não bloqueia desenvolvimento.**
+
+É uma ferramenta de auditoria, não faz parte do site. Ela existe porque o Chrome headless
+**trava a janela em 500px de largura mínima**: pedir `--window-size=380` devolve
+`innerWidth=500`, e o print sai um recorte de um render de 500px. Isso me fez ler estouro
+horizontal onde não havia. Um iframe de mesma origem tem viewport próprio de verdade.
+
+Ela mede, num viewport arbitrário: estouro horizontal real (tentando rolar, porque
+`scrollWidth` dá falso positivo), quem passa da borda descontando quem tem ancestral que
+recorta, alvos de toque abaixo de 44px, e elementos invisíveis separando os que esperam o
+observer dos que são defeito. Com `?seek=` e `?vr=` dá para adiantar o relógio das animações,
+que o `--virtual-time-budget` não faz.
+
+Não expõe nada — é HTML e JS estáticos, sem dado nenhum. Mas um `__diag.html` no ar no site do
+cliente é desleixo. **Apagar no PR de publicação.**
+
+---
+
 ## Decisões já tomadas (não são pendência)
 
 | Tema | Decisão | Quem decidiu |
