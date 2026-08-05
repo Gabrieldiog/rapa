@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ver</title>
+<!--
+  FERRAMENTA DE CAPTURA, NAO FAZ PARTE DO SITE. Apagar antes de publicar
+  junto com __diag.html (ver P13 em PENDENCIAS.md).
+
+  Serve para tirar print de uma secao no meio da pagina, num viewport de
+  largura arbitraria. Duas coisas obrigaram a existir:
+
+  1. O Chrome headless trava a janela em 500px de largura minima. Um
+     iframe tem viewport proprio de verdade.
+  2. Navegar por ancora no headless devolve tela vazia, e um harness
+     hospedado em OUTRA porta nao consegue rolar o iframe por script —
+     e cross-origin e `contentDocument` vem nulo. Por isso este arquivo
+     mora em public/: mesma origem, o script funciona.
+
+  Uso:  /__ver.html?s=servicos&w=1180&h=840
+        s = id da secao · w/h = viewport do iframe
+-->
+<style>
+  html, body { margin: 0; background: #2a2a2e }
+  iframe { border: 0; display: block }
+</style>
+<!-- O iframe fica no MARCADOR, nao criado por script: quando ele era
+     criado no JS o print saia em branco, porque o
+     --virtual-time-budget fecha o quadro antes de o elemento existir
+     e comecar a carregar. -->
+<iframe id="f" src="/"></iframe>
+<script>
+  const q = new URLSearchParams(location.search)
+  const f = document.getElementById('f')
+  f.style.width = (q.get('w') || 1180) + 'px'
+  f.style.height = (q.get('h') || 840) + 'px'
+
+  f.addEventListener('load', () => setTimeout(() => {
+    const d = f.contentDocument
+    const el = d.getElementById(q.get('s') || 'servicos')
+    if (el) el.scrollIntoView()
+    /* Os blocos abaixo da dobra sao escondidos apos a montagem e
+       revelados por IntersectionObserver. Depois de um scroll
+       programatico o observer pode nao ter reagido antes do print,
+       entao aqui eles sao revelados a mao — o objetivo e ver o LAYOUT,
+       nao a animacao de entrada. */
+    setTimeout(() => {
+      for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
+    }, 400)
+  }, 2200))
+</script>
