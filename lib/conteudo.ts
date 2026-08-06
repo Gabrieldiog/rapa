@@ -60,6 +60,15 @@ export type Servico = {
    *  que e proibida e alem disso mentirosa: servico nao tem ordem. */
   codigo: string
   bloco: 'som' | 'luz' | 'led' | 'cenografia' | 'pacotes'
+  /** O PESO NA GRADE, e nao um numero de importancia.
+   *  1 = heroi, ocupa o dobro e leva foto · 2 = medio · 3 = compacto.
+   *  Existe porque 13 e primo e nenhuma grade de colunas iguais o
+   *  acomoda: a saida sao cinco grades pequenas, uma por bloco, cada
+   *  uma fechando exata. Com pesos desiguais a contagem 13 some. */
+  peso: 1 | 2 | 3
+  /** So os quatro que carregam foto. Card sem foto nao fica pobre — o
+   *  que ocupa o lugar dela e dado e tipografia. */
+  foto?: string
 }
 
 /** 13 e primo — nao existe grade de colunas iguais que o acomode sem
@@ -74,47 +83,49 @@ export const BLOCOS: { id: Servico['bloco']; titulo: string; nota: string }[] = 
   { id: 'pacotes', titulo: 'Pacotes', nota: 'A festa inteira' },
 ]
 
-/** Os tres que vendem: entram como card, nao como linha de indice. */
-export const DESTAQUE_LED = ['painel-de-led', 'pista-de-led', 'tunel-de-led']
+/* DESTAQUE_LED saiu. Ele promovia tres servicos a card e rebaixava dez
+   a linha de indice — e a leitura do cliente foi exata: "o som ficou sem
+   nada de card". Sonorizacao e o servico-base da empresa e aparecia como
+   linha. Agora os 13 sao card; o que muda entre eles e o PESO. */
 
 export const SERVICOS: Servico[] = [
-  { ancora: 'sonorizacao-palco', nome: 'Sonorização e palco',
+  { ancora: 'sonorizacao-palco', peso: 1, foto: '/img/eventos/2.webp', nome: 'Sonorização e palco',
     desc: 'Estruturas que elevam qualquer atração, proporcionando som impecável e palco digno de grandes shows.',
     urlAntiga: '/sonorizacaopalco/', codigo: 'PA', bloco: 'som', estado: 'tecnico' },
-  { ancora: 'iluminacao-cenica', nome: 'Iluminação cênica',
+  { ancora: 'iluminacao-cenica', peso: 3, nome: 'Iluminação cênica',
     desc: 'Desenvolvemos uma atmosfera de luz ideal para qualquer evento.',
     urlAntiga: '/iluminacao-cenica/', codigo: 'LX', bloco: 'luz', estado: 'tecnico' },
-  { ancora: 'iluminacao-pista', nome: 'Iluminação de pista',
+  { ancora: 'iluminacao-pista', peso: 2, nome: 'Iluminação de pista',
     desc: 'Luzes que realçam cada momento e transformam seu evento em um espetáculo visual.',
     urlAntiga: '/iluminacao-pista/', codigo: 'LX-P', bloco: 'luz', estado: 'festa' },
-  { ancora: 'painel-de-led', nome: 'Painel de LED',
+  { ancora: 'painel-de-led', peso: 1, foto: '/img/eventos/3.webp', nome: 'Painel de LED',
     desc: 'Utilizamos tecnologias avançadas para um visual impactante.',
     urlAntiga: '/painel-de-led/', codigo: 'LED-P', bloco: 'led', estado: 'festa' },
-  { ancora: 'pista-de-led', nome: 'Pista de LED',
+  { ancora: 'pista-de-led', peso: 2, nome: 'Pista de LED',
     desc: 'Onde o brilho e a grandiosidade se encontram, criando uma pista de dança imponente.',
     urlAntiga: '/pista-de-led/', codigo: 'LED-F', bloco: 'led', estado: 'festa' },
-  { ancora: 'tubos-de-led', nome: 'Tubos de LED',
+  { ancora: 'tubos-de-led', peso: 3, nome: 'Tubos de LED',
     desc: 'Efeitos luminosos modernos e atraentes que criam ambientes dinâmicos e inesquecíveis.',
     urlAntiga: '/tubos-de-led/', codigo: 'LED-T', bloco: 'led', estado: 'festa' },
-  { ancora: 'tunel-de-led', nome: 'Túnel de LED',
+  { ancora: 'tunel-de-led', peso: 2, nome: 'Túnel de LED',
     desc: 'Uma experiência envolvente que leva você para uma nova dimensão.',
     urlAntiga: '/tunel-de-led/', codigo: 'LED-TN', bloco: 'led', estado: 'festa' },
-  { ancora: 'efeitos-especiais', nome: 'Efeitos especiais',
+  { ancora: 'efeitos-especiais', peso: 3, nome: 'Efeitos especiais',
     desc: 'Detalhes que acrescentam um toque especial ao seu evento.',
     urlAntiga: '/efeitos-especiais/', codigo: 'FX', bloco: 'led', estado: 'festa' },
-  { ancora: 'projetos-3d', nome: 'Projetos 3D personalizados',
+  { ancora: 'projetos-3d', peso: 3, nome: 'Projetos 3D personalizados',
     desc: 'Criação de ambientes únicos e exclusivos.',
     urlAntiga: '/projetos-3d-personalizados/', codigo: '3D', bloco: 'cenografia', estado: 'tecnico' },
-  { ancora: 'area-instagramavel', nome: 'Área instagramável',
+  { ancora: 'area-instagramavel', peso: 2, nome: 'Área instagramável',
     desc: 'Um espaço pensado para brilhar nas suas fotos e eternizar o momento perfeito.',
     urlAntiga: '/area-instagramavel/', codigo: 'SET', bloco: 'cenografia', estado: 'festa' },
-  { ancora: 'criacao-de-conteudo', nome: 'Criação de conteúdo',
+  { ancora: 'criacao-de-conteudo', peso: 3, nome: 'Criação de conteúdo',
     desc: 'Criamos projetos personalizados que contam a sua história.',
     urlAntiga: '/criacao-de-conteudo/', codigo: 'REC', bloco: 'cenografia', estado: 'tecnico' },
-  { ancora: 'quinze-anos', nome: 'Emoções 15 anos',
+  { ancora: 'quinze-anos', peso: 2, foto: '/img/eventos/5.webp', nome: 'Emoções 15 anos',
     desc: 'Um momento mágico que celebra o início de uma nova fase, repleto de brilho e encanto.',
     urlAntiga: '/emocoes-15-anos/', codigo: '15A', bloco: 'pacotes', estado: 'festa' },
-  { ancora: 'casamento', nome: 'Emoções casamento',
+  { ancora: 'casamento', peso: 2, foto: '/img/eventos/8.webp', nome: 'Emoções casamento',
     desc: 'Cenários perfeitos para histórias de amor inesquecíveis, no dia mais especial da sua vida.',
     urlAntiga: '/emocoes-casamento/', codigo: 'CAS', bloco: 'pacotes', estado: 'festa' },
 ]

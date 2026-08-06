@@ -1,149 +1,143 @@
 'use client'
 
-import { motion, stagger, steps, type Variants } from 'framer-motion'
+import { useCallback, useRef } from 'react'
 import type { Servico } from '@/lib/conteudo'
 import { zap } from '@/lib/conteudo'
-import { Tubo } from './ui'
-
-/** A cor do tubo de um serviço, pela restrição dura:
- *  'festa' = ambiente (magenta) · 'tecnico' = luz de trabalho (branco). */
-export const corDoTubo = (s: Servico) =>
-  s.estado === 'festa' ? 'var(--color-magenta)' : 'var(--color-branco)'
-
-const PIXELS = 9
-
-/* O chase: o tubo acende pixel a pixel. Não dá para fazer em CSS —
-   exigiria nove :nth-child escritos à mão, e não haveria como inverter
-   a varredura na saída. Com variantes, `from: 'last'` inverte. */
-const ENTRA = [0.22, 1, 0.36, 1] as const
-
-/* NAO existe mais variante `oculto` com opacity 0.
-   O Motion SERIALIZA o `initial` no HTML do `output: 'export'` — e
-   comportamento documentado, nao configuracao errada. Com
-   `initial="oculto"` os tres cards e seus 27 pixels iam para o disco
-   com `style="opacity:0"` e so apareciam quando o bundle chegasse.
-   Em 4G a secao de servicos mostrava o titulo e um buraco.
-   E o mesmo defeito que ja tinha sido corrigido no Reveal e que eu
-   nao vi aqui. O estado servido agora e o estado assentado. */
-const pixelVar: Variants = {
-  'tubo-apagado': { opacity: 0.24, transition: { duration: 0.12 } },
-  'tubo-aceso': { opacity: 1, transition: { duration: 0.12, ease: steps(2, 'end') } },
-}
-
-/* Nomes específicos de propósito: variante propaga por TODA a subárvore
-   de componentes motion, então um nome genérico como 'aceso' dispararia
-   em descendentes que não deviam responder. */
 
 /**
- * Card de destaque — só para os três serviços de LED que vendem.
- * Os outros dez vivem no índice, que não é caixa.
+ * O CARD DE SERVIÇO — um componente, três pesos.
  *
- * whileTap não é enfeite: `whileHover` NUNCA dispara em touch (o Motion
- * filtra pointerType === 'touch' na entrada e na saída). Sem ele, o
- * chase simplesmente não existiria para a maioria do tráfego, que chega
- * pelo link na bio do Instagram.
+ * O QUE ESTAVA ERRADO ANTES
+ * Não era o card, era a divisão em castas: três serviços viravam card e
+ * dez viravam linha de índice. A leitura do cliente foi exata — "o som
+ * ficou sem nada de card" — porque sonorização é o serviço-base da
+ * empresa e aparecia como linha de lista.
+ *
+ * Agora os 13 são card. O que muda entre eles é o PESO, e o peso é
+ * geometria, não hierarquia de valor: 1 ocupa o dobro e leva foto, 2 é
+ * médio, 3 é compacto. Como cada bloco tem sua própria grade pequena, a
+ * contagem 13 nunca aparece em lugar nenhum — e o bloco de som, que tem
+ * um item só, fica com a maior área da página.
+ *
+ * QUATRO DEFEITOS CONCRETOS, TODOS CORRIGIDOS
+ *
+ * 1. `transition: background 260ms` era INERTE. `background-image` tem
+ *    tipo de animação `discrete` (MDN): gradiente não interpola. O aro
+ *    de dois tons TROCAVA num quadro enquanto `transform` deslizava por
+ *    260ms — essa dessincronia é parte concreta do "está horrível".
+ *    Agora o estado de hover é uma camada própria e só `opacity` anima.
+ *
+ * 2. Não existia `:active` em lugar nenhum. No celular, que é a maior
+ *    parte do tráfego, o card não dava sinal nenhum de que foi tocado.
+ *
+ * 3. `delay: i * 0.08` sem teto dava 0,96 s no décimo terceiro card.
+ *
+ * 4. O `<a>` envolvia o `<h3>` e o `<p>`, então o leitor de tela
+ *    anunciava o card inteiro como rótulo do link. Agora o card é
+ *    `<article>` e o link cobre a área por `::after` — o nome acessível
+ *    passa a ser só o texto do CTA.
+ *
+ * O TILT
+ * ±4 graus, não 15. E `perspective()` DENTRO do transform de cada card,
+ * nunca `perspective` como propriedade num wrapper: como propriedade ela
+ * cria containing block para `position: fixed` e quebraria a nav.
+ * Nada de `translateZ`: `overflow: hidden` e `isolation: isolate` no card
+ * forçam `transform-style: flat` mesmo com `preserve-3d` declarado.
+ *
+ * Escreve direto em custom property, sem estado do React — zero
+ * re-render por movimento de ponteiro. E o CSS só liga o tilt em
+ * `(hover: hover) and (pointer: fine)`, então em toque ele não existe.
  */
-export function CardServico({ servico, i, foto }:
-  { servico: Servico; i: number; foto?: string }) {
-  const cor = corDoTubo(servico)
+
+export function CardServico({ servico, i }: { servico: Servico; i: number }) {
+  const ref = useRef<HTMLElement>(null)
+
+  /* Sem estado: `style.setProperty` não passa pelo React. Um mousemove
+     a 120 Hz com useState seria 120 renders por segundo por card. */
+  const mover = useCallback((e: React.PointerEvent<HTMLElement>) => {
+    const el = ref.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width
+    const y = (e.clientY - r.top) / r.height
+    el.style.setProperty('--mx', `${x * 100}%`)
+    el.style.setProperty('--my', `${y * 100}%`)
+    el.style.setProperty('--tx', `${(y - 0.5) * -8}deg`)
+    el.style.setProperty('--ty', `${(x - 0.5) * 8}deg`)
+  }, [])
+
+  const sair = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.setProperty('--tx', '0deg')
+    el.style.setProperty('--ty', '0deg')
+  }, [])
+
+  const heroi = servico.peso === 1
 
   return (
-    <motion.a
+    <article
+      ref={ref}
       id={servico.ancora}
-      href={zap(`Oi! Quero orçamento de ${servico.nome.toLowerCase()}.`)}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-zap
-      className="card group flex h-full scroll-mt-24 flex-col"
-      style={{ ['--tubo-cor' as string]: cor }}
-      /* `initial={false}`: o card nasce pronto no HTML e nunca e servido
-         escondido. A entrada por rolagem volta na etapa de scroll, feita
-         em CSS scroll-driven, que nao passa pelo SSR do Motion. */
-      initial={false}
-      animate="tubo-apagado"
-      whileHover="tubo-aceso"
-      whileFocus="tubo-aceso"
-      whileTap="tubo-aceso"
-      variants={{
-        'tubo-apagado': {
-          opacity: 1, y: 0,
-          transition: { duration: 0.5, delay: i * 0.08, ease: ENTRA,
-                        delayChildren: stagger(0.03, { from: 'last' }) },
-        },
-        'tubo-aceso': {
-          opacity: 1, y: 0,
-          transition: { delayChildren: stagger(0.035) },
-        },
-      }}
+      className="card"
+      data-peso={servico.peso}
+      data-estado={servico.estado}
+      /* teto no atraso: sem ele o 13o card entrava com 0,96 s */
+      style={{ ['--d' as string]: `${Math.min(i, 6) * 55}ms` }}
+      onPointerMove={mover}
+      onPointerLeave={sair}
     >
-      <span className="luz" aria-hidden />
+      {/* o facho e o aro ficam em z-index 0 e a foto e o texto em 1.
+          Assim magenta NAO ALCANCA um rosto por geometria, e nao por
+          disciplina de quem escreve o proximo card. */}
+      <span className="card__facho" aria-hidden />
+      <span className="card__aro" aria-hidden />
 
-      {/* o tubo em pixels discretos — a assinatura, virando interação */}
-      <span aria-hidden
-            className="absolute inset-y-6 left-3.5 flex w-[3px] flex-col justify-between">
-        {Array.from({ length: PIXELS }, (_, p) => (
-          <motion.span key={p} variants={pixelVar} data-pixel
-                       className="h-1.5 w-full rounded-[var(--radius-cut)]"
-                       style={{ background: cor }} />
-        ))}
-      </span>
-
-      {foto && (
-        <img src={foto} width={1033} height={690} loading="lazy" decoding="async"
-             alt={`${servico.nome} montado pela Rapa Sound`}
-             /* raio interno = externo − distância até a borda */
-             className="mb-6 aspect-16/10 w-full rounded-[calc(var(--radius-card)-0.75rem)]
-                        object-cover" />
+      {/* A foto NAO e decorativa: e a prova de que o servico existe.
+          Entao ela leva alt descritivo e o span nao e aria-hidden. */}
+      {servico.foto && (
+        <span className="card__foto">
+          <img src={servico.foto} width={1033} height={690} loading="lazy"
+               decoding="async"
+               alt={`${servico.nome} montado pela Rapa Sound em evento real`} />
+        </span>
       )}
 
-      <span className="lab text-ambar">{servico.codigo}</span>
-      <h3 className="mt-2 text-lg">{servico.nome}</h3>
-      <p className="mt-3 flex-1 text-xs leading-relaxed text-branco-2">{servico.desc}</p>
-      <span className="lab mt-6 inline-flex items-center gap-2 text-ambar
-                       transition-transform duration-300 group-hover:translate-x-1">
-        Falar no WhatsApp
-        <span aria-hidden>→</span>
-      </span>
-    </motion.a>
+      <div className="card__corpo">
+        <span className="card__cod">{servico.codigo}</span>
+        <h3 className="card__titulo">{servico.nome}</h3>
+        <p className="card__desc">{servico.desc}</p>
+
+        {/* A ficha do herói. São fatos já provados no inventário — nada
+            de número de caixa ou de canal de mesa, que eu não tenho e
+            não invento. Ver P14 no PENDENCIAS.md. */}
+        {heroi && (
+          <dl className="card__ficha">
+            {servico.bloco === 'som' ? (
+              <>
+                <div><dt>Artistas</dt><dd>116</dd></div>
+                <div><dt>Mercado</dt><dd>Quase 30 anos</dd></div>
+                <div><dt>Praças</dt><dd>Uberlândia · Araguari · Tiradentes</dd></div>
+              </>
+            ) : (
+              <>
+                <div><dt>Formatos</dt><dd>Painel · pista · túnel · tubo</dd></div>
+                <div><dt>Monta</dt><dd>Junto ou separado</dd></div>
+              </>
+            )}
+          </dl>
+        )}
+
+        {/* O link cobre o card inteiro por ::after. O nome acessivel e
+            so este texto — antes o <a> envolvia titulo e descricao e o
+            leitor de tela lia o card todo como rotulo. */}
+        <a className="card__link"
+           href={zap(`Oi! Quero orçamento de ${servico.nome.toLowerCase()}.`)}
+           target="_blank" rel="noopener noreferrer" data-zap>
+          Falar no WhatsApp
+          <span aria-hidden>→</span>
+        </a>
+      </div>
+    </article>
   )
 }
-
-/**
- * Linha de índice — os dez serviços restantes.
- * Sem caixa e sem sombra: filete e ritmo. O código de rider (PA, LX,
- * LED-T) substitui a numeração 01/02/03, que é proibida e além disso
- * mentirosa — serviço não tem ordem.
- */
-export function LinhaServico({ servico, paraSecao }:
-  { servico: Servico; paraSecao?: boolean }) {
-  const cor = corDoTubo(servico)
-  /* `quinze-anos` e `casamento` ja SAO secoes da pagina. Repetir o id
-     aqui criaria ancora duplicada e o 301 de /emocoes-15-anos/ pararia
-     na segunda ocorrencia. Nesses dois a linha aponta para a secao. */
-  const interno = paraSecao
-  return (
-    <a
-      id={interno ? undefined : servico.ancora}
-      href={interno
-        ? `#${servico.ancora}`
-        : zap(`Oi! Quero orçamento de ${servico.nome.toLowerCase()}.`)}
-      target={interno ? undefined : '_blank'}
-      rel={interno ? undefined : 'noopener noreferrer'}
-      data-zap={interno ? undefined : ''}
-      className="linha scroll-mt-24"
-      style={{ ['--tubo-cor' as string]: cor }}
-    >
-      <span className="linha__px" aria-hidden />
-      <span className="linha__cod">{servico.codigo}</span>
-      <span className="min-w-0">
-        <span className="block text-sm font-bold">{servico.nome}</span>
-        <span className="mt-1 block max-w-[52ch] text-xs text-branco-2">{servico.desc}</span>
-      </span>
-      <span className="linha__seta lab text-ambar" aria-hidden>
-        {interno ? '↓' : '→'}
-      </span>
-    </a>
-  )
-}
-
-export { Tubo }

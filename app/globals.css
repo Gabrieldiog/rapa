@@ -107,6 +107,21 @@
   to   { opacity: 1; }
 }
 
+/* O card entra subindo e assentando.
+   O `to` repete EXATAMENTE a expressao de transform da regra base, e
+   isso nao e redundancia: com `animation-fill-mode: both` o quadro
+   final continua aplicado para sempre e SOBRESCREVE a regra base. Se
+   ele dissesse `transform: none`, o tilt morreria depois da entrada.
+   Como custom property dentro de keyframe e reavaliada, escrever a
+   mesma expressao mantem --tx/--ty vivos. */
+@keyframes card-entra {
+  from { opacity: 0;
+         transform: perspective(900px) translateY(14px); }
+  to   { opacity: 1;
+         transform: perspective(900px)
+                    rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); }
+}
+
 /* O segmento do VU meter acendendo: sobe do escuro e assenta.
    Sem escala e sem deslocamento — um LED nao se move, ele liga. */
 @keyframes vu-acende {
@@ -535,162 +550,241 @@
   }
   .tubo-aceso { opacity: 1; }
 
-  /* ---------- CARD DE SERVICO -------------------------------
-     Animado em duas camadas: o reveal na entrada (stagger por
-     indice) e o acender do tubo no hover/foco. So transform e
-     opacity — nunca width/height/top/left.
+  /* ---------- O BLOCO E SUA GRADE ---------------------------
+     Cinco grades pequenas, uma por bloco. Nenhuma tem 13 celulas —
+     e por isso o numero primo deixa de ser problema.
      --------------------------------------------------------- */
-  /* O ARO DE DOIS TONS — o que separa "painel" de "<div> com contorno".
-     Duas camadas no mesmo background: superficie em padding-box, aro em
-     border-box. A de cima cobre o miolo, entao a de baixo so aparece no
-     1px da borda. Zero DOM, zero JS. */
+  .bloco__cabeca {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.25rem;
+    padding-block-end: 1rem;
+    margin-block-end: 1.25rem;
+    border-block-end: 1px solid var(--color-rule);
+  }
+  .bloco__titulo {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1;
+  }
+
+  .bloco__grade { display: grid; gap: 0.75rem; }
+
+  /* CELULAR: uma coluna. A altura variavel e o que salva o ritmo —
+     card de peso 3 vira faixa baixa, e a quebra de altura evita a
+     sequencia de retangulos iguais que le como lista. */
+  @media (min-width: 640px) {
+    .bloco__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card[data-peso="1"] { grid-column: span 2; }
+  }
+
+  @media (min-width: 1024px) {
+    /* LED tem 5: quatro colunas, o heroi 2x2 e quatro celulas 1x1.
+       Encaixe exato, sem orfao. */
+    .bloco__grade[data-bloco="led"] {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .bloco__grade[data-bloco="led"] .card[data-peso="1"] {
+      grid-column: span 2; grid-row: span 2;
+    }
+    /* Cenografia tem 3: um largo em cima, dois embaixo. NUNCA tres
+       colunas iguais — tres iguais le como "sobrou um". */
+    .bloco__grade[data-bloco="cenografia"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .bloco__grade[data-bloco="cenografia"] .card[data-peso="2"] {
+      grid-column: span 2;
+    }
+  }
+
+  /* ---------- O CARD ----------------------------------------
+     Um componente, tres pesos. O peso e GEOMETRIA, nao hierarquia
+     de valor.
+     --------------------------------------------------------- */
   .card {
     position: relative;
-    border: 1px solid transparent;
-    border-radius: var(--radius-card);
-    padding: 1.75rem 1.5rem 1.5rem 2.25rem;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     isolation: isolate;
+    border-radius: var(--radius-card);
+    border: 1px solid transparent;
+    /* aro de dois tons: topo mais claro, base mais escura. Simula luz
+       vindo de cima, que e como o olho espera que uma superficie se
+       comporte. */
     background:
       linear-gradient(180deg,
         color-mix(in srgb, var(--color-branco) 4%, var(--color-off)) 0%,
-        var(--color-off) 38%) padding-box,
-      /* claro em cima (pega a luz), filete no meio, sombra na base */
+        var(--color-off) 40%) padding-box,
       linear-gradient(175deg,
-        color-mix(in srgb, var(--color-branco) 30%, var(--color-rule)) 0%,
-        var(--color-rule) 26%,
-        var(--color-rule) 62%,
-        color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
-    /* bisel: 1px de luz no topo, 1px de sombra na base. Filete, nao elevacao. */
-    box-shadow:
-      inset 0  1px 0 0 color-mix(in srgb, var(--color-branco)  7%, transparent),
-      inset 0 -1px 0 0 color-mix(in srgb, var(--color-void)   55%, transparent);
-    transition: transform 320ms var(--ease-tubo),
-                box-shadow 260ms var(--ease-out-cut),
-                background 260ms var(--ease-out-cut);
-  }
-  .card::after {
-    /* a luz que o tubo joga na superficie — nasce do proprio tubo */
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background: radial-gradient(
-      120% 100% at 0% 50%,
-      color-mix(in srgb, var(--tubo-cor) 18%, transparent) 0%,
-      transparent 62%
-    );
-    opacity: 0;
-    transition: opacity 320ms var(--ease-out-cut);
-  }
-  /* no hover/foco o aro incorpora a cor do tubo, sem trocar de estrutura */
-  .card:hover, .card:focus-within {
-    transform: translateY(-3px);
-    background:
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--color-branco) 5%, var(--color-off)) 0%,
-        var(--color-off) 38%) padding-box,
-      linear-gradient(175deg,
-        color-mix(in srgb, var(--tubo-cor) 46%, var(--color-rule)) 0%,
-        color-mix(in srgb, var(--tubo-cor) 22%, var(--color-rule)) 30%,
-        var(--color-rule) 70%,
+        color-mix(in srgb, var(--color-branco) 26%, var(--color-rule)) 0%,
+        var(--color-rule) 28%, var(--color-rule) 62%,
         color-mix(in srgb, var(--color-void) 62%, var(--color-rule)) 100%) border-box;
     box-shadow:
-      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 10%, transparent),
-      0 18px 40px -24px color-mix(in srgb, var(--tubo-cor) 55%, transparent);
+      inset 0 1px 0 0 color-mix(in srgb, var(--color-branco) 7%, transparent),
+      inset 0 -1px 0 0 color-mix(in srgb, var(--color-void) 55%, transparent);
+    /* NAO ha transicao de `background` aqui, e e de proposito.
+       `background-image` tem tipo de animacao `discrete`: gradiente NAO
+       interpola. A regra antiga dizia `transition: background 260ms` e
+       era inerte — o aro trocava num quadro enquanto o transform
+       deslizava por 260ms, e essa dessincronia era parte concreta do
+       "esta horrivel". Quem anima agora e a camada .card__aro, por
+       opacity. */
+    transition: transform 320ms var(--ease-out-cut);
+    transform: perspective(900px) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg));
+    transform-style: flat;   /* explicito: overflow+isolation ja forcam */
   }
-  .card:hover::after, .card:focus-within::after { opacity: 1; }
-  .card:hover .tubo, .card:focus-within .tubo { opacity: 1; }
 
-  /* o tubo acompanha o raio do card em que vive */
-  .card .tubo {
-    inset-block: 0.9rem;
-    inset-inline-start: 0.85rem;
-    border-radius: var(--radius-cut);
-  }
+  /* entrada: sobe e assenta. O atraso vem do --d, com teto no JSX. */
+  .card { animation: card-entra 560ms var(--ease-out-cut) both; animation-delay: var(--d, 0ms); }
 
-  /* ---------- O FACHO QUE ACENDE OS PIXELS -------------------
-     O cursor nao soma brilho por cima: ele revela a matriz de LEDs
-     que esta sob o difusor. Disco de tamanho FIXO movido so por
-     translate3d — a mascara e estatica em relacao a ele, entao
-     viaja junto sem repintar. Compositor puro.
-     --------------------------------------------------------- */
-  .luz {
-    position: absolute;
-    top: 0; left: 0;
-    width: 15rem;
-    aspect-ratio: 1;
-    margin: -7.5rem 0 0 -7.5rem;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0;
-    /* pontos discretos, mesma gramatica do .tubo — nunca luz continua */
-    background-image: radial-gradient(circle at center,
-      var(--tubo-cor) 0 1.1px, transparent 1.5px);
-    background-size: 7px 7px;
-    -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
-            mask-image: radial-gradient(closest-side, #000 0%, rgba(0,0,0,.55) 42%, transparent 76%);
-    mix-blend-mode: screen;
-    transform: translate3d(var(--mx, 50%), var(--my, 35%), 0);
-    transition: opacity 260ms var(--ease-out-cut);
-  }
-  /* so onde existe ponteiro fino. Em touch nem chega a ser pintado. */
+  /* O TILT so onde ha ponteiro fino. Em tela de toque `hover` mente e
+     o card ficaria torto depois do primeiro toque. */
   @media (hover: hover) and (pointer: fine) {
-    .card:hover .luz { opacity: .85; }
+    .card:hover { z-index: 2; }
   }
-  .card > :not(.luz) { position: relative; z-index: 1; }
+  @media not ((hover: hover) and (pointer: fine)) {
+    .card { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transform: none; transition: none; animation: none; }
+  }
 
-  /* ---------- A LINHA DE ÍNDICE ------------------------------
-     13 e primo: nao existe grade de colunas iguais sem orfao.
-     A saida e parar de tratar os 13 como iguais. Sem caixa, sem
-     sombra — so filete e ritmo.
-     --------------------------------------------------------- */
-  .linha {
+  /* PRESSAO — nao existia. No celular, que e a maior parte do trafego,
+     o card nao dava sinal nenhum de que tinha sido tocado. */
+  .card:active { transform: scale(0.985); transition-duration: 120ms; }
+
+  /* o facho e o aro em z-index 0; foto e texto em 1. Magenta nao
+     alcanca um rosto POR GEOMETRIA, e nao por disciplina. */
+  .card__facho, .card__aro { position: absolute; inset: 0; z-index: 0;
+                             pointer-events: none; opacity: 0;
+                             transition: opacity 300ms var(--ease-out-cut); }
+  .card__facho {
+    background: radial-gradient(38% 46% at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 22%, transparent) 0%,
+      transparent 100%);
+  }
+  .card__aro {
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 42%, transparent);
+  }
+  .card[data-estado="festa"] { --tubo-cor: var(--color-magenta); }
+  .card[data-estado="tecnico"] { --tubo-cor: var(--color-branco); }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .card__facho, .card:hover .card__aro,
+    .card:focus-within .card__facho, .card:focus-within .card__aro { opacity: 1; }
+  }
+  .card:focus-within .card__aro { opacity: 1; }
+
+  /* ---- a foto ---- */
+  .card__foto {
     position: relative;
-    display: grid;
-    grid-template-columns: 4.5rem 1fr auto;
-    align-items: baseline;
-    gap: 0 1.25rem;
-    min-height: 4.5rem;          /* alvo de toque com folga */
-    padding-block: 1.15rem;
-    border-block-start: 1px solid var(--color-rule);
-    transition: background-color 220ms var(--ease-out-cut);
+    z-index: 1;
+    display: block;
+    overflow: hidden;
+    /* Sangra ate a borda e herda o raio MENOS a espessura da borda.
+       A formula antiga era calc(--radius-card - 0.75rem), com a foto a
+       1.5rem da borda: dava raio NEGATIVO. */
+    border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0;
+    aspect-ratio: 16 / 10;
   }
-  .bloco .linha:last-child { border-block-end: 1px solid var(--color-rule); }
+  .card[data-peso="1"] .card__foto { aspect-ratio: 16 / 7; }
+  .card__foto img { inline-size: 100%; block-size: 100%; object-fit: cover;
+                    opacity: 0.86; transition: opacity 300ms var(--ease-out-cut); }
+  .card:hover .card__foto img { opacity: 1; }
 
-  /* o codigo de rider. E dado, logo ambar. Nao e 01/02/03. */
-  .linha__cod {
+  /* ---- o corpo ---- */
+  .card__corpo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.25rem;
+  }
+  .card[data-peso="1"] .card__corpo { padding: 1.75rem; }
+  .card[data-peso="3"] .card__corpo { padding: 1.1rem 1.25rem; }
+
+  .card__cod {
     font-family: var(--font-mono);
     font-size: var(--text-2xs);
-    letter-spacing: .12em;
-    color: color-mix(in srgb, var(--color-ambar) 78%, var(--color-branco-2));
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-ambar);
+  }
+  .card__titulo {
+    margin-block-start: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    line-height: 1.15;
+  }
+  .card[data-peso="1"] .card__titulo { font-family: var(--font-display);
+                                       font-size: var(--text-xl); }
+  .card[data-peso="3"] .card__titulo { font-size: var(--text-sm); }
+  .card__desc {
+    margin-block-start: 0.625rem;
+    flex: 1;
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--color-branco-2);
+    max-inline-size: 46ch;
+  }
+
+  /* ---- a ficha do heroi ---- */
+  .card__ficha {
+    display: grid;
+    gap: 0.75rem 2rem;
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-rule);
+  }
+  @media (min-width: 480px) {
+    .card__ficha { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
+  }
+  .card__ficha dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+  }
+  .card__ficha dd {
+    margin-block-start: 0.3rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
-  .linha__px {
-    position: absolute;
-    inset-inline-start: -1rem;
-    inset-block-start: 1.6rem;
-    width: 3px; height: 12px;
-    border-radius: var(--radius-cut);
-    background: var(--tubo-cor);
-    opacity: .26;
-    transition: opacity 220ms var(--ease-out-cut);
+
+  /* ---- o link ---- */
+  .card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* 44px de altura no PROPRIO link. O ::after ja faz a area de clique
+       ser o card inteiro, mas auditoria mede a caixa do <a>, e quem so
+       tem 19px de altura reprova o criterio 2.5.8 da WCAG 2.2 em
+       qualquer leitura. Dar altura ao link e honesto nas duas. */
+    min-block-size: 2.75rem;
+    margin-block-start: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ambar);
   }
-  .linha:hover, .linha:focus-within {
-    background-color: color-mix(in srgb, var(--tubo-cor) 5%, transparent);
-  }
-  .linha:hover .linha__px, .linha:focus-within .linha__px { opacity: 1; }
-  .linha__seta {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-    transition: transform 220ms var(--ease-tubo), opacity 220ms var(--ease-out-cut);
-  }
-  .linha:hover .linha__seta, .linha:focus-within .linha__seta {
-    transform: translate3d(4px, 0, 0); opacity: 1;
-  }
-  /* em touch a seta e permanente — hover nao existe la */
-  @media (hover: none) { .linha__seta { opacity: 1; } }
+  .card[data-peso="3"] .card__link { margin-block-start: 0.5rem; }
+  /* O ::after cobre o card inteiro. Assim a area de clique e o card
+     todo E o nome acessivel continua sendo so este texto — antes o <a>
+     envolvia titulo e descricao e o leitor lia o card como rotulo. */
+  .card__link::after { content: ''; position: absolute; inset: 0; z-index: 2; }
+  .card__link > span { transition: transform 300ms var(--ease-out-cut); }
+  .card:hover .card__link > span { transform: translateX(0.25rem); }
+
+  /* A LINHA DE ÍNDICE saiu junto com a divisão em castas: os 13
+     serviços viraram card, e o que muda entre eles é o peso. */
 
   /* ---------- TRILHO DO PALCO ------------------------------- */
   .trilho { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
