@@ -153,7 +153,7 @@
    mesma expressao mantem --tx/--ty vivos. */
 @keyframes card-entra {
   from { opacity: 0;
-         transform: perspective(900px) translateY(26px); }
+         transform: perspective(900px) translateY(14px); }
   to   { opacity: 1;
          transform: perspective(900px)
                     rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); }
@@ -372,9 +372,7 @@
     position: relative;
     display: block;
     block-size: 100%;
-    /* clip e nao hidden: recorta igual e NAO cria scroll container,
-       que sequestraria `animation-timeline: view()` de descendentes */
-    overflow: clip;
+    overflow: hidden;
     border-radius: var(--radius-card);
     border: 1px solid var(--color-rule);
     background: var(--color-off);
@@ -716,68 +714,6 @@
     transform: scale(1.45);
   }
 
-  /* ---------- O TOPO QUE SAI DE CENA ------------------------
-     Rolando para fora do hero, a marca e a manchete sobem um pouco e
-     apagam. Nao e enfeite: sem isso o topo simplesmente some cortado
-     pela borda da tela, o que le como "acabou o carregamento". Saindo
-     devagar, ele entrega a pagina em vez de sumir dela.
-
-     A faixa e `exit`, que so corre DEPOIS que o elemento comeca a
-     deixar a tela — enquanto o hero esta inteiro na tela nada acontece.
-     Termina em 78% para o bloco nunca ficar transparente enquanto
-     ainda ha muito dele visivel.
-
-     ATENCAO: o H1 tem `background-clip: text` na palavra varrida, e
-     contexto de empilhamento MATA isso no Chrome. Por isso quem anima
-     e o CONTAINER, com `transform` e `opacity` — e nao o H1. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .topo-sai {
-        animation: topo-sai linear both;
-        animation-timeline: view();
-        animation-range: exit 0% exit 78%;
-      }
-    }
-  }
-  @keyframes topo-sai {
-    from { opacity: 1; transform: none; }
-    to   { opacity: 0; transform: translateY(-40px); }
-  }
-
-  /* ---------- A FOTO QUE RESPIRA ----------------------------
-     A foto anda mais devagar que a moldura enquanto a moldura cruza a
-     tela. E o unico parallax da pagina, e ele existe por um motivo
-     concreto: sao fotos de festa parada num retangulo, e um retangulo
-     parado nao lembra festa. O deslocamento e de 24px no total — o
-     bastante para o olho registrar profundidade, pouco o bastante para
-     ninguem enjoar.
-
-     A moldura precisa recortar, e por isso as molduras deste projeto
-     usam `overflow: clip` e nao `hidden`: `hidden` criaria scroll
-     container e sequestraria a linha do tempo de `view()` aqui dentro.
-
-     Escala 1.06 fixa: sem ela o deslocamento mostraria a borda vazia.
-     So `transform` — composto, roda na GPU, nao dispara layout. */
-  .respira { overflow: clip; }
-  .respira > img { display: block; inline-size: 100%; }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .respira > img {
-        animation: respira linear both;
-        animation-timeline: view();
-        /* `cover` de proposito AQUI: nao ha estado final a preservar,
-           o efeito e continuo do inicio ao fim da travessia. Uma foto
-           ja visivel no primeiro quadro nasce no meio do percurso, que
-           e exatamente o certo para parallax. */
-        animation-range: cover 0% cover 100%;
-      }
-    }
-  }
-  @keyframes respira {
-    from { transform: scale(1.06) translateY(-12px); }
-    to   { transform: scale(1.06) translateY(12px); }
-  }
-
   /* ---------- O PAINEL DOS ARTISTAS -------------------------
      Uma caixa, que era exatamente o que faltava: os doze nomes de
      alcance nacional estavam soltos no meio da página, sem filete,
@@ -1072,24 +1008,8 @@
     transform-style: flat;   /* explicito: overflow+isolation ja forcam */
   }
 
-  /* ENTRADA DIRIGIDA PELA ROLAGEM, e nao pelo carregamento.
-     Antes era `animation: card-entra 560ms both` com atraso por indice:
-     os treze cards animavam TODOS no load, mesmo os que estao a 4000px
-     abaixo da dobra. Quem chegava neles rolando ja encontrava tudo
-     parado — a animacao acontecia para ninguem, e ainda custava quadro
-     na hora em que a pagina mais precisa deles.
-     Agora cada card tem a sua propria linha do tempo, ancorada na
-     posicao DELE. Zero JS.
-     Sem `view()` nao ha regra e o card nasce assentado: a lei da casa. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .card {
-        animation: card-entra linear both;
-        animation-timeline: view();
-        animation-range: entry 4% entry 58%;
-      }
-    }
-  }
+  /* entrada: sobe e assenta. O atraso vem do --d, com teto no JSX. */
+  .card { animation: card-entra 560ms var(--ease-out-cut) both; animation-delay: var(--d, 0ms); }
 
   /* ---------- A TINTA E O GRAO -------------------------------
      A queixa foi "os cards estao muito cinzas sem vida". Duas causas,
@@ -1257,8 +1177,7 @@
     position: relative;
     z-index: 1;
     display: block;
-    /* clip: recorta igual e nao vira scroll container */
-    overflow: clip;
+    overflow: hidden;
     /* Sangra ate a borda e herda o raio MENOS a espessura da borda.
        A formula antiga era calc(--radius-card - 0.75rem), com a foto a
        1.5rem da borda: dava raio NEGATIVO. */
@@ -1691,58 +1610,15 @@
      Caminho rapido em CSS puro onde animation-timeline existe;
      fallback por IntersectionObserver (~0.4KB) no resto.
      --------------------------------------------------------- */
-  /* A ENTRADA E DIRIGIDA PELA ROLAGEM, e nao por um cronometro.
-     Antes era um IntersectionObserver que disparava uma transicao de
-     320ms: o bloco cruzava um limiar e a animacao corria sozinha, sem
-     relacao com o quanto a pessoa rolou. Agora o progresso E a posicao
-     — quem rola devagar ve o bloco subir devagar, quem rola rapido ve
-     ele ja assentado. E o que faz "as coisas irem aparecendo" em vez
-     de "as coisas piscarem".
-
-     E CSS PURO. Nada aqui depende de JS: se o JS morrer, a rolagem
-     continua revelando. O `Reveal` so entra em campo onde `view()`
-     nao existe — Firefox ate a 156, e navegadores antigos. No trafego
-     de celular brasileiro isso e ~10%, e para eles o fallback e o
-     observador de sempre.
-
-     A LEI DA CASA CONTINUA VALENDO: quem esconde e o `@supports`. Sem
-     suporte a `view()`, `.rev` nao tem regra nenhuma e o bloco nasce
-     visivel. O HTML servido nunca esconde nada. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .rev {
-        animation: rev-entra linear both;
-        /* `animation-timeline` DEPOIS do shorthand, sempre: a timeline
-           e reset-only em `animation`, e qualquer declaracao posterior
-           a zera de volta para o relogio do documento, em silencio. */
-        animation-timeline: view();
-        /* TERMINA DENTRO DE `entry`, e isso e obrigatorio. `view()` nao
-           tem estado inicial: ele calcula o progresso pela posicao
-           ATUAL. Com `cover` um bloco ja visivel no primeiro quadro
-           nasceria em 50% — congelado no meio da entrada. Com `entry`
-           "ja entrou" mapeia para 100%, que e o estado final. */
-        animation-range: entry 6% entry 62%;
-      }
-      /* o `--d` do JSX vira ATRASO EM DISTANCIA, nao em tempo: o bloco
-         irmao comeca a subir um pouco mais tarde na rolagem. */
-      .rev[style*="--d"] { animation-range: entry 12% entry 72%; }
-    }
-  }
-  @keyframes rev-entra {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: none; }
-  }
-
-  /* O CAMINHO DE FALLBACK, so onde `view()` nao existe. A classe e
-     posta por JS depois da montagem e apenas em bloco ABAIXO da dobra
-     — o que ja esta na tela nunca chega a sumir, nem por um quadro. */
-  .rev-js { opacity: 0; transform: translateY(14px); }
+  .rev { opacity: 0; transform: translateY(14px); }
   .rev-on {
     opacity: 1; transform: none;
     transition: opacity 320ms var(--ease-out-cut),
                 transform 320ms var(--ease-tubo);
     transition-delay: var(--d, 0ms);
   }
+  /* `.rev` so e aplicada por JS, depois da montagem, e apenas em
+     elemento ABAIXO da dobra. O HTML servido nunca esconde nada. */
 
   /* ---------- O BEAT DE BLACKOUT ----------------------------
      ~400ms, UM so na pagina inteira. Nao segura o paint: a foto

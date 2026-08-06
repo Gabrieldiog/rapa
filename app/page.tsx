@@ -47,8 +47,8 @@ export default function Home() {
 
         {/* Sem barra: o menu flutua no canto de cima a direita, sobre a
             pagina. O pt maior so garante que a marca nao encoste nele. */}
-        <div className="topo-sai relative mx-auto flex min-h-[92svh] w-full max-w-3xl
-                        flex-col items-center justify-center px-5 pt-20 pb-16
+        <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
+                        items-center justify-center px-5 pt-20 pb-16
                         text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
@@ -138,24 +138,17 @@ export default function Home() {
             {/* a foto que saiu do topo abre aqui, grande e sem veu: e a
                 unica prova visual de que a festa aconteceu de verdade.
                 fetchPriority alto porque agora ela e a candidata a LCP. */}
-            {/* `respira`: a foto anda mais devagar que a moldura enquanto
-                a moldura cruza a tela. 24px no total — o bastante para
-                o olho ver profundidade, pouco para enjoar. */}
-            <span className="respira mb-2 block aspect-16/10 w-full
-                             rounded-[var(--radius-card)]">
-              <img src={FOTOS_EVENTO[0].src} width={FOTOS_EVENTO[0].w}
-                   height={FOTOS_EVENTO[0].h} fetchPriority="high" decoding="async"
-                   alt="Debutante erguida pelas convidadas no meio da pista, com arcos de luz ao fundo"
-                   className="h-full w-full object-cover" />
-            </span>
+            <img src={FOTOS_EVENTO[0].src} width={FOTOS_EVENTO[0].w}
+                 height={FOTOS_EVENTO[0].h} fetchPriority="high" decoding="async"
+                 alt="Debutante erguida pelas convidadas no meio da pista, com arcos de luz ao fundo"
+                 className="mb-2 aspect-16/10 w-full rounded-[var(--radius-card)]
+                            object-cover" />
             <div className="grid grid-cols-2 gap-2">
               {FOTOS_EVENTO.slice(1, 5).map((f, i) => (
-                <span key={f.src} className="respira block aspect-4/3 w-full">
-                  <img src={f.src} width={f.w} height={f.h} loading="lazy"
-                       decoding="async"
-                       alt={`Festa de 15 anos sonorizada e iluminada pela Rapa Sound — foto ${i + 1}`}
-                       className="h-full w-full object-cover" />
-                </span>
+                <img key={f.src} src={f.src} width={f.w} height={f.h} loading="lazy"
+                     decoding="async"
+                     alt={`Festa de 15 anos sonorizada e iluminada pela Rapa Sound — foto ${i + 1}`}
+                     className="aspect-4/3 w-full object-cover" />
               ))}
             </div>
           </Reveal>
@@ -167,13 +160,7 @@ export default function Home() {
           A regra das duas luzes contada como percurso da noite.
           E o argumento mais forte que temos com a noiva: a segunda
           maior objecao dela e "a luz colorida vai estragar minha foto". */}
-      {/* overflow-CLIP e nao hidden. `hidden` cria scroll container, e
-          scroll container SEQUESTRA o `animation-timeline: view()` de
-          tudo que vive dentro dele: a animacao amarra na secao em vez
-          de amarrar na pagina e nunca progride. `clip` recorta sem
-          criar o container. E a mesma armadilha que ja tinha derrubado
-          os cabecalhos `sticky` da secao de servicos. */}
-      <Secao id="casamento" className="relative overflow-clip">
+      <Secao id="casamento" className="relative overflow-hidden">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
              style={{ background:
                'radial-gradient(120% 80% at 78% 0%, color-mix(in srgb, var(--color-congo) 62%, transparent) 0%, transparent 68%)' }} />
@@ -232,14 +219,11 @@ export default function Home() {
           <Reveal delay={90}>
             <div className="grid grid-cols-2 gap-3">
               {FOTOS_EVENTO.slice(5, 8).map((f, i) => (
-                <span key={f.src}
-                      className={`respira block w-full rounded-[var(--radius-card)]
-                                  ${i === 0 ? 'col-span-2 aspect-16/10' : 'aspect-4/5'}`}>
-                  <img src={f.src} width={f.w} height={f.h} loading="lazy"
-                       decoding="async"
-                       alt={`Casamento sonorizado e iluminado pela Rapa Sound — foto ${i + 1}`}
-                       className="h-full w-full object-cover" />
-                </span>
+                <img key={f.src} src={f.src} width={f.w} height={f.h} loading="lazy"
+                     decoding="async"
+                     alt={`Casamento sonorizado e iluminado pela Rapa Sound — foto ${i + 1}`}
+                     className={`w-full rounded-[var(--radius-card)] object-cover
+                                 ${i === 0 ? 'col-span-2 aspect-16/10' : 'aspect-4/5'}`} />
               ))}
             </div>
             <p className="lab mt-5 max-w-[36ch] leading-relaxed">
