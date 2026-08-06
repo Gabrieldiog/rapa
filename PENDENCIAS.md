@@ -203,6 +203,31 @@ cliente é desleixo. **Apagar no PR de publicação.**
 
 ---
 
+## P14 · A ficha técnica dos cards herói
+
+**Não bloqueia publicação. Melhora muito se vier.**
+
+Os dois cards de peso 1 — Sonorização e Painel de LED — têm espaço para uma ficha
+técnica em monoespaçada, e é o único caso em que o rótulo pode ser primário. É o que
+tira o card de "descrição genérica" e o põe em "quem entende, entende".
+
+Hoje a ficha usa **fatos já provados**: 116 artistas, quase 30 anos, e as três praças.
+Não inventei número de caixa nem de canal de mesa.
+
+O que o cliente poderia confirmar, e que valeria mais:
+
+| Card | Dado | Por que importa |
+|---|---|---|
+| **PA** | quantas caixas, quantos subs, quantos canais na mesa | produtor decide por isso |
+| **PA** | potência total em watts | é a primeira pergunta de rider |
+| **LED-P** | passo do painel (P2, P3, P4) e área máxima em m² | idem |
+| **LED-F** | área da pista de LED em m² | a noiva pergunta o tamanho |
+| **LED-TN** | comprimento do túnel em metros | idem |
+
+Cinco números resolvem o vazio de dois cards e dão argumento B2B de graça.
+
+---
+
 ## Decisões já tomadas (não são pendência)
 
 | Tema | Decisão | Quem decidiu |

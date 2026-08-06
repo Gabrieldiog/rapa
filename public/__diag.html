@@ -28,6 +28,14 @@
   const f = document.getElementById('f')
   f.style.width  = larguraAlvo + 'px'
   f.style.height = alturaAlvo + 'px'
+  /* ?so=1 esconde o painel de texto: o print sai so o iframe, no
+     canto superior esquerdo, pronto para recortar. Reaproveita o
+     ?rolar= daqui, que ja funciona, em vez de duplicar a logica. */
+  if (new URLSearchParams(location.search).get('so')) {
+    document.getElementById('out').style.display = 'none'
+    document.getElementById('wrap').style.padding = '0'
+    document.body.style.background = '#000'
+  }
 
   /* ?seek=2400 adianta o relogio das animacoes CSS e congela.
      Necessario porque --virtual-time-budget do Chrome headless NAO
@@ -50,7 +58,12 @@
 
   f.addEventListener('load', () => setTimeout(() => {
     const d0 = f.contentDocument
-    if (rolar) f.contentWindow.scrollTo(0, rolar)
+    /* revela os blocos ANTES de rolar: revelar muda a altura do
+       documento, e a posicao ja calculada deixaria de apontar ao alvo */
+    for (const r of d0.querySelectorAll('.rev')) r.classList.add('rev-on')
+    if (rolar) {
+      for (const ms of [0, 250, 700]) setTimeout(() => f.contentWindow.scrollTo(0, rolar), ms)
+    }
     if (seek) {
       for (const el of d0.querySelectorAll('*'))
         for (const a of el.getAnimations()) { a.pause(); a.currentTime = seek }
@@ -142,7 +155,15 @@
       if (parseFloat(est.opacity) !== 0) continue
       if (est.display === 'none' || est.visibility === 'hidden') continue
       if (!(el.textContent || '').trim()) continue
-      if (el.closest('.rev:not(.rev-on)')) { aguardando++; continue }
+      /* `.rev` e bloco de reveal. Nao adianta exigir `:not(.rev-on)`:
+         o --virtual-time-budget nao avanca transicao CSS, entao mesmo
+         ja revelado ele segue em opacity 0 no print. */
+      if (el.closest('.rev')) { aguardando++; continue }
+      /* aria-hidden e decoracao — a seta do indice, por exemplo, nasce
+         em opacity 0 e so aparece no hover. E o estado correto. */
+      if (el.closest('[aria-hidden="true"]') || el.getAttribute('aria-hidden') === 'true') {
+        aguardando++; continue
+      }
       /* animacao dirigida por rolagem: a opacidade e funcao da posicao
          do scroll, entao 0 fora da faixa e o estado correto, nao
          defeito. Sem isto a `.virada__nota` aparece como falso
@@ -155,6 +176,13 @@
     linhas.push('INVISIVEIS esperando o observer (ok): ' + aguardando)
     linhas.push('INVISIVEIS SEM EXPLICACAO (defeito): ' + semExplicacao.length)
     for (const s of semExplicacao.slice(0, 12)) linhas.push('  ' + s)
+
+    // onde comeca cada secao — para o __ver.html rolar por pixel
+    linhas.push('')
+    linhas.push('OFFSET DAS SECOES (para ?rolar=)')
+    for (const sec of d.querySelectorAll('section[id], header[id]'))
+      linhas.push('  ' + String(Math.round(
+        sec.getBoundingClientRect().top + w.scrollY)).padStart(6) + '  #' + sec.id)
 
     // estado da palavra LED
     const led = d.querySelector('.led')

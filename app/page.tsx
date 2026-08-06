@@ -1,10 +1,10 @@
 import {
-  SERVICOS, BLOCOS, DESTAQUE_LED, RIDER, DESTAQUES, TOTAL_ARTISTAS,
+  SERVICOS, BLOCOS, RIDER, DESTAQUES, TOTAL_ARTISTAS,
   EVENTOS, DEPOIMENTOS, FAQ,
   CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
-import { CardServico, LinhaServico } from '@/components/CardServico'
+import { CardServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
 import { MenuLiquido } from '@/components/MenuLiquido'
@@ -249,38 +249,27 @@ export default function Home() {
           </h2>
         </Reveal>
 
-        {/* os tres que vendem */}
-        <div className="mt-14 grid gap-4 md:grid-cols-3">
-          {DESTAQUE_LED.map((a, i) => {
-            const s = SERVICOS.find((x) => x.ancora === a)!
-            return (
-              <CardServico key={a} servico={s} i={i}
-                           foto={`/img/eventos/${[3, 6, 8][i]}.webp`} />
-            )
-          })}
-        </div>
-
-        {/* o indice: os cinco blocos, tamanhos desiguais de proposito */}
-        <div className="mt-20 flex flex-col gap-14">
-          {BLOCOS.map((b, bi) => {
-            const itens = SERVICOS.filter(
-              (s) => s.bloco === b.id && !DESTAQUE_LED.includes(s.ancora),
-            )
+        {/* CINCO GRADES PEQUENAS, uma por bloco. Nao ha nenhuma grade
+            com 13 celulas — e por isso o numero primo deixa de ser
+            problema. Cada bloco fecha exato:
+              som 1 · luz 2 · LED 5 · cenografia 3 · pacotes 2
+            A assimetria vira informacao: o bloco de som tem UM item, e
+            e o servico-base da empresa, entao esse item recebe a maior
+            area da pagina. */}
+        <div className="mt-14 flex flex-col gap-16 lg:gap-20">
+          {BLOCOS.map((b) => {
+            const itens = SERVICOS.filter((s) => s.bloco === b.id)
             if (!itens.length) return null
             return (
-              <Reveal key={b.id} delay={Math.min(bi, 3) * 60}>
-                <div className="bloco grid gap-x-10 gap-y-5
-                                lg:grid-cols-[minmax(0,13rem)_1fr]">
-                  <div className="lg:sticky lg:top-8 lg:self-start">
-                    <h3 className="text-lg">{b.titulo}</h3>
-                    <p className="lab mt-2">
-                      {b.nota} · {itens.length + (b.id === 'led' ? 3 : 0)}
-                    </p>
+              <Reveal key={b.id}>
+                <div className="bloco">
+                  <div className="bloco__cabeca">
+                    <h3 className="bloco__titulo">{b.titulo}</h3>
+                    <p className="lab">{b.nota} · {itens.length}</p>
                   </div>
-                  <div className="lg:pl-4">
-                    {itens.map((s) => (
-                      <LinhaServico key={s.ancora} servico={s}
-                                    paraSecao={b.id === 'pacotes'} />
+                  <div className="bloco__grade" data-bloco={b.id}>
+                    {itens.map((s, i) => (
+                      <CardServico key={s.ancora} servico={s} i={i} />
                     ))}
                   </div>
                 </div>
@@ -378,8 +367,12 @@ export default function Home() {
 
       {/* ══════════════ ESTADO TÉCNICO · SOBRE E EQUIPE ══════════════ */}
       <Secao id="sobre" className="border-t border-rule">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
-          <Reveal>
+        {/* minmax(0,1fr) e nao 1fr: coluna de grid nasce com
+            `min-width: auto` e nao encolhe abaixo do conteudo. Sem isto
+            o trilho da equipe esticava a coluna inteira — medido em
+            1140px alem da borda a 380px. */}
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
+          <Reveal className="min-w-0">
             <Eyebrow><b>A casa</b> · quase <i>30</i> anos</Eyebrow>
             <h2 className="max-w-[18ch] text-2xl lg:text-3xl">Quase 30 anos</h2>
             <p className="mt-6 text-base text-branco-2">
@@ -392,7 +385,7 @@ export default function Home() {
               sabe onde pendurar o refletor para a foto sair boa.
             </p>
           </Reveal>
-          <Reveal delay={90}>
+          <Reveal delay={90} className="min-w-0">
             <LequeEquipe cards={EQUIPE.map((p) => ({
               src: p.src,
               alt: `${p.nome}, ${p.papel.toLowerCase()} na Rapa Sound`,
