@@ -113,12 +113,17 @@ export const SERVICOS: Servico[] = [
   { ancora: 'efeitos-especiais', peso: 3, nome: 'Efeitos especiais',
     desc: 'Detalhes que acrescentam um toque especial ao seu evento.',
     urlAntiga: '/efeitos-especiais/', codigo: 'FX', bloco: 'led', estado: 'festa' },
-  { ancora: 'projetos-3d', peso: 3, nome: 'Projetos 3D personalizados',
-    desc: 'Criação de ambientes únicos e exclusivos.',
-    urlAntiga: '/projetos-3d-personalizados/', codigo: '3D', bloco: 'cenografia', estado: 'tecnico' },
+  /* A ORDEM AQUI E LAYOUT, e nao ranking. O bloco de cenografia tem
+     tres itens e a grade da a largura dupla AO PRIMEIRO — entao o
+     primeiro precisa ser o que aguenta ficar largo. Antes a regra
+     mirava `peso 2`, que caia no MEIO da lista: a Area instagramavel
+     esticava sozinha na linha do meio e sobravam dois buracos. */
   { ancora: 'area-instagramavel', peso: 2, nome: 'Área instagramável',
     desc: 'Um espaço pensado para brilhar nas suas fotos e eternizar o momento perfeito.',
     urlAntiga: '/area-instagramavel/', codigo: 'SET', bloco: 'cenografia', estado: 'festa' },
+  { ancora: 'projetos-3d', peso: 3, nome: 'Projetos 3D personalizados',
+    desc: 'Criação de ambientes únicos e exclusivos.',
+    urlAntiga: '/projetos-3d-personalizados/', codigo: '3D', bloco: 'cenografia', estado: 'tecnico' },
   { ancora: 'criacao-de-conteudo', peso: 3, nome: 'Criação de conteúdo',
     desc: 'Criamos projetos personalizados que contam a sua história.',
     urlAntiga: '/criacao-de-conteudo/', codigo: 'REC', bloco: 'cenografia', estado: 'tecnico' },
