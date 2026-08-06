@@ -323,7 +323,18 @@
          atraso de proposito: fora de fase elas competiriam pela
          atencao e o topo viraria pisca-pisca. Em fase, lê como uma
          luz so passando pelo bloco inteiro. */
-      animation: led-varre 7200ms linear 1200ms infinite;
+      /* TRES PASSADAS, E NAO `infinite`.
+       Ela anima `background-position`, que NAO roda na GPU: repinta a
+       palavra inteira a cada quadro, na thread principal. Infinita,
+       isso durava enquanto a pessoa estivesse na pagina.
+       Tres passadas dao 21,6s de varredura — tempo de sobra para
+       qualquer um ver — e depois a palavra descansa em ambar cheio,
+       que e o quadro final (`background-position: 0%` deixa a janela
+       do gradiente toda na faixa clara).
+       E tira a pagina do criterio 2.2.2 da WCAG por aqui: movimento
+       que termina nao e movimento automatico continuo, e nao precisa
+       de mecanismo de pausa. Era o que obrigava o botao no rodape. */
+    animation: led-varre 7200ms linear 1200ms 3;
     }
     /* Contínua, como pedido. A ressalva de bateria continua de pe —
        background-clip:text repinta na main thread, nao vai para o
@@ -714,47 +725,19 @@
     transform: scale(1.45);
   }
 
-  /* ---------- O CONTROLE DE PAUSA ---------------------------
-     Criterio 2.2.2 da WCAG, NIVEL A: movimento que comeca sozinho,
-     dura mais de cinco segundos e aparece junto com outro conteudo
-     precisa de um mecanismo de pausa NA PAGINA.
-     `prefers-reduced-motion` nao fecha esse criterio — a tecnica que
-     o usa e de 2.3.3, que e AAA, e alem disso ela depende de a pessoa
-     ter configurado o sistema. O botao vale para quem so quer que
-     aquilo pare AGORA.
-     --------------------------------------------------------- */
-  .pausa-geral {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-block-size: 2.75rem;
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-branco-2);
-    transition: color 200ms var(--ease-out-cut);
-  }
-  .pausa-geral:hover, .pausa-geral:focus-visible { color: var(--color-ambar); }
-  .pausa-geral__sinal {
-    display: grid;
-    place-items: center;
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
-    border-radius: 999px;
-    border: 1px solid currentColor;
-  }
-
-  /* A VARREDURA DA PALAVRA "marcantes" PARA DE VERDADE.
-     `animation-play-state: paused` congela onde esta, sem saltar para
-     o quadro inicial — a palavra continua legivel exatamente como
-     estava. `PausaLed` continua existindo e faz outra coisa: economiza
-     quadro quando a palavra sai da tela. Uma e acessibilidade, a outra
-     e desempenho, e as duas somam. */
-  html[data-parado] .led { animation-play-state: paused; }
-  /* e qualquer outra animacao de tempo da pagina */
-  html[data-parado] .vu,
-  html[data-parado] .rolo__par { animation-play-state: paused; }
+  /* O BOTAO DE PAUSA SAIU, e o motivo e melhor do que "nao gostei".
+     Ele existia porque a pagina tinha movimento automatico continuo —
+     a varredura de "marcantes" era `infinite` e a seda desenhava para
+     sempre — e o criterio 2.2.2 da WCAG, nivel A, exige mecanismo de
+     pausa NA PAGINA nesse caso.
+     Mas botao so ajuda quem aperta, e quase ninguem aperta. Movimento
+     FINITO ajuda todo mundo sem pedir nada: a varredura passa tres
+     vezes e descansa, a seda ondula sete segundos e congela num
+     quadro. Nada dura mais de cinco segundos por conta propria, o
+     criterio nao e acionado, e o rodape fica limpo.
+     De quebra a seda para de custar: medido com CPU estrangulada em
+     6x, ela comia 4 quadros por segundo o tempo inteiro (51,0 contra
+     55,1 com o canvas escondido). Congelada, custa zero. */
 
   /* ---------- O PAINEL DE CONTATO ---------------------------
      Cada dado e uma LINHA com simbolo e filete dourado embaixo.
