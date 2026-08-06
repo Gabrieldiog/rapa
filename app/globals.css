@@ -1413,31 +1413,29 @@
      esticar a altura da barra. O `top` soma o safe-area porque a
      posicao absoluta ignora a padding do pai — sem isso a pilula
      subiria para dentro da ilha dinamica num iPhone. */
+  /* o gatilho: a pilula ambar do menu.md. Deixou de MORFAR — quem
+     abre agora e a gaveta lateral — entao ela e so um botao. */
   .barra-cel__pilula {
     position: absolute;
     inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
     inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
-    border-radius: 22px;
-    /* A ALTURA E DAQUI, e nao do JavaScript. O painel vive dentro
-       desta caixa com `overflow: hidden`: enquanto a altura vinha de
-       uma animacao de JS, ver os nove itens dependia dessa animacao
-       chegar ao fim — e se ela fosse interrompida a caixa ficava em
-       44px com tudo recortado. Bastava o hamburguer virar X e nada
-       mais aparecer. Agora o React so troca o atributo; abrir e
-       fechar sao estado de CSS, e a transicao e enfeite. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
     block-size: 2.75rem;
-    transition: block-size 800ms cubic-bezier(0.22, 1, 0.36, 1);
-    /* TETO. Com o texto do navegador em 200% — criterio 1.4.4, nivel
-       AA — os nove itens passam de 670px; o teto respeita a tela e
-       quem rola por dentro e o painel. */
-    max-block-size: calc(100dvh - 6rem - env(safe-area-inset-top, 0px));
+    padding-inline: 1.25rem;
+    border-radius: 22px;
+    background: var(--color-ambar);
+    color: var(--color-void);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: transform 180ms var(--ease-out-cut);
   }
-  .barra-cel__pilula[data-aberto] { block-size: 28.25rem; }
-  /* fechar e mais rapido do que abrir, como no original */
-  .barra-cel__pilula:not([data-aberto]) { transition-duration: 150ms; }
-  @media (prefers-reduced-motion: reduce) {
-    .barra-cel__pilula { transition: none; }
-  }
+  .barra-cel__pilula:active { transform: scale(0.95); }
 
   /* a marca da barra so entra depois do hero: no topo ela repetia a
      marca grande do hero, 40px acima dela */
@@ -1453,18 +1451,127 @@
     transform: none;
     pointer-events: auto;
   }
-  .menu-painel {
-    position: relative;
-    z-index: 10;
+
+  /* ---------- A GAVETA LATERAL -----------------------------
+     `<dialog>` aberto com showModal(). O elemento vai para a TOP LAYER
+     do navegador, acima de qualquer z-index da pagina — a classe de
+     defeito "alguma coisa esta cobrindo o menu" deixa de ser possivel.
+
+     A REGRA QUE EU JA QUEBREI DUAS VEZES AQUI: a gaveta ABERTA tem
+     `translate: 0` como estado BASE, e a transicao so desliza ate ele.
+     Se a transicao nao rodar, ela aparece inteira de uma vez. Antes a
+     altura do painel vinha de uma animacao de JS dentro de uma caixa
+     que recortava, e bastava a animacao nao terminar para o menu sumir
+     com o hamburguer ja virado em X.
+     --------------------------------------------------------- */
+  .gaveta {
+    /* o <dialog> ocupa a tela toda para receber o toque no fundo;
+       quem tem largura de gaveta e o painel de dentro */
+    position: fixed;
+    inset: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100%;
+    max-block-size: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+  .gaveta::backdrop {
+    background: color-mix(in srgb, var(--color-void) 68%, transparent);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out-cut);
+  }
+  .gaveta[data-aberta]::backdrop { opacity: 1; }
+
+  .gaveta__painel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: min(20rem, 84vw);
     display: flex;
-    flex: 1;
     flex-direction: column;
-    justify-content: center;
-    padding-inline: 1.5rem;
-    padding-block-end: 1.75rem;
+    padding:
+      calc(env(safe-area-inset-top, 0px) + 1.25rem)
+      max(1.5rem, env(safe-area-inset-right, 0px))
+      calc(env(safe-area-inset-bottom, 0px) + 1.5rem)
+      1.5rem;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+      linear-gradient(200deg,
+        color-mix(in srgb, var(--color-ambar) 7%, var(--color-off)) 0%,
+        var(--color-off) 42%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+    border-inline-start: 1px solid var(--color-rule);
+    box-shadow: -24px 0 60px -20px var(--color-void);
+    /* fechada: fora da tela, pelo lado direito */
+    translate: 100% 0;
+    transition: translate 320ms var(--ease-out-cut);
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  .gaveta[data-aberta] .gaveta__painel { translate: 0 0; }
+  @media (prefers-reduced-motion: reduce) {
+    .gaveta__painel, .gaveta::backdrop { transition: none; }
+  }
+
+  .gaveta__topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1.25rem;
+    border-block-end: 1px solid var(--color-rule);
+  }
+  .gaveta__x {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    margin-inline-end: -0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-rule);
+    color: var(--color-branco);
+    transition: border-color 200ms var(--ease-out-cut),
+                color 200ms var(--ease-out-cut);
+  }
+  .gaveta__x:hover, .gaveta__x:focus-visible {
+    border-color: var(--color-ambar);
+    color: var(--color-ambar);
+  }
+
+  .gaveta__nav { flex: 1; padding-block: 1.75rem; }
+  .gaveta__nav ul { display: flex; flex-direction: column; gap: 0.25rem; }
+  .gaveta__nav .menu-item {
+    display: flex;
+    align-items: center;
+    min-block-size: 3rem;
+  }
+
+  .gaveta__zap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-block-size: 3.25rem;
+    border-radius: var(--radius-botao);
+    background: var(--color-ambar);
+    color: var(--color-void);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* trava a rolagem do fundo. O showModal() NAO trava sozinho — e
+     issue aberta na WHATWG desde 2022. */
+  html:has(dialog[open]) { overflow: hidden; }
+
 
   /* UM SO ELEMENTO FIXO. O WhatsApp entrou na barra do topo, entao nao
      ha mais nada preso no rodape — o `padding-block-end` no body e o
@@ -1510,8 +1617,6 @@
      Foram junto os keyframes acender-sala e acender-nota.
      A tese sobrevive por tipografia, no bloco .registro. */
 }
-
-
 
 @layer components {
 
