@@ -140,6 +140,50 @@
 }
 
 @layer components {
+  /* ---------- O ROLAR DE LETRA DO MENU ---------------------
+     Cada caractere vive numa coluna de 1em com overflow escondido,
+     e dentro dela o mesmo caractere aparece DUAS vezes empilhado.
+     Subir a pilha em 50% troca a copia de cima pela de baixo: a
+     letra tomba sobre si mesma.
+
+     No componente original isso dispara em `onMouseEnter`. O menu e
+     `lg:hidden` — no desktop nao existe, no celular `mouseenter` nao
+     dispara. Aqui dispara na ABERTURA, por `[data-rolar]`, o que
+     funciona no toque.
+
+     O atraso soma duas contagens: `--i` e o item, `--c` e o
+     caractere. Assim as palavras entram em cascata e cada uma tomba
+     da esquerda para a direita.
+     --------------------------------------------------------- */
+  .menu-item {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .rolo { display: flex; justify-content: center; }
+  /* 1.12em e nao 1em: VIDEOS, DUVIDAS e SERVICOS tem acento e cedilha,
+     que ficam fora da caixa em varios serifs. Com 1em exato funciona na
+     Zodiak e corta se a fonte cair no fallback do sistema. */
+  .rolo__col { display: block; block-size: 1.12em; overflow: hidden; }
+  .rolo__par {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(0);
+    transition: transform 800ms var(--ease-out-cut);
+    transition-delay: calc(var(--i) * 90ms + var(--c) * 30ms);
+  }
+  .rolo__par > span { display: block; block-size: 1.12em; line-height: 1.12em; }
+  [data-rolar] .rolo__par { transform: translateY(-50%); }
+
+  /* Sem movimento: a letra ja nasce assentada e nada tomba. O texto
+     continua identico — o rolo troca uma copia por outra IGUAL. */
+  @media (prefers-reduced-motion: reduce) {
+    .rolo__par { transition: none; transform: translateY(-50%); }
+  }
+
   /* ---------- label utilitaria: o registro tecnico ---------- */
   .lab {
     font-family: var(--font-mono);

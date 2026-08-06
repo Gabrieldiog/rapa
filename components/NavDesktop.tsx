@@ -23,7 +23,13 @@ const ANCORAS = [
   { href: '#servicos', label: 'Serviços' },
   { href: '#eventos', label: 'Vídeos' },
   { href: '#rider', label: 'Rider' },
+  /* `#sobre` e `#contato` faltavam aqui, e como o menu do celular so
+     monta os itens ao ABRIR, as duas secoes ficavam sem NENHUM link
+     apontando para elas no HTML servido. Medido: zero ocorrencias de
+     href="#sobre" e href="#contato" no out/index.html. */
+  { href: '#sobre', label: 'A casa' },
   { href: '#duvidas', label: 'Dúvidas' },
+  { href: '#contato', label: 'Contato' },
 ]
 
 export function NavDesktop() {
@@ -64,7 +70,10 @@ export function NavDesktop() {
             <Logo className="h-9 w-auto" />
           </a>
 
-          <ul className="ml-auto flex items-center gap-7">
+          {/* gap-5 no lg: com os dois itens novos a fileira passa de 8, e
+              a 1024px a soma de logo + itens + botao estourava a largura
+              util. gap-7 volta a partir de 1280px, onde sobra espaco. */}
+          <ul className="ml-auto flex items-center gap-5 xl:gap-7">
             {ANCORAS.map((a) => (
               <li key={a.href}>
                 <a href={a.href}

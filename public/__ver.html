@@ -44,6 +44,28 @@
        nao a animacao de entrada. */
     setTimeout(() => {
       for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
+      /* ?clique=<seletor> aperta um botao antes do print. Serve para
+         fotografar estado aberto — menu, <details>, modal. */
+      const sel = q.get('clique')
+      if (sel) {
+        const alvo = d.querySelector(sel)
+        if (alvo) alvo.click()
+        /* O --virtual-time-budget do Chrome headless NAO avanca a linha
+           do tempo de animacao: sem isto o print sai no meio do morph e
+           o painel aparece como um retangulo vazio. `finish()` leva
+           cada animacao ao quadro final, que e o estado que interessa
+           fotografar. Duas passadas porque o painel so entra no DOM
+           depois que o container comeca a abrir. */
+        const acabar = () => {
+          for (const el of d.querySelectorAll('*'))
+            for (const a of el.getAnimations()) { try { a.finish() } catch {} }
+        }
+        /* Varias passadas: o painel so entra no DOM depois que o
+           container comeca a abrir, e o rolo de letra tem atraso
+           acumulado (item x 90ms + caractere x 30ms) — o ultimo item
+           so comeca em ~720ms. Uma passada so pegava o meio do rolo. */
+        for (const ms of [60, 260, 560, 900, 1400]) setTimeout(acabar, ms)
+      }
     }, 400)
   }, 2200))
 </script>
