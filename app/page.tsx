@@ -4,6 +4,10 @@ import {
   CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
+import {
+  IconeWhatsApp, IconeTelefone, IconeEmail, IconeLugar,
+  ICONE_REDE, ROTULO_REDE,
+} from '@/components/Marcas'
 import { CardServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
@@ -12,6 +16,7 @@ import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
 import { Logo } from '@/components/Logo'
 import { PausaLed } from '@/components/PausaLed'
+import { Pausa } from '@/components/Pausa'
 import { Blackout } from '@/components/Blackout'
 import { Zap, Secao, Eyebrow } from '@/components/ui'
 
@@ -533,51 +538,79 @@ export default function Home() {
             </Zap>
           </Reveal>
 
+          {/* CADA DADO VIRA UMA LINHA COM SÍMBOLO E FILETE DOURADO.
+              Antes eram rótulo e valor soltos, e o WhatsApp — que é a
+              única conversão da página — tinha exatamente o mesmo peso
+              do CEP. O símbolo é reconhecido antes de a palavra ser
+              lida; o filete âmbar embaixo dá a cada linha um chão e
+              transforma a lista num painel de contato em vez de uma
+              tabela de dados.
+              O filete acende inteiro no hover — é o mesmo gesto do
+              segmento nos cards de depoimento. */}
           <Reveal delay={90}>
-            <dl className="grid gap-x-8 gap-y-7 sm:grid-cols-2">
-              <div>
-                <dt className="lab">WhatsApp</dt>
-                <dd className="mt-2 font-mono text-xs">{CONTATO.whatsappVisivel}</dd>
-              </div>
-              <div>
-                <dt className="lab">Telefone fixo</dt>
-                <dd className="font-mono text-xs">
-                  <a href={`tel:${CONTATO.fixoLink}`}
-                     className="inline-flex min-h-11 items-center hover:text-ambar">
-                    {CONTATO.fixo}
+            <dl className="contatos">
+              <div className="contato">
+                <dt className="contato__rot"><IconeWhatsApp /> WhatsApp</dt>
+                <dd className="contato__val">
+                  <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
+                     target="_blank" rel="noopener noreferrer" data-zap>
+                    {CONTATO.whatsappVisivel}
                   </a>
                 </dd>
               </div>
-              <div>
-                <dt className="lab">E-mail</dt>
-                <dd className="font-mono text-xs break-all">
-                  <a href={`mailto:${CONTATO.email}`}
-                     className="inline-flex min-h-11 items-center hover:text-ambar">
-                    {CONTATO.email}
-                  </a>
+
+              <div className="contato">
+                <dt className="contato__rot"><IconeTelefone /> Telefone fixo</dt>
+                <dd className="contato__val">
+                  <a href={`tel:${CONTATO.fixoLink}`}>{CONTATO.fixo}</a>
                 </dd>
               </div>
-              <div>
-                <dt className="lab">Endereço</dt>
+
+              <div className="contato">
+                <dt className="contato__rot"><IconeEmail /> E-mail</dt>
+                <dd className="contato__val contato__val--quebra">
+                  <a href={`mailto:${CONTATO.email}`}>{CONTATO.email}</a>
+                </dd>
+              </div>
+
+              <div className="contato">
+                <dt className="contato__rot"><IconeLugar /> Endereço</dt>
                 {/* PENDENTE P1: confirmar qual dos dois enderecos vale */}
-                <dd className="mt-2 font-mono text-xs not-italic leading-relaxed text-branco-2">
+                <dd className="contato__val contato__val--calmo">
                   {CONTATO.endereco.rua}<br />
-                  {CONTATO.endereco.bairro} · {CONTATO.endereco.cep}<br />
+                  {/* nowrap no CEP: sem isto ele quebra no hífen e sai
+                      "38406-" numa linha e "634" na outra */}
+                  {CONTATO.endereco.bairro} ·{' '}
+                  <span className="whitespace-nowrap">{CONTATO.endereco.cep}</span><br />
                   {CONTATO.endereco.cidade}/{CONTATO.endereco.uf}
                 </dd>
               </div>
-              <div className="sm:col-span-2">
-                <dt className="lab">Redes</dt>
-                <dd className="mt-1 flex flex-wrap gap-x-6 font-mono text-xs">
-                  {Object.entries(CONTATO.redes).map(([nome, url]) => (
-                    <a key={nome} href={url} target="_blank" rel="noopener noreferrer"
-                       className="inline-flex min-h-11 items-center capitalize underline
-                                  decoration-rule underline-offset-4 hover:text-ambar">
-                      {nome}
-                    </a>
-                  ))}
-                </dd>
-              </div>
+
+              {/* O NOME DA REDE vem do mapa, não de `capitalize`: com
+                  `capitalize` o YouTube sai "Youtube", e nome de marca
+                  escrito errado no rodapé é o tipo de detalhe que só o
+                  dono nota — e nota sempre.
+                  E o PERFIL sai da própria URL. Escrever "@rapasound"
+                  cravado dava o handle errado no Facebook, que é
+                  /rapasoundoficial. Derivar do link é a única versão
+                  que não pode divergir do destino. */}
+              {Object.entries(CONTATO.redes).map(([nome, url]) => {
+                const Icone = ICONE_REDE[nome]
+                const rotulo = ROTULO_REDE[nome] ?? nome
+                const perfil = url.replace(/\/$/, '').split('/').pop() ?? ''
+                return (
+                  <div key={nome} className="contato">
+                    <dt className="contato__rot">
+                      {Icone ? <Icone /> : null} {rotulo}
+                    </dt>
+                    <dd className="contato__val">
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        {perfil.startsWith('@') ? perfil : `@${perfil}`}
+                      </a>
+                    </dd>
+                  </div>
+                )
+              })}
             </dl>
           </Reveal>
         </div>
@@ -589,6 +622,11 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 lg:flex-row
                         lg:items-center lg:justify-between lg:px-8">
           <p className="lab">© Rapa Sound · Uberlândia/MG</p>
+          {/* O controle de pausa mora aqui, ao lado do ©, que é onde a
+              convenção põe controle de página. Ver o comentário em
+              components/Pausa.tsx: é o critério 2.2.2 da WCAG, nível A,
+              e é o único item da página com exposição jurídica. */}
+          <Pausa />
           <p className="lab">Sonorização · iluminação · efeitos · LED</p>
         </div>
       </footer>

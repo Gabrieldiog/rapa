@@ -83,8 +83,18 @@ export function Seda({ forca = 1 }: { forca?: number }) {
        suave nao mostra bloco, mostra um campo suave maior.
        O ganho e quadratico — 420x282 sao 118 mil pixels contra 1,1
        milhao de uma tela cheia. Nove vezes menos trigonometria. */
-    const LADO_MAX = 420
-    const LADO_MAX_MOVEL = 300
+    /* MEDIDO, e o numero antigo era alto demais. Com CPU estrangulada
+       em 6x — o perfil de um Android de entrada — a seda a 420/300
+       derruba a pagina para 27,8 quadros por segundo, com p50 de
+       33,3ms num orcamento de 16,7ms. A pagina inteira ficava a
+       16,9fps, e so `serviceScriptedAnimations` comia 40,7ms por
+       quadro. Reduzindo o buffer: 160 devolve 32,8fps, e 110 devolve
+       51,0 — contra 55,1 com o canvas escondido. A 110 a seda
+       praticamente para de custar.
+       E nao se perde nada: ela e um FUNDO, ampliado para a tela inteira
+       de qualquer jeito, e o que se ve dela e o drapeado grande. */
+    const LADO_MAX = 160
+    const LADO_MAX_MOVEL = 110
 
     let w = 0, h = 0, img: ImageData | null = null, ruido: Float32Array | null = null
 
@@ -120,9 +130,10 @@ export function Seda({ forca = 1 }: { forca?: number }) {
 
     let t = 0
     let id = 0
+    let manual = true   // false = a pessoa apertou pausa no rodape
     let naTela = true
     let comFoco = true
-    const rodando = () => naTela && comFoco
+    const rodando = () => naTela && comFoco && manual
 
     /* 30 quadros por segundo, nao 60. O padrao anda 0.02 por quadro:
        a diferenca entre um quadro e o seguinte e imperceptivel, e
@@ -177,11 +188,25 @@ export function Seda({ forca = 1 }: { forca?: number }) {
       cancelAnimationFrame(id)
       if (rodando()) id = requestAnimationFrame(quadro)
     }
-    const io = new IntersectionObserver(([e]) => { naTela = e.isIntersecting; religa() },
-                                        { threshold: 0 })
-    io.observe(canvas)
+    /* O OBSERVADOR OBSERVAVA O PROPRIO CANVAS, e o canvas e
+       `fixed inset-0`: ele esta SEMPRE na tela, por definicao. Ou seja
+       `naTela` nunca virava false e o laco rodava pelos 17.899px de
+       rolagem inteiros, do topo ao rodape, para sempre.
+       Nao ha o que observar: um fundo fixo nunca sai de vista. Quem
+       pausa de verdade e a aba perder o foco — e isso o
+       `visibilitychange` ja faz. O observador saiu. */
     const onVis = () => { comFoco = !document.hidden; religa() }
     document.addEventListener('visibilitychange', onVis)
+
+    /* O BOTAO DE PAUSA DO RODAPE. Canvas nao e alcancado por CSS —
+       `animation-play-state` nao existe aqui — entao ele ouve o evento
+       e para o proprio laco. O ultimo quadro fica pintado: o fundo
+       continua na tela, so deixa de se mexer. E o criterio 2.2.2 da
+       WCAG, nivel A: movimento automatico continuo precisa de um
+       mecanismo de pausa NA PAGINA. */
+    const onPausa = () => { manual = !document.documentElement.hasAttribute('data-parado'); religa() }
+    window.addEventListener('rs-pausa', onPausa)
+    onPausa()
     const ro = new ResizeObserver(medir)
     ro.observe(canvas)
 
@@ -189,9 +214,9 @@ export function Seda({ forca = 1 }: { forca?: number }) {
 
     return () => {
       cancelAnimationFrame(id)   // o original so cancelava, nunca desligava o resto
-      io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVis)
+      window.removeEventListener('rs-pausa', onPausa)
     }
   }, [forca])
 

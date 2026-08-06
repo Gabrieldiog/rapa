@@ -714,6 +714,128 @@
     transform: scale(1.45);
   }
 
+  /* ---------- O CONTROLE DE PAUSA ---------------------------
+     Criterio 2.2.2 da WCAG, NIVEL A: movimento que comeca sozinho,
+     dura mais de cinco segundos e aparece junto com outro conteudo
+     precisa de um mecanismo de pausa NA PAGINA.
+     `prefers-reduced-motion` nao fecha esse criterio — a tecnica que
+     o usa e de 2.3.3, que e AAA, e alem disso ela depende de a pessoa
+     ter configurado o sistema. O botao vale para quem so quer que
+     aquilo pare AGORA.
+     --------------------------------------------------------- */
+  .pausa-geral {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-block-size: 2.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+    transition: color 200ms var(--ease-out-cut);
+  }
+  .pausa-geral:hover, .pausa-geral:focus-visible { color: var(--color-ambar); }
+  .pausa-geral__sinal {
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+
+  /* A VARREDURA DA PALAVRA "marcantes" PARA DE VERDADE.
+     `animation-play-state: paused` congela onde esta, sem saltar para
+     o quadro inicial — a palavra continua legivel exatamente como
+     estava. `PausaLed` continua existindo e faz outra coisa: economiza
+     quadro quando a palavra sai da tela. Uma e acessibilidade, a outra
+     e desempenho, e as duas somam. */
+  html[data-parado] .led { animation-play-state: paused; }
+  /* e qualquer outra animacao de tempo da pagina */
+  html[data-parado] .vu,
+  html[data-parado] .rolo__par { animation-play-state: paused; }
+
+  /* ---------- O PAINEL DE CONTATO ---------------------------
+     Cada dado e uma LINHA com simbolo e filete dourado embaixo.
+     Antes eram rotulo e valor soltos numa grade, e o WhatsApp — a
+     unica conversao da pagina — tinha exatamente o mesmo peso do CEP.
+     --------------------------------------------------------- */
+  .contatos { display: grid; gap: 0; }
+  @media (min-width: 640px) {
+    .contatos { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.5rem; }
+  }
+
+  .contato {
+    position: relative;
+    padding-block: 1rem;
+  }
+  /* O FILETE. Duas camadas no mesmo lugar: uma cinza que e o chao da
+     linha, e uma ambar por cima que cresce de 0 a 100% da esquerda
+     para a direita. Animar `transform` e nao `width` — largura dispara
+     layout a cada quadro, escala roda na GPU. */
+  .contato::before,
+  .contato::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    block-size: 1px;
+  }
+  .contato::before { background: var(--color-rule); }
+  .contato::after {
+    background: var(--color-ambar);
+    transform-origin: 0 50%;
+    scale: 0 1;
+    transition: scale 420ms var(--ease-out-cut);
+  }
+  .contato:hover::after,
+  .contato:focus-within::after { scale: 1 1; }
+
+  /* O WHATSAPP JA NASCE ACESO. Ele nao e mais um dado da lista: e a
+     conversao, e a pagina inteira empurra para la. Deixar o filete
+     dele apagado ate alguem passar o mouse seria esconder o unico
+     item que interessa — e no celular nao existe passar o mouse. */
+  .contato:first-child::after { scale: 1 1; }
+
+  .contato__rot {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+    transition: color 260ms var(--ease-out-cut);
+  }
+  .contato:hover .contato__rot,
+  .contato:focus-within .contato__rot { color: var(--color-branco); }
+  /* o simbolo do WhatsApp ja nasce ambar, pelo mesmo motivo do filete */
+  .contato:first-child .contato__rot { color: var(--color-ambar); }
+
+  .contato__val {
+    margin-block-start: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-branco);
+  }
+  /* 44px de altura no PROPRIO link: o criterio 2.5.8 da WCAG 2.2 mede
+     a caixa do <a>, e uma linha de texto tem 19px. */
+  .contato__val a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    transition: color 200ms var(--ease-out-cut);
+  }
+  .contato__val a:hover, .contato__val a:focus-visible { color: var(--color-ambar); }
+  .contato__val--quebra a { word-break: break-all; }
+  .contato__val--calmo {
+    line-height: 1.6;
+    color: var(--color-branco-2);
+    font-style: normal;
+  }
+
   /* ---------- AS FALAS -------------------------------------
      A primeira versao era a orbita do algum.png: cupula de particulas
      e as falas girando por cima. Saiu — "faca um mais profissional".
@@ -1799,7 +1921,27 @@
     background-image: none;
     -webkit-text-fill-color: var(--color-ambar);
   }
+  /* `animation-name: none` E O QUE DESLIGA DE VERDADE, e foi medido.
+     `animation-duration: 1ms` NAO governa animacao dirigida por
+     rolagem: com `animation-timeline: view()` a duracao nao e a fonte
+     do progresso — a posicao e. Sonda a 430px, elemento parado no meio
+     da faixa:
+       sem reduce                   -> opacity 0,601
+       com reduce (regra antiga)    -> opacity 0,601   IDENTICO
+       com `animation-name: none`   -> opacity 1       CORRETO
+     Ou seja, quem pediu movimento reduzido continuava recebendo a
+     varredura dos cards e a do painel dos artistas.
+
+     E `animation-timeline: none` seria PIOR que nada: devolve a
+     animacao para o relogio do documento com duracao 1ms e `fill`, e o
+     elemento congela no quadro INICIAL — invisivel para sempre. Foi
+     medido tambem: opacity 0,2.
+
+     Apagar o NOME funciona porque a regra base de todo efeito desta
+     pagina ja e o estado final. Sem animacao, a pagina fica parada e
+     COMPLETA. */
   *, *::before, *::after {
+    animation-name: none !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
