@@ -882,29 +882,13 @@
   .eyebrow i { font-style: normal; font-variant-numeric: tabular-nums;
                color: var(--color-ambar); }
 
-  /* ---------- A COLUNA DE PIXELS ----------------------------
-     A expressao da assinatura. Pontos DISCRETOS, nunca linha
-     continua: um tubo de LED de perto e um conjunto de pontos.
-     Sem glow — glow e o default de IA para "neon".
-     --------------------------------------------------------- */
-  .tubo {
-    --tubo-cor: var(--color-ambar);
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 3px;
-    background-image: linear-gradient(
-      to bottom,
-      var(--tubo-cor) 0 4px,
-      transparent 4px 10px
-    );
-    background-size: 100% 10px;
-    background-repeat: repeat-y;
-    opacity: 0.28;
-    transition: opacity 320ms var(--ease-out-cut),
-                --tubo-cor 320ms linear;
-  }
-  .tubo-aceso { opacity: 1; }
+  /* A COLUNA DE PIXELS SAIU. Era um filete de pontos na borda de cada
+     secao — a "assinatura" da pagina. Saiu a pedido: "tire todas as
+     listras". O desenho de pontos continua vivo onde ele INFORMA em vez
+     de decorar margem: o marcador do .eyebrow, o separador entre os
+     nomes do rider, e o tubo da miniatura de video que marca qual esta
+     em exibicao. */
+
 
   /* ---------- O BLOCO E SUA GRADE ---------------------------
      Cinco grades pequenas, uma por bloco. Nenhuma tem 13 celulas —
@@ -1297,6 +1281,17 @@
      serviços viraram card, e o que muda entre eles é o peso. */
 
   /* ---------- TRILHO DO PALCO ------------------------------- */
+  /* CINTO DE SEGURANCA CONTRA FUGA DE `position: absolute`.
+     Um descendente absoluto so e recortado por um ancestral que
+     tambem seja CONTAINING BLOCK dele — ou seja, posicionado. Sem
+     isso ele se resolve contra o bloco inicial e escapa do
+     `overflow`, esticando o documento. Foi assim que um `.sr-only`
+     dentro do trilho de video levou o documento a 1424px de largura e
+     derrubou todo `position: fixed` no celular.
+     `position: relative` num container que ja recorta nao muda nada
+     visualmente e fecha a porta para sempre. */
+  .trilho, .equipe__trilho { position: relative; }
+
   .trilho { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
   .trilho::-webkit-scrollbar { height: 3px; }
   .trilho::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 2px; }
@@ -1357,96 +1352,223 @@
   .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
   .navbar__zap:hover { color: var(--color-void); }
 
-  /* ---------- A BARRA DO CELULAR ----------------------------
-     Existe porque o PC tem navbar e o celular nao tinha nada em cima —
-     o menu morava no rodape e nao lia como navegacao.
+  /* ---------- O MENU FLUTUANTE DO CELULAR ------------------
+     A BARRA PRETA MORREU. Foram duas tentativas — um painel descendo
+     de uma pilula presa no canto de cima, depois uma gaveta lateral —
+     as duas penduradas numa faixa fixa no topo. "No mobile nao faz
+     sentido ter uma barra preta" esta certo: ela comia 64px de altura
+     o tempo todo, repetia a marca que ja esta no hero, e existia so
+     para segurar um botao. O menu.md nunca teve barra.
 
-     `env(safe-area-inset-top)` so tem valor se o `<meta viewport>`
-     trouxer `viewport-fit=cover`; sem isso ele devolve 0. Como a barra
-     e opaca e cobre a faixa da ilha/entalhe, o `max()` garante um piso
-     de respiro nos aparelhos que nao reportam nada.
+     Fechado: duas pilulas flutuando no rodape, na zona do polegar.
+     Aberto: a mesma pilula, crescida, com as secoes dentro.
      --------------------------------------------------------- */
-  .barra-cel {
+  .flutua {
     position: fixed;
-    inset-inline: 0;
-    inset-block-start: 0;
-    z-index: 100;
+    /* CANTO SUPERIOR DIREITO, a pedido. Sem barra por tras: sao as
+       pilulas flutuando sobre a pagina. */
+    inset-inline-end: max(1rem, env(safe-area-inset-right, 0px));
+    inset-block-start: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+    z-index: 90;
     display: flex;
     align-items: center;
-    min-block-size: 4rem;
-    /* O SAFE-AREA LATERAL NAO E ZERO EM PAISAGEM: num iPhone com ilha
-       ele vale de 44 a 62px de cada lado. Com padding fixa de 20px a
-       marca cai debaixo do entalhe assim que o aparelho vira.
-       Em retrato, e em aba normal do Safari, os quatro insets valem 0
-       (o 59/62 so aparece em PWA standalone) — entao `max()` cai no
-       1.25rem e nada muda no caso comum. */
-    padding-inline:
-      max(1.25rem, env(safe-area-inset-left, 0px))
-      max(1.25rem, env(safe-area-inset-right, 0px));
-    /* `calc(X + env())` e nao `max(X, env())`: max() de um valor >= 0
-       com 0 devolve sempre o proprio valor — a versao anterior era um
-       no-op que nao garantia respiro nenhum. */
-    padding-block-start: env(safe-area-inset-top, 0px);
-    background: color-mix(in srgb, var(--color-void) 86%, transparent);
-    backdrop-filter: blur(14px);
-    border-block-end: 1px solid var(--color-rule);
+    gap: 0.5rem;
+    pointer-events: none;
+    transition: opacity 200ms var(--ease-out-cut);
   }
+  .flutua > * { pointer-events: auto; }
+  /* com o menu aberto ela sai: o painel ocupa o mesmo lugar */
+  .flutua[data-oculto] { opacity: 0; pointer-events: none; }
 
-  /* o WhatsApp DENTRO da barra, ao lado do hamburguer. Redondo e so
-     com o icone: a 360px a soma de marca + rotulo + pilula do menu nao
-     fecha. 44px e o minimo da casa e o criterio 2.5.5 da WCAG. */
-  .barra-cel__zap {
-    position: absolute;
-    inset-inline-end: calc(max(0.75rem, env(safe-area-inset-right, 0px)) + 8.5rem);
-    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
+  .flutua__pilula {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    block-size: 3rem;
+    padding-inline: 1.375rem;
     border-radius: 999px;
-    border: 1px solid var(--color-ambar);
-    color: var(--color-ambar);
-    background: color-mix(in srgb, var(--color-void) 70%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: transform 180ms var(--ease-out-cut);
+  }
+  .flutua__pilula {
+    background: var(--color-ambar);
+    color: var(--color-void);
+    box-shadow: 0 14px 38px -14px var(--color-ambar);
+  }
+  .flutua__pilula:active { transform: scale(0.95); }
+
+  .flutua__risco { display: flex; flex-direction: column; gap: 3px; }
+  .flutua__risco > span {
+    display: block;
+    inline-size: 1rem;
+    block-size: 2px;
+    background: currentColor;
+    transition: transform 300ms var(--ease-out-cut),
+                opacity 200ms var(--ease-out-cut);
+  }
+  .flutua__risco[data-x] > span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  .flutua__risco[data-x] > span:nth-child(2) { opacity: 0; }
+  .flutua__risco[data-x] > span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+
+  /* ---------- O MORPH ---------------------------------------
+     `<dialog>` modal: TOP LAYER do navegador, acima de qualquer
+     z-index. Depois de tres rodadas de "o menu nao aparece", nada aqui
+     depende de empilhamento.
+
+     E O TAMANHO ABERTO E O ESTADO BASE. `data-entrando` encolhe por um
+     quadro, e SAIR dele e o que produz o morph. Se a transicao nao
+     rodar, o painel aparece aberto. A lei que eu ja quebrei duas vezes
+     neste arquivo: nada que seja preciso VER pode depender de uma
+     animacao terminar.
+     --------------------------------------------------------- */
+  .morf {
+    position: fixed;
+    inset: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100%;
+    max-block-size: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .morf::backdrop {
+    background: color-mix(in srgb, var(--color-void) 62%, transparent);
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out-cut);
+  }
+  .morf[data-aberto]::backdrop { opacity: 1; }
+
+  /* O MORPH E `clip-path`, E NAO LARGURA E ALTURA. Este e o segundo
+     conserto do "pipoco".
+     Animar `inline-size`/`block-size` refaz o LAYOUT a cada quadro: os
+     nove itens reflowiam dentro de uma caixa que ia de 148px a 304px,
+     as palavras quebravam e desquebravam, e o resultado era a tela
+     pipocando. Com `clip-path` a caixa tem SEMPRE o tamanho final e o
+     conteudo e disposto uma vez so — o que anda e a janela que o
+     revela. Zero layout, zero reflow.
+     A ordem do inset() e topo/direita/baixo/esquerda: mantendo topo e
+     direita em 0 e recortando baixo e esquerda, a janela que sobra e
+     exatamente a pilula no canto de cima a direita. */
+  .morf__caixa {
+    --larg: min(19rem, calc(100vw - 2rem));
+    --alt: min(30rem, calc(100dvh - 8rem));
+    position: absolute;
+    inset-block-start: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+    inset-inline-end: max(1rem, env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    inline-size: var(--larg);
+    block-size: var(--alt);
+    clip-path: inset(0 0 0 0 round 26px);
+    transition: clip-path 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .morf__caixa[data-entrando] {
+    clip-path: inset(0 0 calc(100% - 3rem) calc(100% - 9.25rem) round 999px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .morf__caixa, .morf::backdrop { transition: none; }
   }
 
-  /* A pilula e ABSOLUTA: crescendo, ela nao pode empurrar a marca nem
-     esticar a altura da barra. O `top` soma o safe-area porque a
-     posicao absoluta ignora a padding do pai — sem isso a pilula
-     subiria para dentro da ilha dinamica num iPhone. */
-  .barra-cel__pilula {
+  .morf__ambar {
     position: absolute;
-    inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
-    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
-    /* TETO DE ALTURA. O motion escreve `height: 452px` inline, e a
-       caixa tem `overflow: hidden`. Com o texto do navegador em 200%
-       — criterio 1.4.4, nivel AA — os nove itens passam de 670px e os
-       ultimos ficavam cortados e inalcancaveis. O teto respeita a
-       tela; quem rola por dentro e o painel. */
-    max-block-size: calc(100dvh - 6rem - env(safe-area-inset-top, 0px));
+    inset: 0;
+    border-radius: inherit;
+    background: var(--color-ambar);
   }
-  .menu-painel {
+  /* o circulo escuro subindo de baixo: 200% de lado, `bottom` de
+     -200% a -20%. E o "liquid" do menu.md, literal. */
+  .morf__circulo {
+    position: absolute;
+    inset-inline-start: 50%;
+    inline-size: 200%;
+    aspect-ratio: 1;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: var(--color-void);
+    inset-block-start: -20%;
+    /* `translate` e nao `inset`: propriedade composta, roda na GPU e
+       nao dispara layout. Desce DE CIMA porque o painel se revela para
+       baixo — preenchimento vindo do lado contrario le como erro. */
+    transition: translate 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .morf__caixa[data-entrando] .morf__circulo { translate: -50% -100%; }
+
+  /* O CONTEUDO ENTRA DEPOIS DA JANELA. No menu.md original os itens
+     tem `opacity: 0` durante o morph e so aparecem no fim — e por isso
+     que ele parece fluido. Sem isso a pessoa ve o texto sendo revelado
+     em pedaco pela janela crescendo, que e feio mesmo sem reflow. */
+  .morf__nav {
     position: relative;
-    z-index: 10;
-    display: flex;
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 260ms var(--ease-out-cut) 180ms;
     flex: 1;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     padding-inline: 1.5rem;
-    padding-block-end: 1.75rem;
+    padding-block-end: 1.25rem;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  .morf__caixa[data-entrando] .morf__nav {
+    opacity: 0;
+    transition-delay: 0ms;
+    transition-duration: 120ms;
+  }
+  .morf__nav ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .morf__nav .menu-item { display: flex; align-items: center; min-block-size: 2.5rem; }
 
-  /* UM SO ELEMENTO FIXO. O WhatsApp entrou na barra do topo, entao nao
-     ha mais nada preso no rodape — o `padding-block-end` no body e o
-     `scroll-padding-block-end` saíram junto.
-     E o `scroll-padding-block-start` saiu TAMBEM: o `Secao` ja tem
-     `scroll-mt-16`, e os dois SOMAVAM. Uma ancora no celular parava
-     144px abaixo do titulo para uma barra de 64px — 80px de buraco
-     morto em cima de cada secao. Quem cuida do desvio e o
-     `scroll-mt-20` do proprio Secao, que da os 64px da barra mais
-     16px de respiro, e vale igual nas duas larguras porque a
-     NavDesktop tambem mede 64px. */
+  /* o rodape da pilula: rotulo e hamburguer, ancorados onde o dedo
+     tocou. Vem DEPOIS da nav no DOM e nao encolhe, entao ele fica
+     colado embaixo — como no original. */
+  .morf__rodape {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    display: flex;
+    align-items: center;
+    /* a DIREITA: na janela do tamanho da pilula, esta linha e a unica
+       coisa visivel, e ela cai exatamente onde o gatilho estava. A
+       troca "Secoes" -> "Fechar" acontece no lugar, sem salto. */
+    justify-content: flex-end;
+    gap: 0.625rem;
+    block-size: 3rem;
+    padding-inline: 1.375rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-branco);
+  }
+
+  /* trava a rolagem do fundo. O showModal() NAO trava sozinho — e
+     issue aberta na WHATWG desde 2022. */
+  html:has(dialog[open]) { overflow: hidden; }
+
+
+  /* O menu voltou para o RODAPE, entao a ancora precisa de folga
+     embaixo e o corpo tambem — senao o ultimo bloco da pagina fica
+     atras da pilula. Em cima nao ha mais barra no celular; quem cuida
+     do desvio da ancora e o `scroll-mt-20` do proprio Secao, que serve
+     a NavDesktop no desktop e nao atrapalha no celular. */
+  @media (max-width: 1023px) {
+    html { scroll-padding-block-start: 5rem; }
+  }
 
   /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
   .folha {
@@ -1481,8 +1603,6 @@
      Foram junto os keyframes acender-sala e acender-nota.
      A tese sobrevive por tipografia, no bloco .registro. */
 }
-
-
 
 @layer components {
 

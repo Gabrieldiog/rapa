@@ -13,7 +13,7 @@ import { LequeEquipe } from '@/components/LequeEquipe'
 import { Logo } from '@/components/Logo'
 import { PausaLed } from '@/components/PausaLed'
 import { Blackout } from '@/components/Blackout'
-import { Tubo, Zap, Secao, Eyebrow } from '@/components/ui'
+import { Zap, Secao, Eyebrow } from '@/components/ui'
 
 export default function Home() {
   return (
@@ -45,14 +45,10 @@ export default function Home() {
             o fundo continua e ela nao. A vinheta agora e do proprio
             fundo, fixa e sem costura. */}
 
-        {/* A barra do celular e FIXA NO TOPO e tem 4rem — o pt-16
-            antigo deixava a marca encostada nela. E o rodape ficou
-            LIVRE: o WhatsApp entrou na barra de cima, entao nao ha
-            mais nada preso embaixo para o topo desviar. Eram 152px de
-            barra fixa somados, 27,5% da tela de um iPhone SE; agora
-            sao 64px. */}
+        {/* Sem barra: o menu flutua no canto de cima a direita, sobre a
+            pagina. O pt maior so garante que a marca nao encoste nele. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 pt-24 pb-16
+                        items-center justify-center px-5 pt-20 pb-16
                         text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
@@ -121,7 +117,6 @@ export default function Home() {
 
       {/* ══════════════ ESTADO FESTA · 15 ANOS ══════════════ */}
       <Secao id="quinze-anos" className="relative">
-        <Tubo cor="var(--color-magenta)" aceso />
         <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-20">
           <Reveal>
             <Eyebrow cor="var(--color-magenta)"><b>15 anos</b> · o que mais fazemos</Eyebrow>
@@ -169,7 +164,6 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10"
              style={{ background:
                'radial-gradient(120% 80% at 78% 0%, color-mix(in srgb, var(--color-congo) 62%, transparent) 0%, transparent 68%)' }} />
-        <Tubo cor="var(--color-congo)" aceso />
 
         <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-20">
           <Reveal>
@@ -313,7 +307,6 @@ export default function Home() {
       <Secao id="rider" className="relative">
         {/* branco puro: no registro tecnico o tubo e luz de trabalho,
             nunca cor de ambiente. */}
-        <Tubo cor="var(--color-branco)" aceso />
         <Reveal>
           <Eyebrow><b>Rider técnico</b> · <i>{TOTAL_ARTISTAS}</i> artistas</Eyebrow>
           <h2 className="max-w-[24ch] text-2xl lg:text-3xl">

@@ -1,60 +1,56 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { zap } from '@/lib/conteudo'
-import { Logo } from '@/components/Logo'
 
 /**
- * A BARRA DO CELULAR — porte do `liquid-morph-floating-menu` de
- * melhorias/menu.md, vestido na direção da casa.
+ * O MENU DO CELULAR — o `liquid-morph-floating-menu` de
+ * melhorias/menu.md, e nada além dele.
  *
- * ELA SUBIU PARA O TOPO. A queixa foi literal: "não tem nenhum botão
- * hambúrguer, no modo PC temos a navbar, por que no mobile não temos".
- * O menu EXISTIA — era uma pílula flutuante no rodapé — e é justamente
- * esse o problema: no rodapé ele não é lido como navegação, e no print
- * que o cliente mandou ele nem aparecia, porque o recorte da tela
- * cortava antes. Navegação onde o PC tem navegação: no topo, com a
- * marca à esquerda e o hambúrguer à direita.
+ * NÃO HÁ BARRA. Tentei duas: primeiro um painel que descia de uma
+ * pílula presa no canto de cima, depois uma gaveta lateral, as duas
+ * penduradas numa faixa preta fixa no topo. A leitura foi direta e
+ * está certa — "no mobile não faz sentido ter uma barra preta".
+ * Não faz mesmo: a faixa come 64px de altura o tempo todo, repete a
+ * marca que já está no hero, e existe só para segurar um botão.
+ * O menu.md nunca teve barra. Ele é uma pílula que flutua e cresce.
  *
- * O QUE FICOU NO RODAPÉ é o WhatsApp, sozinho. Não é sobra: é a única
- * conversão da página, e o rodapé é a zona que o polegar alcança sem
- * reposicionar o aparelho. Navegação em cima, conversão embaixo — cada
- * uma onde o gesto correspondente é mais barato.
+ * O MORPH É O DO ARQUIVO: pílula âmbar de 150×48 que vira um painel,
+ * com o círculo escuro subindo de baixo (200% de lado, `bottom` de
+ * −200% a −20%), o rótulo e o hambúrguer ancorados no rodapé dela, e o
+ * rolar de letra em cada item.
  *
- * O MORPH É O DO ORIGINAL, com uma inversão de sinal: o círculo escuro
- * entra POR CIMA (`y: -200% → -12%`) em vez de subir de baixo, porque
- * o painel agora cresce para baixo e o preenchimento tem que seguir a
- * direção do crescimento. Fora isso, mesma pílula que cresce, mesmo
- * fundo âmbar, mesma curva.
+ * O QUE MUDA DO ORIGINAL, E POR QUÊ:
  *
- * O ROLAR DE LETRA dispara na ABERTURA, e não no hover. No original é
- * `onMouseEnter`; este componente é `lg:hidden`, ou seja, só existe
- * onde `mouseenter` não dispara — era código morto para 100% do
- * público. Escalonado por item e por caractere, ele funciona no toque
- * e vira entrada em vez de enfeite de hover.
- *
- * O que mais mudou do original, e por quê:
- *
- *  - era uma <div> com onClick: sem teclado, sem aria-expanded, sem
- *    Esc. Agora o gatilho é <button>, fecha no Esc, devolve o foco e
- *    move o foco para o painel ao abrir;
- *  - fechava só em `mousedown`, que ignora toque. Agora é `pointerdown`;
- *  - os itens não tinham href — viraram <a> de verdade;
- *  - o rolar duplica cada caractere. Leitor de tela leria "SSEEÇÇÕÕEESS",
- *    então o visual é `aria-hidden` e o nome acessível vem de um
- *    `sr-only` ao lado;
+ *  - É UM <dialog> ABERTO COM showModal(). Não é preciosismo: um
+ *    dialog modal é pintado na TOP LAYER do navegador, acima de
+ *    qualquer z-index da página. Depois de três rodadas de "o menu não
+ *    aparece", eu não vou mais depender de empilhamento. Vem junto, de
+ *    graça: o resto da página fica inerte, Esc fecha, o foco fica
+ *    contido e o `::backdrop` é do navegador.
+ *  - O TAMANHO ABERTO É O ESTADO BASE, e a animação SUBTRAI. O painel
+ *    nasce grande no CSS; `data-entrando` o encolhe por um quadro e
+ *    sair dele é o que produz o morph. Se a transição não rodar, ele
+ *    aparece aberto. Já quebrei essa lei duas vezes neste arquivo: a
+ *    altura vinha de uma animação de JS dentro de uma caixa que
+ *    recortava, e bastava a animação não terminar para o menu sumir
+ *    com o hambúrguer já virado em X.
+ *  - o original é uma <div> com onClick: sem teclado, sem
+ *    aria-expanded, sem Esc. O gatilho aqui é <button>.
+ *  - os itens não tinham href — viraram <a> de verdade, dentro de
+ *    <nav> com <ul>.
+ *  - o rolar duplica cada caractere. Leitor de tela leria
+ *    "SSEEÇÇÕÕEESS", então o visual é `aria-hidden` e o nome acessível
+ *    vem de um `sr-only` ao lado.
+ *  - o rolar dispara na ABERTURA, não no hover: este componente é
+ *    `lg:hidden`, ou seja, só existe onde `mouseenter` nunca dispara.
+ *    Era código morto para 100% do público.
  *  - cor e fonte estavam fixas no componente; agora vêm dos tokens.
  *
- * ⚠️ OS ITENS SÓ EXISTEM NO DOM DEPOIS DE ABRIR. Estão dentro do
- * `AnimatePresence`, então o HTML servido não os contém — sem JS este
- * menu é só um botão. Isso é aceitável porque a página é uma rolagem
- * só e tudo se alcança rolando, MAS exige que a `NavDesktop` liste
- * TODAS as âncoras: ela é quem as entrega no HTML. Foi assim que
- * `#sobre` e `#contato` ficaram sem nenhum link apontando para elas.
+ * ⚠️ A `NavDesktop` precisa listar TODAS as âncoras: ela é quem as
+ * entrega no HTML para a busca. Foi assim que `#sobre` e `#contato`
+ * ficaram sem nenhum link apontando para elas.
  */
-
-const ease = [0.22, 1, 0.36, 1] as const
 
 const SECOES = [
   { href: '#quinze-anos', label: '15 anos' },
@@ -75,6 +71,9 @@ function Rolo({ texto, i }: { texto: string; i: number }) {
       {Array.from(texto, (ch, c) => (
         <span key={c} className="rolo__col"
               style={{ ['--c' as string]: c, ['--i' as string]: i }}>
+          {/* ESPAÇO VIRA ` `. Cada caractere mora num
+              `inline-block` próprio, e espaço normal dentro de um
+              inline-block colapsa para zero — saía "15ANOS", "ACASA". */}
           <span className="rolo__par">
             <span>{ch === ' ' ? ' ' : ch}</span>
             <span>{ch === ' ' ? ' ' : ch}</span>
@@ -87,191 +86,144 @@ function Rolo({ texto, i }: { texto: string; i: number }) {
 
 export function MenuLiquido() {
   const [aberto, setAberto] = useState(false)
+  /* um quadro encolhido, só para o morph ter de onde crescer */
+  const [entrando, setEntrando] = useState(false)
   const [rolar, setRolar] = useState(false)
-  const raiz = useRef<HTMLDivElement>(null)
+  const cx = useRef<HTMLDialogElement>(null)
   const gatilho = useRef<HTMLButtonElement>(null)
-  const painel = useRef<HTMLDivElement>(null)
 
-  const fechar = useCallback(() => {
-    setAberto(false)
-    gatilho.current?.focus()
+  const abrir = useCallback(() => {
+    const d = cx.current
+    if (!d || d.open) return
+    /* O ATRIBUTO VAI NO DOM À MÃO, ANTES do showModal(). Este é o
+       conserto do "pipoco".
+       Com `setEntrando(true)` o React só aplica o atributo no próximo
+       render — mas `showModal()` mostra o diálogo NA HORA. A sequência
+       real era: primeiro quadro pinta o painel INTEIRO, o render do
+       React chega e ele SALTA para o tamanho da pílula, e só então a
+       animação cresce. Três estados em três quadros: é o pipoco.
+       Escrevendo no elemento antes de abrir, o primeiro quadro já
+       nasce do tamanho da pílula. O estado do React vem junto só para
+       manter as duas fontes coerentes. */
+    const caixa = d.querySelector<HTMLElement>('.morf__caixa')
+    caixa?.setAttribute('data-entrando', '')
+    setEntrando(true)
+    d.showModal()
+    setAberto(true)
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      caixa?.removeAttribute('data-entrando')
+      setEntrando(false)
+    }))
   }, [])
 
-  /* O rolo começa DEPOIS do morph. Disparado junto, a letra tombava
-     enquanto a caixa ainda crescia e as duas coisas se anulavam. */
+  const fechar = useCallback(() => {
+    const d = cx.current
+    if (!d || !d.open) return
+    setAberto(false)
+    d.querySelector<HTMLElement>('.morf__caixa')?.setAttribute('data-entrando', '')
+    setEntrando(true)
+    /* `close()` espera o morph encolher. `transitionend` sozinho não
+       serve: sem transição o evento nunca chega e o menu ficaria aberto
+       para sempre. É uma corrida com um teto de tempo. */
+    let feito = false
+    const acabar = () => {
+      if (feito) return
+      feito = true
+      d.removeEventListener('transitionend', acabar)
+      if (d.open) d.close()
+      setEntrando(false)
+      gatilho.current?.focus()
+    }
+    d.addEventListener('transitionend', acabar)
+    setTimeout(acabar, 420)
+  }, [])
+
+  /* O rolo começa DEPOIS do morph. Disparado junto, a letra tomba
+     enquanto a caixa ainda cresce e as duas coisas se anulam. */
   useEffect(() => {
     if (!aberto) { setRolar(false); return }
-    const t = setTimeout(() => setRolar(true), 340)
+    const t = setTimeout(() => setRolar(true), 320)
     return () => clearTimeout(t)
   }, [aberto])
 
-  // Esc fecha e o foco volta para o gatilho
+  /* Esc é do <dialog>, mas ele fecha na hora, sem deixar o morph
+     encolher. Interceptar `cancel` devolve a animação — e continua
+     sendo o Esc nativo. */
   useEffect(() => {
-    if (!aberto) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') fechar() }
-    // pointerdown cobre toque, o mousedown do original nao cobria
-    /* Fechar clicando fora TEM que devolver o foco. Sem isto o foco
-       cai no <body> e a próxima tecla Tab recomeça do topo do
-       documento — é o critério 2.4.3 (Focus Order, nível A). */
-    const onFora = (e: PointerEvent) => {
-      if (raiz.current && !raiz.current.contains(e.target as Node)) fechar()
-    }
-    document.addEventListener('keydown', onKey)
-    document.addEventListener('pointerdown', onFora)
-    painel.current?.querySelector<HTMLAnchorElement>('a')?.focus()
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.removeEventListener('pointerdown', onFora)
-    }
-  }, [aberto, fechar])
+    const d = cx.current
+    if (!d) return
+    const onCancel = (e: Event) => { e.preventDefault(); fechar() }
+    d.addEventListener('cancel', onCancel)
+    return () => d.removeEventListener('cancel', onCancel)
+  }, [fechar])
 
   return (
     <>
-      {/* ══════════ A BARRA, no topo ══════════ */}
-      <div ref={raiz} className="barra-cel lg:hidden">
-        <a href="#conteudo" aria-label="Rapa Sound — voltar ao topo"
-           className="flex min-h-11 items-center">
-          <Logo className="w-[6.5rem] text-branco" />
-        </a>
+      {/* ---------- fechado: só a pílula ----------
+          A pílula de WhatsApp que ficava ao lado saiu a pedido. A
+          conversão não some com ela: o WhatsApp continua sendo o
+          último item do painel, em âmbar, e cada seção da página tem o
+          seu próprio botão em fluxo. O que sai é o segundo objeto
+          flutuando no mesmo canto. */}
+      <div className="flutua lg:hidden" data-oculto={aberto ? '' : undefined}>
+        <button ref={gatilho} type="button" onClick={abrir}
+                aria-expanded={aberto} aria-controls="menu-secoes"
+                className="flutua__pilula">
+          <span aria-hidden className="flutua__risco">
+            <span /><span /><span />
+          </span>
+          Seções
+        </button>
+      </div>
 
-        {/* O WHATSAPP MORA AQUI, e não numa segunda pílula flutuante.
-            Dois elementos fixos custavam 152px num iPhone SE — 27,5%
-            da tela visível, e 59,6% em paisagem. A técnica C34 da WCAG
-            manda soltar o `fixed` em viewport curta justamente por
-            isso, e o critério 1.4.10 exige que a página funcione com
-            256px de ALTURA, onde 152px de barra não deixam nada.
-            Num elemento só o custo cai para 64px, 11,6%.
-            E é literalmente o que foi pedido: a navbar do PC tem marca,
-            navegação e o botão âmbar de WhatsApp. Agora o celular tem
-            os três, na mesma ordem. */}
-        <AnimatePresence>
-          {!aberto && (
-            <motion.a
-              href={zap('Oi! Quero um orçamento. Meu evento é:')}
-              target="_blank" rel="noopener noreferrer" data-zap
-              aria-label="Falar com a Rapa Sound no WhatsApp"
-              className="barra-cel__zap"
-              initial={false}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.18 }}
-              whileTap={{ scale: 0.94 }}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden
-                   className="h-5 w-5">
-                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.25 8.24a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.39c0-4.54 3.7-8.24 8.25-8.24Zm-2.5 4.02c-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66s.72 1.93.82 2.06c.1.13 1.4 2.14 3.4 3 .47.2.84.32 1.13.42.48.15.91.13 1.25.08.38-.06 1.17-.48 1.34-.95.16-.46.16-.86.11-.94-.05-.08-.18-.13-.38-.23-.2-.1-1.17-.58-1.35-.64-.18-.07-.31-.1-.44.1-.13.2-.51.64-.62.77-.12.13-.23.15-.43.05a5.4 5.4 0 0 1-1.6-.99 6.03 6.03 0 0 1-1.1-1.38c-.12-.2-.02-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.44-1.07-.6-1.46-.16-.38-.32-.33-.44-.34h-.37Z" />
-              </svg>
-            </motion.a>
-          )}
-        </AnimatePresence>
+      {/* ---------- aberto: o mesmo lugar, crescido ----------
+          <dialog> modal: top layer, resto da página inerte, Esc e foco
+          contido pelo navegador. Depois de três rodadas de "o menu não
+          aparece", nada aqui depende de z-index. */}
+      <dialog ref={cx} id="menu-secoes" className="morf lg:hidden"
+              aria-label="Seções da página"
+              data-aberto={aberto ? '' : undefined}
+              onClick={(e) => { if (e.target === e.currentTarget) fechar() }}>
+        <div className="morf__caixa" data-entrando={entrando ? '' : undefined}>
+          {/* o fundo âmbar */}
+          <span aria-hidden className="morf__ambar" />
+          {/* o círculo escuro subindo de baixo — o "liquid" do morph */}
+          <span aria-hidden className="morf__circulo" />
 
-        {/* A pílula é ABSOLUTA dentro da barra: crescendo, ela não pode
-            empurrar a marca nem esticar a altura da barra. */}
-        <motion.div
-          className="barra-cel__pilula flex flex-col overflow-hidden"
-          /* initial={false}: o menu nasce pronto no HTML. Com initial
-             animado ele sairia com opacity:0 e so apareceria depois da
-             hidratacao. */
-          initial={false}
-          animate={{
-            width: aberto ? 'min(17.5rem, calc(100vw - 1.5rem))' : 124,
-            height: aberto ? 452 : 44,
-            borderRadius: 22,
-          }}
-          transition={{ duration: 0.8, ease,
-                        height: { duration: aberto ? 0.8 : 0.15 } }}
-        >
-          {/* fundo âmbar */}
-          <span aria-hidden className="absolute inset-0 rounded-[inherit] bg-ambar" />
-
-          {/* O CÍRCULO ESCURO — o "liquid" do morph. Ele desce DE CIMA
-              agora: o painel cresce para baixo, e preenchimento que
-              vem do lado contrário ao crescimento lê como erro. */}
-          <motion.span
-            aria-hidden
-            className="absolute left-1/2 rounded-full bg-void"
-            /* O `y` VAI NO STYLE, e não só no `animate`. Sem valor
-               inicial declarado, o motion lê a posição atual do DOM —
-               que é 0 — e o círculo escuro nasce COBRINDO a pílula
-               âmbar no HTML servido, com o texto "Menu" em cor escura
-               por cima dele. Fica um retângulo preto vazio até a
-               hidratação animar para fora. */
-            style={{ width: '220%', aspectRatio: '1', x: '-50%', y: '-200%' }}
-            animate={{ y: aberto ? '-12%' : '-200%' }}
-            transition={{ duration: aberto ? 0.8 : 0.5, ease }}
-          />
-
-          {/* ---------- a barra, sempre no TOPO da pílula ----------
-              Vem ANTES das âncoras, ao contrário do original: lá o
-              painel crescia para cima a partir do rodapé, aqui ele
-              cresce para baixo a partir do topo. A barra fica ancorada
-              onde o dedo tocou nos dois casos. */}
-          <button
-            ref={gatilho}
-            type="button"
-            onClick={() => setAberto((v) => !v)}
-            aria-expanded={aberto}
-            aria-controls="menu-secoes"
-            className="relative z-10 flex h-11 shrink-0 items-center justify-center gap-2.5
-                       px-5 font-mono text-2xs font-medium uppercase tracking-[0.14em]"
-            style={{ color: aberto ? 'var(--color-branco)' : 'var(--color-void)' }}
-          >
-            <span aria-hidden className="flex flex-col gap-[3px]">
-              <motion.span className="block h-[2px] w-4 bg-current"
-                           animate={{ rotate: aberto ? 45 : 0, y: aberto ? 5 : 0 }}
-                           transition={{ duration: 0.4, ease }} />
-              <motion.span className="block h-[2px] w-4 bg-current"
-                           animate={{ opacity: aberto ? 0 : 1 }}
-                           transition={{ duration: 0.2 }} />
-              <motion.span className="block h-[2px] w-4 bg-current"
-                           animate={{ rotate: aberto ? -45 : 0, y: aberto ? -5 : 0 }}
-                           transition={{ duration: 0.4, ease }} />
+          {/* o rótulo com o hambúrguer fica EM CIMA, ancorado onde o
+              dedo tocou — o painel agora cresce do canto de cima para
+              baixo, então o gatilho fica no topo dele. */}
+          <button type="button" onClick={fechar} className="morf__rodape">
+            <span aria-hidden className="flutua__risco" data-x>
+              <span /><span /><span />
             </span>
-            {aberto ? 'Fechar' : 'Menu'}
+            Fechar
           </button>
 
-          {/* ---------- as âncoras ----------
-              `<nav>` com `<ul>`, e não um punhado de `<a>` soltos: é
-              navegação, e leitor de tela anuncia "lista de 9 itens".
-              `overflow-y: auto` no painel porque a altura da pílula é
-              px cravado e a caixa tem `overflow: hidden`: com o texto
-              do navegador em 200% (critério 1.4.4, nível AA) os nove
-              itens passam de 670px numa caixa de 452 e os últimos
-              ficavam cortados e inalcançáveis. O CSS ainda limita a
-              altura ao que cabe na tela. */}
-          <AnimatePresence>
-            {aberto && (
-              <motion.nav
-                ref={painel}
-                id="menu-secoes"
-                aria-label="Seções da página"
-                data-rolar={rolar ? '' : undefined}
-                className="menu-painel"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
-                <ul className="flex flex-col items-center gap-3.5">
-                  {SECOES.map((s, i) => (
-                    <li key={s.href}>
-                      <a href={s.href} onClick={fechar} className="menu-item text-branco">
-                        <span className="sr-only">{s.label}</span>
-                        <Rolo texto={s.label} i={i} />
-                      </a>
-                    </li>
-                  ))}
-                  <li className="mt-1">
-                    <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
-                       target="_blank" rel="noopener noreferrer" data-zap onClick={fechar}
-                       className="menu-item text-ambar">
-                      <span className="sr-only">Falar no WhatsApp</span>
-                      <Rolo texto="WhatsApp" i={SECOES.length} />
-                    </a>
-                  </li>
-                </ul>
-              </motion.nav>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+          <nav aria-label="Seções" className="morf__nav"
+               data-rolar={rolar ? '' : undefined}>
+            <ul>
+              {SECOES.map((s, i) => (
+                <li key={s.href}>
+                  <a href={s.href} onClick={fechar} className="menu-item text-branco">
+                    <span className="sr-only">{s.label}</span>
+                    <Rolo texto={s.label} i={i} />
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
+                   target="_blank" rel="noopener noreferrer" data-zap onClick={fechar}
+                   className="menu-item text-ambar">
+                  <span className="sr-only">Falar no WhatsApp</span>
+                  <Rolo texto="WhatsApp" i={SECOES.length} />
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+        </div>
+      </dialog>
     </>
   )
 }
