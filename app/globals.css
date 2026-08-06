@@ -882,29 +882,13 @@
   .eyebrow i { font-style: normal; font-variant-numeric: tabular-nums;
                color: var(--color-ambar); }
 
-  /* ---------- A COLUNA DE PIXELS ----------------------------
-     A expressao da assinatura. Pontos DISCRETOS, nunca linha
-     continua: um tubo de LED de perto e um conjunto de pontos.
-     Sem glow — glow e o default de IA para "neon".
-     --------------------------------------------------------- */
-  .tubo {
-    --tubo-cor: var(--color-ambar);
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 3px;
-    background-image: linear-gradient(
-      to bottom,
-      var(--tubo-cor) 0 4px,
-      transparent 4px 10px
-    );
-    background-size: 100% 10px;
-    background-repeat: repeat-y;
-    opacity: 0.28;
-    transition: opacity 320ms var(--ease-out-cut),
-                --tubo-cor 320ms linear;
-  }
-  .tubo-aceso { opacity: 1; }
+  /* A COLUNA DE PIXELS SAIU. Era um filete de pontos na borda de cada
+     secao — a "assinatura" da pagina. Saiu a pedido: "tire todas as
+     listras". O desenho de pontos continua vivo onde ele INFORMA em vez
+     de decorar margem: o marcador do .eyebrow, o separador entre os
+     nomes do rider, e o tubo da miniatura de video que marca qual esta
+     em exibicao. */
+
 
   /* ---------- O BLOCO E SUA GRADE ---------------------------
      Cinco grades pequenas, uma por bloco. Nenhuma tem 13 celulas —

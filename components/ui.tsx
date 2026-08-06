@@ -1,15 +1,13 @@
 import type { ReactNode } from 'react'
 import { zap } from '@/lib/conteudo'
 
-/** A coluna de pixels — a expressao da assinatura.
- *  Pontos discretos, nunca linha continua. Sem glow. */
-export function Tubo({ cor = 'var(--color-ambar)', aceso = false }:
-  { cor?: string; aceso?: boolean }) {
-  return (
-    <span aria-hidden className={`tubo ${aceso ? 'tubo-aceso' : ''}`}
-          style={{ ['--tubo-cor' as string]: cor }} />
-  )
-}
+/* A COLUNA DE PIXELS SAIU.
+   Era a "assinatura" da página: um filete de pontos na borda de cada
+   seção. Saiu a pedido — "tire todas as listras". A assinatura não
+   morre com ela: o mesmo desenho de pontos continua vivo no marcador
+   do `.eyebrow`, no separador entre os nomes do rider e no tubo da
+   miniatura de vídeo, que são os lugares onde ele diz alguma coisa em
+   vez de só decorar a margem. */
 
 /** O CTA. Sempre ambar, sempre com o texto ja preenchido, e o rotulo
  *  sempre diz o que acontece. Alvo de toque 48px. */
