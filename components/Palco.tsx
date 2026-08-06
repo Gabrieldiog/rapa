@@ -72,7 +72,7 @@ export function Palco({ videos }: { videos: Video[] }) {
       </div>
 
       {/* ---------- PALCO ---------- */}
-      <div className="relative aspect-video w-full overflow-hidden
+      <div className="relative aspect-video w-full overflow-clip
                       rounded-[var(--radius-placa)] bg-off">
         {tocando ? (
           <iframe
@@ -169,7 +169,7 @@ export function Palco({ videos }: { videos: Video[] }) {
             <button type="button" onClick={() => escolher(n)}
                     aria-current={item.id === v.id ? 'true' : undefined}
                     className="mini group relative block w-[9rem] text-left sm:w-[11rem]">
-              <span className="relative block aspect-video overflow-hidden
+              <span className="relative block aspect-video overflow-clip
                                rounded-[var(--radius-botao)] bg-off">
                 <img src={CAPA_MINI(item.id)} alt="" width={320} height={180}
                      loading="lazy" decoding="async"

@@ -38,11 +38,21 @@ export function Reveal({
     if (!el) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+    /* ONDE HA `view()`, ESTE COMPONENTE NAO FAZ NADA.
+       A entrada passou a ser dirigida pela rolagem, em CSS puro: o
+       progresso da animacao É a posicao do bloco na tela, e não um
+       cronômetro disparado por um limiar. Fica mais fluido, reverte
+       ao rolar de volta, e roda sem uma linha de JavaScript.
+       Este caminho sobra para quem nao tem `view()` — Firefox ate a
+       156 e navegadores antigos, ~10% do trafego de celular
+       brasileiro. Para eles, o observador de sempre. */
+    if (CSS.supports('animation-timeline: view()')) return
+
     // já visível? então não esconde. Nunca.
     const r = el.getBoundingClientRect()
     if (r.top < window.innerHeight * 0.92) return
 
-    el.classList.add('rev')
+    el.classList.add('rev-js')
     if (delay) el.style.setProperty('--d', `${delay}ms`)
 
     const io = new IntersectionObserver(
@@ -59,5 +69,19 @@ export function Reveal({
     return () => io.disconnect()
   }, [delay])
 
-  return <Tag ref={ref} className={className || undefined}>{children}</Tag>
+  /* A classe `rev` VAI NO HTML SERVIDO, e isso é seguro: a única regra
+     que a usa mora dentro de `@supports (animation-timeline: view())`.
+     Onde `view()` não existe ela não casa com nada e o bloco nasce
+     visível — que é a lei da casa. Onde existe, o navegador já revela
+     pela rolagem sem esperar JS nenhum.
+     O `--d` também vai no HTML: no caminho de rolagem ele não é atraso
+     em tempo, é atraso em DISTÂNCIA — o bloco irmão começa a subir um
+     pouco mais tarde no percurso. */
+  return (
+    <Tag ref={ref}
+         className={`rev${className ? ` ${className}` : ''}`}
+         style={delay ? ({ ['--d' as string]: `${delay}ms` }) : undefined}>
+      {children}
+    </Tag>
+  )
 }
