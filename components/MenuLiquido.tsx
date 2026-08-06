@@ -175,6 +175,16 @@ export function MenuLiquido() {
           {/* o círculo escuro subindo de baixo — o "liquid" do morph */}
           <span aria-hidden className="morf__circulo" />
 
+          {/* o rótulo com o hambúrguer fica EM CIMA, ancorado onde o
+              dedo tocou — o painel agora cresce do canto de cima para
+              baixo, então o gatilho fica no topo dele. */}
+          <button type="button" onClick={fechar} className="morf__rodape">
+            <span aria-hidden className="flutua__risco" data-x>
+              <span /><span /><span />
+            </span>
+            Fechar
+          </button>
+
           <nav aria-label="Seções" className="morf__nav"
                data-rolar={rolar ? '' : undefined}>
             <ul>
@@ -197,14 +207,6 @@ export function MenuLiquido() {
             </ul>
           </nav>
 
-          {/* o rodapé da pílula: rótulo e hambúrguer, ancorados onde o
-              dedo tocou — como no original */}
-          <button type="button" onClick={fechar} className="morf__rodape">
-            <span aria-hidden className="flutua__risco" data-x>
-              <span /><span /><span />
-            </span>
-            Fechar
-          </button>
         </div>
       </dialog>
     </>

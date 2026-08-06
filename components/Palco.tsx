@@ -149,11 +149,26 @@ export function Palco({ videos }: { videos: Video[] }) {
       {/* ---------- TRILHO ---------- */}
       <ul className="trilho mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
           aria-label="Escolha um vídeo">
+        {/* `relative` NO BOTAO, e nao e enfeite — e o conserto de um
+            defeito que derrubou a pagina inteira no celular.
+            O `.sr-only` la embaixo e `position: absolute`. Sem um
+            ancestral POSICIONADO ele se resolve contra o bloco
+            inicial e ESCAPA do `overflow-x: auto` do trilho: o
+            ultimo item parava em x=1423 e o documento passava a
+            medir 1424px de largura em qualquer viewport.
+            Em desktop isso nao rola de lado (o navegador nao
+            considera essa sobra rolavel) e passa despercebido. Em
+            EMULACAO DE CELULAR o navegador nao rola: ele AFASTA O
+            ZOOM para caber os 1424px, e o viewport de layout vira
+            1425px. Tudo que e `position: fixed` — o menu flutuante,
+            a barra — vai parar fora da area visivel. Foi por isso
+            que o botao do menu "nao existia" no aparelho e existia
+            em todo teste meu. */}
         {lista.map((item, n) => (
           <li key={item.id} className="shrink-0 snap-start">
             <button type="button" onClick={() => escolher(n)}
                     aria-current={item.id === v.id ? 'true' : undefined}
-                    className="mini group block w-[9rem] text-left sm:w-[11rem]">
+                    className="mini group relative block w-[9rem] text-left sm:w-[11rem]">
               <span className="relative block aspect-video overflow-hidden
                                rounded-[var(--radius-botao)] bg-off">
                 <img src={CAPA_MINI(item.id)} alt="" width={320} height={180}
