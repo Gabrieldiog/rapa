@@ -39,6 +39,12 @@
        errada: revelar os blocos muda a altura do documento, e a posicao
        de rolagem ja calculada deixa de apontar para o alvo. */
     for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
+    /* O IntersectionObserver NAO DISPARA sob --virtual-time-budget: as
+       observacoes sao entregues nos passos de renderizacao, e o relogio
+       virtual nao os produz. Entao o que depende de observer precisa
+       ser ligado a mao aqui — senao o leque da equipe sai em branco no
+       print e parece bug de layout. */
+    for (const t of d.querySelectorAll('.equipe__trilho')) t.setAttribute('data-natela', '')
     const el = d.getElementById(q.get('s') || 'servicos')
     if (el) el.scrollIntoView()
     /* Os blocos abaixo da dobra sao escondidos apos a montagem e
@@ -53,10 +59,48 @@
        ancora nao converge: imagem com loading=lazy so reserva altura ao
        entrar na tela, entao cada rolagem muda o documento e a posicao
        anterior deixa de apontar para o alvo. */
+    /* MATA A ROLAGEM SUAVE ANTES DE QUALQUER COISA.
+       A folha do site tem `html { scroll-behavior: smooth }`, entao
+       TODO `scrollTo` vira animacao — e o --virtual-time-budget do
+       Chrome headless nao avanca linha do tempo de animacao, do mesmo
+       jeito que nao avanca @keyframes. Resultado: a rolagem programada
+       parava no meio e todo print saia numa secao antes do alvo. Foram
+       cinco prints no lugar errado ate cair a ficha. */
+    d.documentElement.style.scrollBehavior = 'auto'
+
+    /* VARRE A PAGINA INTEIRA ANTES DE MIRAR.
+       `loading="lazy"` so reserva a altura real quando a imagem entra
+       na tela. Enquanto ha imagem por carregar abaixo, o documento
+       cresce a cada rolagem e a posicao ja calculada deixa de apontar
+       para o alvo — foi por isso que `?s=sobre` caia no rider tres
+       vezes seguidas. Descer ate o fim em passos forca todas a
+       carregar; dai em diante a altura para de mudar e mirar funciona. */
+    const w = f.contentWindow
+    const varrer = () => {
+      const h = d.documentElement.scrollHeight
+      for (let i = 1, t = 0; i <= 14; i++, t += 55)
+        setTimeout(() => w.scrollTo(0, (h / 14) * i), t)
+    }
+    varrer()
+
     const rolar = Number(q.get('rolar') || 0)
-    const ir = () => rolar ? f.contentWindow.scrollTo(0, rolar)
-                           : (el && el.scrollIntoView())
-    for (const ms of [80, 300, 700, 1200]) setTimeout(ir, ms)
+    const ir = () => rolar ? w.scrollTo(0, rolar) : (el && el.scrollIntoView())
+    for (const ms of [900, 1100, 1400, 1700]) setTimeout(ir, ms)
+
+    /* LEVA TODA ANIMACAO AO QUADRO FINAL.
+       O --virtual-time-budget do Chrome headless NAO avanca a linha do
+       tempo de animacao: um elemento cuja opacidade vem de uma
+       @keyframes sai do print no PRIMEIRO quadro, que costuma ser
+       opacity 0. Foi assim que o leque da equipe apareceu vazio num
+       print e pareceu bug de layout. `finish()` pula para o fim, que e
+       o estado que interessa fotografar quando o assunto e LAYOUT.
+       Varias passadas porque animacao com delay so existe depois que
+       o delay corre, e a entrada do leque escalona ate 500ms. */
+    const acabarTudo = () => {
+      for (const n of d.querySelectorAll('*'))
+        for (const a of n.getAnimations()) { try { a.finish() } catch {} }
+    }
+    for (const ms of [1500, 1800, 2100]) setTimeout(acabarTudo, ms)
     setTimeout(() => {
       /* ?clique=<seletor> aperta um botao antes do print. Serve para
          fotografar estado aberto — menu, <details>, modal. */

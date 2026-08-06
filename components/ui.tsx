@@ -41,7 +41,12 @@ export function Zap({ texto, children, className = '' }:
 export function Secao({ id, children, className = '' }:
   { id?: string; children: ReactNode; className?: string }) {
   return (
-    <section id={id} className={`scroll-mt-16 py-24 lg:py-40 ${className}`}>
+    /* scroll-mt-20 = 80px: os 64px da barra fixa (a do celular e a
+       NavDesktop medem o mesmo) mais 16px de respiro. Era 16 (64px),
+       que encostava o titulo na barra no desktop; e no celular ele
+       SOMAVA com um `scroll-padding-block-start` de 80px na html,
+       dando 144px de desvio para uma barra de 64. */
+    <section id={id} className={`scroll-mt-20 py-24 lg:py-40 ${className}`}>
       <div className="mx-auto w-full max-w-6xl px-5 lg:px-8">{children}</div>
     </section>
   )

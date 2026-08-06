@@ -64,6 +64,25 @@
   /* --- MOTION --- */
   --ease-tubo: linear(0,.11 3.3%,.4 8.6%,.83 15.5%,1.02 19.6%,1.06 22.7%,1.03 28%,1 34.6%,1);
   --ease-out-cut: linear(0,.53 12%,.79 25%,.92 38%,.98 55%,1);
+
+  /* A ELASTICA DA ENTRADA DO LEQUE — equivale a elastic.out(1.05, .78)
+     do GSAP, em 40 pontos. Erro maximo 0,0040, que sobre o percurso
+     real de 480px do card externo da 1,9px: invisivel.
+
+     A formula do GSAP 3 (`_configElastic` em gsap-core.js) e
+        f(t) = p1 · 2^(−10t) · sin(2π/P · (t − p3)) + 1
+        p1 = max(A,1) · P = T/min(A,1) · p3 = P/(2π)·asin(1/p1)
+     com o caso especial f(1) = 1. Ela passa de 1 de PROPOSITO: a
+     elastica ultrapassa o alvo (pico de 1,128 aqui) e volta. `linear()`
+     aceita saida fora de [0,1] — css-easing-2 diz que o valor de saida
+     e um real em [-inf, inf]; a restricao e so sobre as posicoes.
+
+     ESTAS DUAS SO SAO USADAS EM @keyframes, nunca dentro de
+     `transition`. Medido: passar uma linear() de 32 pontos por var()
+     dentro de transition custa +31% de recalculo de estilo, porque o
+     var() forca reparse da curva a cada recalculo. Onde ha transicao,
+     a string vai literal na regra. */
+  --elast-entra: linear(0, 0.2356, 0.4482, 0.6314, 0.7828, 0.9023, 0.9922, 1.0556, 1.0966, 1.1194, 1.1279, 1.126, 1.1168, 1.1031, 1.0871, 1.0704, 1.0544, 1.0398, 1.0271, 1.0165, 1.0081, 1.0016, 0.997, 0.994, 0.9922, 0.9915, 0.9915, 0.992, 0.9929, 0.9939, 0.995, 0.9961, 0.9971, 0.998, 0.9988, 0.9994, 0.9998, 1.0001, 1.0004, 1);
 }
 
 /* Permite animar a cor do tubo de verdade (transicao de custom
@@ -98,13 +117,31 @@
   to   { background-position: 0% 0; }
 }
 
-/* Os cards do leque sobem do baixo e assentam no arco. So opacity e
-   translate: escala ja vem do proprio --esc do card. */
-@keyframes equipe-entra {
-  from { opacity: 0; transform:
-    translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem + 3rem), 0)
-    rotate(var(--rot)) scale(calc(var(--esc) * 0.9)); }
-  to   { opacity: 1; }
+/* A ENTRADA DO LEQUE, literal do card.md: os seis nascem juntos no
+   centro, meio tamanho, 12rem abaixo, e sobem para o arco em cascata.
+
+   `to` repete a expressao inteira do transform base de proposito. E o
+   mesmo motivo do `card-entra`: com fill-mode o quadro final continua
+   valendo, entao ele TEM que ser o estado de repouso — e como custom
+   property dentro de keyframe e reavaliada, escrever a expressao
+   mantem --x/--y/--rot/--esc vivos.
+
+   fill-mode e `backwards`, NAO `both`. Com `both` o quadro final
+   congelaria o transform para sempre e a transicao de hover nunca
+   teria efeito: a animacao ganha da regra base na cascata. Com
+   `backwards` a animacao so vale antes e durante — depois o card cai
+   na regra base, que tem o mesmo valor e a transicao ligada. */
+@keyframes leque-entra {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, calc(12 * var(--uy, 1rem)), 0) rotate(0deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform:
+      translate3d(calc(var(--x) * var(--ux) - 50%), calc(var(--y) * var(--uy)), 0)
+      rotate(var(--rot)) scale(var(--esc));
+  }
 }
 
 /* O card entra subindo e assentando.
@@ -127,6 +164,14 @@
 @keyframes vu-acende {
   from { opacity: 0.08; }
   to   { opacity: 1; }
+}
+
+/* A faixa de luz atravessando o card de servico. So `translate`, que
+   e propriedade composta: roda na GPU e nao toca a main thread nem
+   quando os treze cards estao na tela ao mesmo tempo. */
+@keyframes card-brilho {
+  from { translate: -72% 0; }
+  to   { translate: 72% 0; }
 }
 
 @layer base {
@@ -358,12 +403,64 @@
     position: absolute;
     inset-inline: 0;
     inset-block-end: 0;
+    /* acima do veu de z-index 2: o nome nunca escurece junto */
+    z-index: 3;
     padding: 2.5rem 1rem 1rem;
     background: linear-gradient(to top,
       var(--color-void) 0%,
       color-mix(in srgb, var(--color-void) 82%, transparent) 55%,
       transparent 100%);
     color: var(--color-branco);
+    transition: padding 500ms var(--ease-out-cut);
+  }
+  .equipe__nome {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    line-height: 1.15;
+    /* nome proprio nao hifeniza; quebra por palavra e sempre legivel */
+    hyphens: none;
+  }
+  .equipe__papel { display: block; margin-block-start: 0.25rem; }
+
+  /* A LEGENDA DENTRO DA TIRA VISIVEL.
+     No leque os cards se cobrem, e a ordem de empilhamento cresce em
+     direcao ao centro: quem esta a esquerda e coberto pela direita, e
+     vice-versa. Entao a metade de FORA de cada card e a que aparece —
+     e e nela que o nome tem que caber. Sem isto o nome nasce na largura
+     toda e some atras do vizinho: era o "Dagm...", "Daniel..." cortados.
+
+     OS 49% SAO MEDIDOS NA BASE DO CARD, e nao na largura dele.
+     A primeira conta usou o passo do leque (12 unidades a 1.10cqi =
+     143px de 240px, logo 40%) e ERROU, porque os cards sao girados: no
+     rodape — que e justo onde mora a legenda — o vizinho avanca mais.
+     A conta certa projeta os cantos. Para o par slot1/slot2:
+       o canto inferior esquerdo do slot 2 cai em −177,8 do centro
+       a base do slot 1 vai de −288,4 a −73,1  (215px de vao)
+       coberto: de −177,8 a −73,1 = 104,7px = 49%
+     Os 46% de recuo ficam com uma folga de 3%.
+
+     E O CARGO SOME NO REPOUSO. Nome e cargo nao cabem os dois em 130px
+     sem virar tres linhas. O nome basta para identificar; o cargo entra
+     quando o card sobe para o topo da pilha, que e quando ha largura.
+     E o padrao do Material Components para carrossel mascarado — o
+     titulo do item ativo aparece, o dos parciais nao. */
+  @media (min-width: 1024px) {
+    .equipe__card[data-lado="esq"] .equipe__legenda { padding-inline-end: 46%; }
+    .equipe__card[data-lado="dir"] .equipe__legenda {
+      padding-inline-start: 46%;
+      text-align: end;
+    }
+    .equipe__papel {
+      opacity: 0;
+      transition: opacity 260ms var(--ease-out-cut);
+    }
+    /* apontado, o card esta no topo da pilha: a legenda volta inteira */
+    .equipe__card[data-aceso] .equipe__legenda {
+      padding-inline: 1.125rem;
+      text-align: start;
+    }
+    .equipe__card[data-aceso] .equipe__papel { opacity: 1; }
   }
 
   /* ---- ate 1023px: TRILHO ---- */
@@ -410,25 +507,53 @@
     aspect-ratio: 380 / 548;
   }
 
-  /* ---- 1024px para cima: LEQUE ---- */
+  /* ---- 1024px para cima: LEQUE ----
+     O leque ocupa a LARGURA INTEIRA da seção agora, e não meia coluna.
+     Não é gosto: com 6 cards em meia coluna (≈504px) o card cabia em
+     191px e o afastamento máximo era de 103px do centro — leque
+     fechado e foto pequena. Na largura toda (1088px na seção) o card
+     vai a 240px e o externo chega a 359px do centro. É o que permitiu
+     atender os dois pedidos de uma vez: fotos maiores e leque aberto.
+
+     AS DUAS UNIDADES
+     `--ux` converte as unidades de x do card.md em pixel, em `cqi`,
+     para o leque medir a CAIXA e não a janela — era o defeito do leque
+     de GSAP, que usava `window.innerWidth` vivendo dentro de um grid e
+     sangrava 359px para fora a 1280px.
+     `--uy` é a vertical, em `rem`, e encolhe em tela baixa. É o
+     `getHeightMultiplier` do card.md, que existe porque um leque de
+     500px de altura não cabe num notebook de 768px de tela.
+
+     DE ONDE SAI 1.10cqi — medido, não escolhido. O caso apertado é
+     1024px de janela: a seção tem 960px, o card fica em 220x317, e
+     girado a 21° ocupa 220·cos21 + 317·sin21 = 319px, meia caixa 160.
+     O card externo para a 30 · 1.10% · 960 = 317px do centro:
+     317 + 160 = 477, dentro dos 480 disponíveis. Com 1.13cqi passava
+     4px, e o print não mostrava porque a sobra fica atrás da borda. */
   @media (min-width: 1024px) {
     .equipe__trilho {
+      --ux: 1.10cqi;
+      --uy: 1rem;
       display: block;
       position: relative;
-      block-size: 30rem;
+      block-size: 32rem;
       overflow: visible;
       padding: 0;
       scroll-padding: 0;
       margin-inline: 0;
       scroll-snap-type: none;
     }
+    /* tela baixa: o leque encolhe na vertical em vez de empurrar o
+       resto da página para fora da dobra */
+    @media (max-height: 860px) {
+      .equipe__trilho { --uy: 0.72rem; block-size: 27rem; }
+    }
+
     .equipe__card {
       position: absolute;
       inset-block-start: 0;
       inset-inline-start: 50%;
-      /* 42cqi = 42% da coluna. Com teto em rem para nao virar poster
-         numa tela larga. */
-      inline-size: min(13rem, 38cqi);
+      inline-size: min(15rem, 23cqi);
       /* Centralizacao por `translate` e nao por margem negativa.
          `margin-inline-start: min(-6.5rem, -21cqi)` parecia certo e
          estava errado: min() de dois NEGATIVOS escolhe o mais negativo,
@@ -436,68 +561,299 @@
          porcentagem do translate se refere ao proprio elemento e acerta
          sempre. */
       z-index: var(--z);
-      transform-origin: 50% 120%;
-      /* O arco. `--x` e `--y` sao numeros puros para poder multiplicar
-         por rem aqui e nao no JS — assim o arco acompanha o zoom de
-         texto em vez de ficar preso a pixel. */
-      /* 0.68cqi por unidade. A conta tem que incluir o GIRO: um card
-         de 20 graus ocupa `l*cos20 + a*sin20` de largura, nao `l`.
-         A 1024px — a largura onde a coluna e mais estreita — sao 167px
-         de card, 239px de caixa girada, 119px de meia caixa, e o card
-         externo para a 93px do centro: 212 dentro dos 220 disponiveis.
-         Com 0.9cqi sangrava 16px, e o print nao mostrava porque a
-         sobra ficava atras da borda da secao. */
+      /* 50% 50% e o transform-origin padrao do GSAP, que e o que o
+         card.md assume. Com `50% 120%` (o valor antigo) o giro pivota
+         abaixo do card e o arco sobe nas pontas em vez de descer. */
+      transform-origin: 50% 50%;
       transform:
-        translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem), 0)
+        translate3d(calc(var(--x) * var(--ux) - 50%), calc(var(--y) * var(--uy)), 0)
         rotate(var(--rot)) scale(var(--esc));
-      transition: transform 520ms var(--ease-tubo);
+      /* UMA propriedade em transicao, e ela e COMPOSTA.
+         Transicionar --x/--y/--rot/--esc separados exigiria quatro
+         @property e quatro transicoes por card, 24 no total. Medido em
+         Chrome 150 com 7 cards: 31 recalculos de estilo contra 5, e
+         18,9ms contra 0,8ms de main thread por transicao — 2,78ms POR
+         QUADRO com CPU de celular, 17% do orcamento de 16,7ms antes de
+         qualquer outra coisa rodar. Custom property registrada nao
+         anima na compositor thread; `transform` anima. Com a main
+         thread travada de proposito, a versao por custom property
+         congela e esta continua.
+         De quebra desvia do bug WebKit 285622 (rem + custom property
+         registrada = tremida de layout), aberto e sem correcao.
+
+         A ordem `translate3d() rotate() scale()` e a mesma que o GSAP
+         emite em `_renderCSSTransforms` — com a estrutura igual nos
+         dois lados, o CSS interpola funcao a funcao em vez de cair em
+         decomposicao de matriz, e o caminho visual bate.
+
+         A curva vai LITERAL aqui, e nao por var(): a mesma medicao deu
+         +31% de recalculo quando a linear() passa por var() dentro de
+         transition. E o `elastic.out(1, .75)` do card.md em 32 pontos.
+         O atraso tambem e do card.md: dist · 20ms a partir do card
+         apontado — e o que faz o leque abrir em onda e nao em bloco. */
+      transition: transform 500ms linear(0, 0.2294, 0.4517, 0.6477, 0.8076, 0.9288, 1.0132, 1.0659, 1.0932, 1.1014, 1.0967, 1.0843, 1.068, 1.0509, 1.035, 1.0214, 1.0106, 1.0026, 0.9973, 0.9941, 0.9927, 0.9925, 0.9931, 0.9942, 0.9954, 0.9967, 0.9978, 0.9987, 0.9995, 1, 1.0003, 1);
+      transition-delay: var(--atraso, 0ms);
     }
-    /* entrada: sobem do baixo, em cascata, quando a secao aparece */
-    .equipe__card { opacity: 0; }
+
+    /* ENTRADA — nascem no centro, meio tamanho, e sobem para o arco.
+       A opacidade base e 1: quem esconde e `[data-armado]`, um atributo
+       que so existe DEPOIS que o componente montou. Sem JS os seis
+       ficam visiveis, sem entrada. O contrario — esconder na folha e
+       devolver por JS — deixa a equipe invisivel para sempre quando o
+       chunk falha, e ja aconteceu neste projeto com os cards. */
+    [data-armado] .equipe__card { opacity: 0; }
     [data-natela] .equipe__card {
       opacity: 1;
-      animation: equipe-entra 720ms var(--ease-out-cut) both;
-      animation-delay: calc(var(--i) * 70ms);
+      animation: leque-entra 1200ms var(--elast-entra) backwards;
+      animation-delay: calc(200ms + var(--i) * 60ms);
     }
-    /* realce: so onde ha ponteiro fino. Em touchpad de laptop tambem
-       vale, mas em tela de toque `hover` mente e o card ficava preso
-       levantado depois do primeiro toque. */
-    @media (hover: hover) and (pointer: fine) {
-      .equipe__trilho:hover .equipe__card { opacity: 0.72; }
-      .equipe__card:hover {
-        opacity: 1;
-        z-index: 20;
-        transform:
-          translate3d(calc(var(--x) * 0.68cqi - 50%), calc(var(--y) * 1rem - 1.6rem), 0)
-          rotate(calc(var(--rot) * 0.35)) scale(calc(var(--esc) + 0.08));
-      }
+
+    /* O card apontado vai para o topo da pilha. `z-index` nao entra na
+       transicao de proposito — trocar a ordem de empilhamento no meio
+       do caminho faria o card passar POR TRAS do vizinho na ida. */
+    .equipe__card[data-aceso] { z-index: 20; }
+
+    /* Os outros escurecem um tico. Nao e `opacity` no card inteiro
+       (isso criaria contexto de empilhamento e brigaria com o z-index):
+       e um veu preto sobre a figura. */
+    .equipe__trilho:hover .equipe__figura::after {
+      opacity: 0.34;
     }
+    .equipe__card[data-aceso] .equipe__figura::after { opacity: 0; }
   }
 
-  /* ---- as setas ---- */
+  /* o veu que escurece os cards nao apontados */
+  .equipe__figura::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--color-void);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms var(--ease-out-cut);
+  }
+
+  /* ---- as setas ----
+     CENTRALIZADAS, com os pontos no meio, como no card.md. Antes
+     ficavam encostadas na direita (`justify-content: flex-end`) e a
+     seta da esquerda nascia desabilitada a 32% de opacidade: duas
+     manchas cinzas no canto. A queixa foi exata — "as setas estao meia
+     apagadas, podia ser centralizadas".
+
+     O que mudou, item a item:
+      - `justify-content: center` e os pontos entre elas;
+      - a seta ganhou FUNDO e anel interno, entao ela existe como
+        objeto mesmo parada — antes era so um contorno de 1px na cor
+        do filete, que sobre a seda quase some;
+      - desabilitada nao cai mais para 32%. 32% de --branco-2 sobre o
+        fundo da secao da 1,6:1, abaixo de qualquer leitura. Agora ela
+        perde a borda e o texto, mas mantem o fundo: continua legivel
+        como "existe, e nao da para usar agora". */
   .equipe__setas {
     display: flex;
-    gap: 0.75rem;
-    justify-content: flex-end;
-    margin-block-start: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-block-start: 1.5rem;
   }
   .equipe__seta {
+    position: relative;
     /* 44px e o minimo da casa e do criterio 2.5.8 da WCAG 2.2 */
     inline-size: 2.75rem;
     block-size: 2.75rem;
+    flex: none;
     display: grid;
     place-items: center;
-    border-radius: var(--radius-botao);
-    border: 1px solid var(--color-rule);
-    color: var(--color-branco-2);
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--color-branco) 16%, transparent);
+    background: color-mix(in srgb, var(--color-branco) 6%, transparent);
+    backdrop-filter: blur(12px);
+    color: var(--color-branco);
     transition: color 200ms var(--ease-out-cut),
-                border-color 200ms var(--ease-out-cut);
+                border-color 200ms var(--ease-out-cut),
+                background-color 200ms var(--ease-out-cut),
+                transform 200ms var(--ease-out-cut);
   }
-  .equipe__seta:hover:not(:disabled) {
+  /* o anel interno do card.md: da espessura sem engordar a borda */
+  .equipe__seta::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--color-branco) 6%, transparent);
+    pointer-events: none;
+  }
+  .equipe__seta:hover:not(:disabled),
+  .equipe__seta:focus-visible:not(:disabled) {
     color: var(--color-ambar);
     border-color: var(--color-ambar);
+    background: color-mix(in srgb, var(--color-ambar) 12%, transparent);
   }
-  .equipe__seta:disabled { opacity: 0.32; cursor: default; }
+  .equipe__seta:active:not(:disabled) { transform: scale(0.94); }
+  .equipe__seta:disabled {
+    color: color-mix(in srgb, var(--color-branco) 34%, transparent);
+    border-color: transparent;
+    cursor: default;
+  }
+
+  /* ---- os pontos ----
+     Posicao no trilho, entre as setas. Sem eles as setas informam so
+     "da para andar", e nao "onde eu estou nos seis". */
+  .equipe__pontos { display: flex; align-items: center; gap: 0.5rem; }
+  .equipe__ponto {
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-branco) 22%, transparent);
+    transition: background-color 300ms var(--ease-out-cut),
+                transform 300ms var(--ease-out-cut);
+  }
+  .equipe__ponto[data-atual] {
+    background: var(--color-ambar);
+    transform: scale(1.45);
+  }
+
+  /* ---------- O PAINEL DOS ARTISTAS -------------------------
+     Uma caixa, que era exatamente o que faltava: os doze nomes de
+     alcance nacional estavam soltos no meio da página, sem filete,
+     sem fundo, sem nada — "os cantores estão flutuando em algo".
+
+     O objeto que a empresa vende é um painel de LED. Então o
+     recipiente é um painel: chão escuro, aro fino, e uma varredura de
+     luz que atravessa UMA VEZ quando a seção entra. Uma vez, e não em
+     laço: movimento contínuo em paralelo com outro conteúdo por mais
+     de 5 segundos aciona o critério 2.2.2 da WCAG, que é NÍVEL A e
+     exige botão de pausa visível na página — `prefers-reduced-motion`
+     não fecha esse critério, e a técnica C39 é de 2.3.3, não de 2.2.2.
+     Uma varredura que termina não aciona nada.
+     --------------------------------------------------------- */
+  .painel {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+    border-radius: var(--radius-placa);
+    border: 1px solid var(--color-rule);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--color-branco) 3%, var(--color-off)) 0%,
+        var(--color-off) 60%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+    padding: clamp(1.5rem, 1rem + 2.2vw, 2.75rem);
+  }
+  /* a faixa de luz. Nasce fora e sai fora: sem a rolagem ela nunca
+     aparece, e quem não tem `view()` simplesmente não vê varredura
+     nenhuma — o painel já nasce no estado final. */
+  .painel__varre {
+    position: absolute;
+    inset-block: -30%;
+    inset-inline: -60%;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg,
+      transparent 44%,
+      color-mix(in srgb, var(--color-branco) 9%, transparent) 50%,
+      transparent 56%);
+    translate: 62% 0;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .painel__varre {
+        animation: card-brilho linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+  .painel__nomes {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: clamp(1.25rem, 0.6rem + 2.4vw, 2.5rem);
+    row-gap: 0.35rem;
+  }
+  .painel__nome {
+    font-family: var(--font-display);
+    /* 24 -> 40. Todos no MESMO corpo e na MESMA cor: hierarquia entre
+       nomes de artista é negociação de contrato, e esta empresa monta
+       o palco — não promove o show. */
+    font-size: clamp(1.5rem, 0.98rem + 2.2vw, 2.5rem);
+    line-height: 1.12;
+    color: var(--color-branco);
+  }
+  .painel__resto {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-rule);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-branco-2);
+  }
+  .painel__resto b {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+    color: var(--color-ambar);
+  }
+
+  /* ---------- O CABEÇALHO DE CATEGORIA DO RIDER -------------
+     Era `.lab`: mono 12px em --branco-2. Medido em APCA isso dá
+     Lc 43, abaixo do piso de Lc 45 que vale para texto GRANDE — e
+     este tem 12px. "Está apagado, muito sem vida, pequena demais" é
+     medida, não impressão. Sobe para 24px em --branco, Lc 96.
+     O tracking cai junto: .18em está certo a 12px e vira gagueira a
+     24px. --------------------------------------------------------- */
+  .rider__cat {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    /* sticky TAMBEM no celular: e o que faz o rotulo acompanhar os 27
+       nomes em vez de sumir na primeira rolagem */
+    position: sticky;
+    inset-block-start: 0.5rem;
+    align-self: start;
+    padding-block-end: 0.75rem;
+    border-block-end: 1px solid var(--color-rule);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    color: var(--color-branco);
+    text-transform: none;
+    /* o filete tem que ter chao atras dele, senao os nomes passam por
+       baixo do rotulo grudado */
+    background: linear-gradient(to bottom,
+      var(--color-void) 0%, var(--color-void) 82%, transparent 100%);
+  }
+  @media (min-width: 1024px) {
+    .rider__cat {
+      inset-block-start: 2rem;
+      border-block-end: 0;
+      background: none;
+      padding-block-end: 0;
+    }
+  }
+  .rider__conta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--color-ambar);
+  }
 
   /* ---------- EYEBROW ---------------------------------------
      Marcador de pixel na cor do tubo + contraste de valor na
@@ -577,6 +933,20 @@
   @media (min-width: 640px) {
     .bloco__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .card[data-peso="1"] { grid-column: span 2; }
+
+    /* Cenografia tem 3: um largo em cima, dois embaixo.
+       A regra mirava `data-peso="2"` e isso estava ERRADO — o peso 2 do
+       bloco e a Area instagramavel, que e o SEGUNDO item. Resultado
+       medido: linha 1 com um card e um buraco, linha 2 com um card
+       gigante esticado, linha 3 com um card e outro buraco. Era a
+       queixa "a Area instagramavel ta bem maior que as outras".
+       Quem manda agora e a POSICAO, nao o peso: o primeiro fica largo
+       e os dois seguintes dividem a linha de baixo. A ordem do item na
+       lista de servicos foi trocada junto, para que o primeiro seja o
+       que aguenta ficar largo. */
+    .bloco__grade[data-bloco="cenografia"] > .card:first-child {
+      grid-column: span 2;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -588,25 +958,43 @@
     .bloco__grade[data-bloco="led"] .card[data-peso="1"] {
       grid-column: span 2; grid-row: span 2;
     }
-    /* Cenografia tem 3: um largo em cima, dois embaixo. NUNCA tres
-       colunas iguais — tres iguais le como "sobrou um". */
-    .bloco__grade[data-bloco="cenografia"] {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .bloco__grade[data-bloco="cenografia"] .card[data-peso="2"] {
-      grid-column: span 2;
-    }
   }
 
   /* ---------- O CARD ----------------------------------------
      Um componente, tres pesos. O peso e GEOMETRIA, nao hierarquia
      de valor.
      --------------------------------------------------------- */
+  /* A COR DE CADA BLOCO. Nao e enfeite: e o que faz cinco grades
+     lerem como cinco assuntos em vez de treze retangulos cinzas.
+     Tres matizes para cinco blocos — cinco cores seriam arco-iris.
+     A RESTRICAO DURA continua valendo: a tinta mora em z-index 0 e a
+     foto em z-index 1. Sendo a foto opaca, magenta NAO ALCANCA um
+     rosto por GEOMETRIA, e nao por disciplina de quem escreve o
+     proximo card. */
+  /* O PADRAO MORA NA GRADE, e nao no card. Se `.card` declarasse
+     `--tinta` para si, esse valor venceria SEMPRE o do bloco — valor
+     declarado no proprio elemento ganha de valor herdado, nao importa
+     a especificidade do outro seletor. Foi o que fez os cinco blocos
+     saírem todos ambar no primeiro teste. */
+  .bloco__grade                          { --tinta: var(--color-ambar); }
+  .bloco__grade[data-bloco="led"]        { --tinta: var(--color-magenta); }
+  /* congo e quase preto: a 16% nao aparece. Como e escuro, tambem nao
+     ameaca contraste — a 30% da L 0,0108, que e 5,47:1 com o texto
+     secundario, folgado. */
+  .bloco__grade[data-bloco="cenografia"] { --tinta: var(--color-congo); }
+  .bloco__grade[data-bloco="pacotes"]    { --tinta: var(--color-magenta); }
+
   .card {
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    /* CLIP e nao HIDDEN. `overflow: hidden` cria scroll container, e
+       scroll container SEQUESTRA o `animation-timeline: view()` do
+       brilho la embaixo: a animacao amarra no card em vez de amarrar
+       na pagina e nunca progride. `clip` recorta sem criar container.
+       De quebra, `hidden` deixaria o Tab rolar o proprio card quando
+       um filho recebe foco. */
+    overflow: clip;
     isolation: isolate;
     border-radius: var(--radius-card);
     border: 1px solid transparent;
@@ -639,6 +1027,125 @@
   /* entrada: sobe e assenta. O atraso vem do --d, com teto no JSX. */
   .card { animation: card-entra 560ms var(--ease-out-cut) both; animation-delay: var(--d, 0ms); }
 
+  /* ---------- A TINTA E O GRAO -------------------------------
+     A queixa foi "os cards estao muito cinzas sem vida". Duas causas,
+     as duas resolvidas aqui e sem uma linha de JS:
+
+     1. COR SO NO HOVER. O facho e o aro dependiam de `:hover`, entao
+        em tela de toque — que e a maior parte do trafego — o card era
+        literalmente um retangulo cinza. Agora a tinta do bloco esta
+        acesa NO REPOUSO, em todo lugar.
+
+     2. BANDING. Gradiente escuro sobre preto e o caso classico: de
+        rgb(28,28,32) a rgb(10,10,12) sao 18 degraus de 8 bits
+        espalhados por centenas de pixels, uma faixa visivel a cada
+        ~22px. O remedio e ruido de amplitude 1/255 — daí a opacidade
+        de 3,5%. O turbulence vem ASSADO num data-URI: `filter: url()`
+        em elemento vivo reprocessa o filtro a cada quadro.
+
+     OS PERCENTUAIS DE TINTA SAO O TETO DE CONTRASTE, nao gosto.
+     O texto secundario e --branco-2 #8E9199, luminancia 0,2831. Para
+     manter 4,5:1 (criterio 1.4.3) o fundo tem que ficar em L <= 0,024.
+     Medido sobre o chao do card #191A1F (L = 0,01045):
+       magenta a 16%  ->  L 0,01823  ->  4,88:1   OK
+       ambar   a 12%  ->  L 0,02493  ->  4,45:1   REPROVA
+       ambar   a  9%  ->  L 0,02053  ->  4,72:1   OK
+     Por isso ambar entra a 9% e os outros a 16%: ambar e claro demais
+     para ir mais longe. E o pico do radial fica no canto SUPERIOR,
+     atras da foto, longe do paragrafo. */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    /* A OPACIDADE DO GRAO VAI DENTRO DO SVG, no proprio <rect>.
+       Poe-la na camada CSS nao serve: `opacity` no pseudo-elemento
+       derrubaria a tinta junto, e o `feTurbulence` renderiza um
+       retangulo OPACO — sem o `opacity` no rect ele cobre o card
+       inteiro com um cinza chapado. 0,045 e a amplitude de ~1/255,
+       que e exatamente o que mata banding sem virar textura. */
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
+      radial-gradient(130% 90% at 8% 0%,
+        color-mix(in srgb, var(--tinta) 16%, transparent) 0%,
+        color-mix(in srgb, var(--tinta) 6%, transparent) 38%,
+        transparent 72%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+  }
+  /* ambar e o matiz mais claro da paleta: mesmo 12% ja reprova o
+     contraste do texto secundario (4,45:1). Ele entra a 9%. */
+  .bloco__grade[data-bloco="som"] .card::before,
+  .bloco__grade[data-bloco="luz"] .card::before {
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
+      radial-gradient(130% 90% at 8% 0%,
+        color-mix(in srgb, var(--tinta) 9%, transparent) 0%,
+        color-mix(in srgb, var(--tinta) 4%, transparent) 38%,
+        transparent 72%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+  }
+  /* congo e o mais escuro da paleta e a 16% some no chao do card */
+  .bloco__grade[data-bloco="cenografia"] .card::before {
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
+      radial-gradient(130% 90% at 8% 0%,
+        color-mix(in srgb, var(--tinta) 34%, transparent) 0%,
+        color-mix(in srgb, var(--tinta) 14%, transparent) 38%,
+        transparent 72%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+  }
+
+  /* ---------- O BRILHO QUE ATRAVESSA -------------------------
+     ESTA E A ANIMACAO QUE FUNCIONA NO CELULAR, e era o pedido.
+     Uma faixa de luz cruza o card conforme ele ENTRA na tela. Quem
+     dirige e a rolagem (`animation-timeline: view()`), nao um relogio:
+     zero JS, zero IntersectionObserver, e anda na compositor thread
+     porque o que muda e `translate`.
+
+     Cobertura: Chrome/Edge 115, Safari 26.0, Samsung 23. No trafego
+     de celular brasileiro isso da ~90% — o unico grande ausente e o
+     Firefox, que no celular daqui e 0,33%. Quem nao tem, nao anima: o
+     card ja nasce no estado final, entao nao ha nada para consertar.
+
+     O RANGE TERMINA DENTRO DE `entry`, e isso e a parte que quebra
+     quando se erra. `view()` nao tem estado inicial: ele calcula o
+     progresso pela posicao ATUAL. Com `cover 0% cover 100%`, um card
+     que ja esta visivel no primeiro quadro nasce em 50% — congelado
+     no meio da varredura, com a faixa de luz parada em cima dele. Com
+     `entry 0% entry 100%`, "ja entrou" mapeia para 100%, que e o
+     estado final: a faixa ja saiu do card. */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset-block: -25%;
+    inset-inline: -70%;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg,
+      transparent 42%,
+      color-mix(in srgb, var(--tinta) 30%, transparent) 50%,
+      transparent 58%);
+    translate: 72% 0;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .card::after {
+        animation: card-brilho linear both;
+        /* `animation-timeline` DEPOIS do shorthand, sempre: a timeline
+           e reset-only no shorthand `animation`, entao qualquer
+           `animation: ...` posterior a zera de volta para `auto` e a
+           animacao vira temporal, silenciosamente. */
+        animation-timeline: view();
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+
   /* O TILT so onde ha ponteiro fino. Em tela de toque `hover` mente e
      o card ficaria torto depois do primeiro toque. */
   @media (hover: hover) and (pointer: fine) {
@@ -662,16 +1169,19 @@
                              transition: opacity 300ms var(--ease-out-cut); }
   .card__facho {
     background: radial-gradient(38% 46% at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 22%, transparent) 0%,
+      color-mix(in srgb, var(--tinta) 26%, transparent) 0%,
       transparent 100%);
   }
   .card__aro {
     border-radius: inherit;
     box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--tubo-cor, var(--color-ambar)) 42%, transparent);
+      color-mix(in srgb, var(--tinta) 48%, transparent);
   }
-  .card[data-estado="festa"] { --tubo-cor: var(--color-magenta); }
-  .card[data-estado="tecnico"] { --tubo-cor: var(--color-branco); }
+  /* O facho e o aro seguem a tinta DO BLOCO, e nao mais o estado do
+     servico. Antes eram duas cores para treze cards (magenta em
+     "festa", branco em "tecnico"), o que nao dizia nada sobre a grade
+     em que o card vive — e branco de aro sobre fundo escuro e
+     exatamente a leitura "cinza" da queixa. */
   @media (hover: hover) and (pointer: fine) {
     .card:hover .card__facho, .card:hover .card__aro,
     .card:focus-within .card__facho, .card:focus-within .card__aro { opacity: 1; }
@@ -847,11 +1357,96 @@
   .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
   .navbar__zap:hover { color: var(--color-void); }
 
-  /* a ancora nao pode parar atras do menu flutuante */
-  @media (max-width: 1023px) {
-    html { scroll-padding-block-end: 6rem; }
-    body { padding-block-end: 6rem; }
+  /* ---------- A BARRA DO CELULAR ----------------------------
+     Existe porque o PC tem navbar e o celular nao tinha nada em cima —
+     o menu morava no rodape e nao lia como navegacao.
+
+     `env(safe-area-inset-top)` so tem valor se o `<meta viewport>`
+     trouxer `viewport-fit=cover`; sem isso ele devolve 0. Como a barra
+     e opaca e cobre a faixa da ilha/entalhe, o `max()` garante um piso
+     de respiro nos aparelhos que nao reportam nada.
+     --------------------------------------------------------- */
+  .barra-cel {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-start: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    min-block-size: 4rem;
+    /* O SAFE-AREA LATERAL NAO E ZERO EM PAISAGEM: num iPhone com ilha
+       ele vale de 44 a 62px de cada lado. Com padding fixa de 20px a
+       marca cai debaixo do entalhe assim que o aparelho vira.
+       Em retrato, e em aba normal do Safari, os quatro insets valem 0
+       (o 59/62 so aparece em PWA standalone) — entao `max()` cai no
+       1.25rem e nada muda no caso comum. */
+    padding-inline:
+      max(1.25rem, env(safe-area-inset-left, 0px))
+      max(1.25rem, env(safe-area-inset-right, 0px));
+    /* `calc(X + env())` e nao `max(X, env())`: max() de um valor >= 0
+       com 0 devolve sempre o proprio valor — a versao anterior era um
+       no-op que nao garantia respiro nenhum. */
+    padding-block-start: env(safe-area-inset-top, 0px);
+    background: color-mix(in srgb, var(--color-void) 86%, transparent);
+    backdrop-filter: blur(14px);
+    border-block-end: 1px solid var(--color-rule);
   }
+
+  /* o WhatsApp DENTRO da barra, ao lado do hamburguer. Redondo e so
+     com o icone: a 360px a soma de marca + rotulo + pilula do menu nao
+     fecha. 44px e o minimo da casa e o criterio 2.5.5 da WCAG. */
+  .barra-cel__zap {
+    position: absolute;
+    inset-inline-end: calc(max(0.75rem, env(safe-area-inset-right, 0px)) + 8.5rem);
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-ambar);
+    color: var(--color-ambar);
+    background: color-mix(in srgb, var(--color-void) 70%, transparent);
+  }
+
+  /* A pilula e ABSOLUTA: crescendo, ela nao pode empurrar a marca nem
+     esticar a altura da barra. O `top` soma o safe-area porque a
+     posicao absoluta ignora a padding do pai — sem isso a pilula
+     subiria para dentro da ilha dinamica num iPhone. */
+  .barra-cel__pilula {
+    position: absolute;
+    inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+    /* TETO DE ALTURA. O motion escreve `height: 452px` inline, e a
+       caixa tem `overflow: hidden`. Com o texto do navegador em 200%
+       — criterio 1.4.4, nivel AA — os nove itens passam de 670px e os
+       ultimos ficavam cortados e inalcancaveis. O teto respeita a
+       tela; quem rola por dentro e o painel. */
+    max-block-size: calc(100dvh - 6rem - env(safe-area-inset-top, 0px));
+  }
+  .menu-painel {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline: 1.5rem;
+    padding-block-end: 1.75rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* UM SO ELEMENTO FIXO. O WhatsApp entrou na barra do topo, entao nao
+     ha mais nada preso no rodape — o `padding-block-end` no body e o
+     `scroll-padding-block-end` saíram junto.
+     E o `scroll-padding-block-start` saiu TAMBEM: o `Secao` ja tem
+     `scroll-mt-16`, e os dois SOMAVAM. Uma ancora no celular parava
+     144px abaixo do titulo para uma barra de 64px — 80px de buraco
+     morto em cima de cada secao. Quem cuida do desvio e o
+     `scroll-mt-20` do proprio Secao, que da os 64px da barra mais
+     16px de respiro, e vale igual nas duas larguras porque a
+     NavDesktop tambem mede 64px. */
 
   /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
   .folha {

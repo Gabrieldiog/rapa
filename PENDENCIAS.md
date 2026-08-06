@@ -183,9 +183,27 @@ cobertura em Araguari e Tiradentes, e "quase 30 anos" com os 116 artistas.
 
 ---
 
-## P13 · Apagar `public/__diag.html` antes de publicar
+## P13 · Apagar as tres ferramentas de `public/` antes de publicar
 
 **Bloqueia publicação. Não bloqueia desenvolvimento.**
+
+São três arquivos, todos em `public/`, todos fora do site:
+
+| arquivo | o que faz |
+|---|---|
+| `__diag.html` | auditoria de layout num viewport arbitrário |
+| `__ver.html`  | print de uma seção no meio da página |
+| `__sonda.html` | lê o estilo COMPUTADO de um seletor — print não distingue `opacity: 0` de `display: none` |
+
+Duas descobertas que ficam registradas aqui porque custaram tempo e vão custar de novo:
+
+1. **`html { scroll-behavior: smooth }` quebra print de headless.** Todo `scrollTo` vira
+   animação, e o `--virtual-time-budget` não avança linha do tempo de animação — a rolagem
+   para no meio e o print sai numa seção antes do alvo. As três ferramentas forçam
+   `scrollBehavior = 'auto'` antes de rolar.
+2. **`IntersectionObserver` não dispara sob relógio virtual.** As observações são entregues
+   nos passos de renderização, que o relógio virtual não produz. Qualquer coisa revelada por
+   observer precisa ser ligada à mão na ferramenta.
 
 É uma ferramenta de auditoria, não faz parte do site. Ela existe porque o Chrome headless
 **trava a janela em 500px de largura mínima**: pedir `--window-size=380` devolve

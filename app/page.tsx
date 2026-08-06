@@ -19,9 +19,16 @@ export default function Home() {
   return (
     <>
       <Blackout />
+      {/* z-200, e nao z-100. A barra do celular tambem e z-100 e vem
+          DEPOIS no DOM — com o mesmo indice, quem vem depois pinta por
+          cima, e o link de pular ficava inteiramente atras dela. E a
+          falha F110 da WCAG ao pe da letra (2.4.11, nivel AA:
+          "o componente com foco nao pode ficar inteiramente escondido
+          por conteudo do autor"), e foi regressao direta da barra
+          nova. */}
       <a href="#conteudo"
          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4
-                    focus:z-[100] focus:bg-ambar focus:px-4 focus:py-2 focus:text-void">
+                    focus:z-[200] focus:bg-ambar focus:px-4 focus:py-2 focus:text-void">
         Pular para o conteúdo
       </a>
 
@@ -38,12 +45,14 @@ export default function Home() {
             o fundo continua e ela nao. A vinheta agora e do proprio
             fundo, fixa e sem costura. */}
 
-        {/* pb maior que pt no celular: o menu de secoes e fixo no
-            rodape e cobria o CTA. O `justify-center` centraliza o que
-            sobra, entao o bloco sobe e o botao fica alcancavel. */}
+        {/* A barra do celular e FIXA NO TOPO e tem 4rem — o pt-16
+            antigo deixava a marca encostada nela. E o rodape ficou
+            LIVRE: o WhatsApp entrou na barra de cima, entao nao ha
+            mais nada preso embaixo para o topo desviar. Eram 152px de
+            barra fixa somados, 27,5% da tela de um iPhone SE; agora
+            sao 64px. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 pt-16
-                        pb-[calc(6.5rem+env(safe-area-inset-bottom))]
+                        items-center justify-center px-5 pt-24 pb-16
                         text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
@@ -319,35 +328,74 @@ export default function Home() {
           </Zap>
         </Reveal>
 
-        {/* os que a pessoa reconhece, grandes. Sem isto os 116 tem o
-            mesmo peso — e peso igual e peso nenhum. */}
-        <Reveal className="mt-16">
-          <div className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
-            {DESTAQUES.map((n, i) => (
-              <span key={n}
-                    className="font-[family-name:var(--font-display)] text-lg
-                               leading-tight lg:text-xl"
-                    style={{ opacity: 1 - i * 0.045 }}>
-                {n}
-              </span>
-            ))}
-            <span className="lab self-center">
-              e mais {TOTAL_ARTISTAS - DESTAQUES.length}
-            </span>
+        {/* ---------- O PAINEL ----------
+            Os nomes que a pessoa reconhece, DENTRO DE UMA CAIXA.
+            A queixa foi literal — "os cantores estão flutuando em
+            algo" — e a causa era que não havia recipiente nenhum: os
+            doze nomes e os 116 usavam o mesmo container, que era
+            nada. Agora eles moram num painel, que é o objeto que esta
+            empresa vende.
+
+            E A RAMPA DE OPACIDADE MORREU. Ela era `1 − i · 0,045`, e o
+            problema não é contraste (o 12º ainda dava 11,4:1). O
+            problema é que ela RANQUEIA EM PÚBLICO os clientes da
+            empresa: em pôster de festival, posição e corpo são
+            negociação contratual, e é por isso que artista briga com
+            produtora por tamanho de letra. A Rapa monta o palco, não
+            promove o show — ela não tem por que dizer que Sérgio Reis
+            vale mais que Jerry Smith. Todos no mesmo corpo e na mesma
+            cor. É o formato do Tomorrowland, que lista 850 nomes sem
+            hierarquia nenhuma, e a escala é o argumento. */}
+        <Reveal className="mt-14 block">
+          <div className="painel">
+            <span aria-hidden className="painel__varre" />
+            <ul className="painel__nomes">
+              {DESTAQUES.map((n) => (
+                <li key={n} className="painel__nome">{n}</li>
+              ))}
+            </ul>
+            <p className="painel__resto">
+              <span>e mais</span>
+              <b className="tabular-nums">{TOTAL_ARTISTAS - DESTAQUES.length}</b>
+              <span>abaixo</span>
+            </p>
           </div>
         </Reveal>
 
-        {/* a lista completa: corrida, com o pixel do tubo separando.
-            Em coluna vertical de mono minusculo ninguem le. */}
+        {/* ---------- OS 116, TODOS ----------
+            Nada escondido: nem `<details>`, nem "ver todos", nem
+            coluna. Em `flex-wrap` os 116 ocupam ~1.400px no celular,
+            duas telas — e a densidade É o argumento. Empilhados um por
+            linha a 24px seriam 3.341px, cinco telas. E accordion com
+            render condicional em estado do React não é indexado pelo
+            Google ("won't load content that requires user
+            interactions"), que é o defeito das duas imagens PNG do
+            site antigo com outra roupa.
+
+            OS NOMES SUBIRAM DE --branco-2 PARA --branco. Medido em
+            APCA: Lc 43 para Lc 96. Custa zero pixel de altura e é a
+            maior correção de legibilidade disponível na seção. */}
         <div className="mt-20 flex flex-col gap-12">
           {RIDER.map((cat, i) => (
             <Reveal key={cat.categoria} delay={Math.min(i, 3) * 60}>
-              <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[minmax(0,15rem)_1fr]">
-                <h3 className="lab flex items-baseline gap-3 lg:sticky lg:top-8 lg:self-start">
+              <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[minmax(0,17rem)_1fr]">
+                {/* O RÓTULO DEIXOU DE SER LEGENDA E VIROU CABEÇALHO.
+                    Era `.lab`: mono 12px em --branco-2, que dá APCA
+                    Lc 43 — abaixo do piso de Lc 45 para texto GRANDE,
+                    quanto mais para 12px. "Está apagado, está muito
+                    sem vida, pequena demais" não é impressão: é
+                    medida. Sobe para 24px em --branco (Lc 96), o
+                    tracking cai de .18em para .05em porque tracking é
+                    inversamente proporcional ao corpo, e a contagem
+                    fica em âmbar tabular — âmbar já é a cor de dado na
+                    identidade. O `sticky` agora vale no celular
+                    também: o rótulo acompanhando os 27 nomes é o
+                    dispositivo mais útil da seção. */}
+                <h3 className="rider__cat">
                   <b>{cat.categoria}</b>
-                  <span className="tabular-nums opacity-60">{cat.nomes.length}</span>
+                  <span className="rider__conta tabular-nums">{cat.nomes.length}</span>
                 </h3>
-                <ul className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-branco-2
+                <ul className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-branco
                                lg:border-l lg:border-rule lg:pl-10">
                   {cat.nomes.map((n, j) => (
                     <li key={n} className="flex items-center gap-3">
@@ -367,33 +415,46 @@ export default function Home() {
 
       {/* ══════════════ ESTADO TÉCNICO · SOBRE E EQUIPE ══════════════ */}
       <Secao id="sobre" className="border-t border-rule">
-        {/* minmax(0,1fr) e nao 1fr: coluna de grid nasce com
-            `min-width: auto` e nao encolhe abaixo do conteudo. Sem isto
-            o trilho da equipe esticava a coluna inteira — medido em
-            1140px alem da borda a 380px. */}
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
-          <Reveal className="min-w-0">
-            <Eyebrow><b>A casa</b> · quase <i>30</i> anos</Eyebrow>
-            <h2 className="max-w-[18ch] text-2xl lg:text-3xl">Quase 30 anos</h2>
-            <p className="mt-6 text-base text-branco-2">
+        {/* O TEXTO EM CIMA E O LEQUE NA LARGURA TODA.
+            Era grid de duas colunas, e a coluna do leque tinha ~504px:
+            nela o card cabia em 191px e o card externo parava a 103px
+            do centro — foto pequena e leque fechado. Na largura da
+            seção (1088px) o card vai a 240px e o externo a 359px.
+            É geometria, não gosto: seis cards em leque precisam de
+            largura, e meia coluna não tem.
+            min-w-0 continua: item de grid/flex nasce com
+            `min-width: auto` e o trilho do celular esticava o pai —
+            medido em 1140px além da borda a 380px. */}
+        <Reveal className="min-w-0">
+          <Eyebrow><b>A casa</b> · quase <i>30</i> anos</Eyebrow>
+          <h2 className="max-w-[18ch] text-2xl lg:text-3xl">Quase 30 anos</h2>
+          {/* Os dois parágrafos lado a lado em vez de empilhados: o
+              leque desceu para baixo e liberou a largura toda. Nada de
+              track em `ch` aqui — `ch` numa faixa de grid resolve contra
+              a fonte do CONTAINER (16px), e não contra o display de
+              64px do H2. `20ch` virava 160px e quebrava "Quase 30 anos"
+              em três linhas. */}
+          <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-16">
+            <p className="text-base text-branco-2">
               A Rapa Sound é de Uberlândia e atende casamento, festa de 15 anos e
               evento de empresa. Já montamos em Araguari, em Tiradentes e no
               Palácio de Cristal — e continuamos atendendo aqui do lado.
             </p>
-            <p className="mt-4 text-xs text-branco-2">
+            <p className="max-w-[46ch] self-end text-xs text-branco-2">
               O equipamento qualquer um aluga. O que não se aluga é a equipe que
               sabe onde pendurar o refletor para a foto sair boa.
             </p>
-          </Reveal>
-          <Reveal delay={90} className="min-w-0">
-            <LequeEquipe cards={EQUIPE.map((p) => ({
-              src: p.src,
-              alt: `${p.nome}, ${p.papel.toLowerCase()} na Rapa Sound`,
-              nome: p.nome,
-              papel: p.papel,
-            }))} />
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={90} className="mt-14 block min-w-0 lg:mt-20">
+          <LequeEquipe cards={EQUIPE.map((p) => ({
+            src: p.src,
+            alt: `${p.nome}, ${p.papel.toLowerCase()} na Rapa Sound`,
+            nome: p.nome,
+            papel: p.papel,
+          }))} />
+        </Reveal>
       </Secao>
 
       {/* ══════════════ FAQ ══════════════ */}

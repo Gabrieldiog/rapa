@@ -1,0 +1,77 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>sonda</title>
+<!--
+  FERRAMENTA DE MEDICAO, NAO FAZ PARTE DO SITE. Apagar antes de
+  publicar junto com __diag.html e __ver.html (ver P13 em PENDENCIAS).
+
+  Le o ESTILO COMPUTADO de um seletor dentro de um iframe de mesma
+  origem, num viewport de largura arbitraria. Existe porque print nao
+  responde "por que isto esta invisivel" — opacity 0 e display:none
+  produzem exatamente o mesmo pixel.
+
+  Uso: /__sonda.html?sel=.equipe__card&props=opacity,transform&w=1400&rolar=16000
+-->
+<style>
+  html,body { margin:0; background:#222; color:#eee; font:12px ui-monospace,monospace }
+  #wrap { display:flex; gap:10px; padding:10px }
+  iframe { border:0; width:1px; height:1px; opacity:.01; position:absolute; left:-9999px }
+  pre { white-space:pre-wrap }
+</style>
+<div id="wrap"><pre id="out">medindo...</pre></div>
+<iframe id="f" src="/"></iframe>
+<script>
+  const q = new URLSearchParams(location.search)
+  const f = document.getElementById('f')
+  f.style.position = 'static'; f.style.left = '0'; f.style.opacity = '1'
+  f.style.width = (q.get('w') || 1400) + 'px'
+  f.style.height = (q.get('h') || 900) + 'px'
+  const sel = q.get('sel') || '.equipe__card'
+  const props = (q.get('props') || 'opacity').split(',')
+
+  f.addEventListener('load', () => setTimeout(() => {
+    const d = f.contentDocument, w = f.contentWindow
+    /* sem isto o `html { scroll-behavior: smooth }` da folha transforma
+       cada scrollTo em animacao, e o headless nao avanca animacao */
+    d.documentElement.style.scrollBehavior = 'auto'
+    for (const r of d.querySelectorAll('.rev')) r.classList.add('rev-on')
+    // varre a pagina toda para acordar IntersectionObserver e lazy
+    const h = d.documentElement.scrollHeight
+    for (let i = 1; i <= 16; i++) setTimeout(() => w.scrollTo(0, (h/16)*i), i*50)
+    if (q.get('rolar')) setTimeout(() => w.scrollTo(0, Number(q.get('rolar'))), 1000)
+
+    /* ?clique=<seletor> aperta um botao antes de medir. Serve para
+       sondar estado aberto — menu, <details>, modal. */
+    const cliqueSel = q.get('clique')
+    if (cliqueSel) setTimeout(() => {
+      const alvo = d.querySelector(cliqueSel)
+      if (alvo) alvo.click()
+      else console.warn('sem alvo para', cliqueSel)
+    }, 1100)
+
+    setTimeout(() => {
+      const linhas = []
+      if (cliqueSel) {
+        const alvo = d.querySelector(cliqueSel)
+        linhas.push('clique em ' + cliqueSel + ' -> ' +
+          (alvo ? 'achado, aria-expanded=' + alvo.getAttribute('aria-expanded')
+                : 'NAO ACHADO'))
+      }
+      const alvos = d.querySelectorAll(sel)
+      linhas.push('seletor: ' + sel + '  ->  ' + alvos.length + ' elemento(s)')
+      const tr = d.querySelector('.equipe__trilho')
+      if (tr) linhas.push('trilho: data-armado=' + tr.hasAttribute('data-armado') +
+                          '  data-natela=' + tr.hasAttribute('data-natela') +
+                          '  caixa=' + JSON.stringify(tr.getBoundingClientRect()))
+      alvos.forEach((el, i) => {
+        const c = w.getComputedStyle(el)
+        const r = el.getBoundingClientRect()
+        linhas.push('[' + i + '] caixa ' + Math.round(r.left) + ',' + Math.round(r.top) +
+                    ' ' + Math.round(r.width) + 'x' + Math.round(r.height) +
+                    '  anims=' + el.getAnimations().length)
+        for (const p of props) linhas.push('     ' + p + ': ' + c.getPropertyValue(p))
+      })
+      document.getElementById('out').textContent = linhas.join('\n')
+    }, 1600)
+  }, 2000))
+</script>
