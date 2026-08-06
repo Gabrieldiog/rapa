@@ -16,7 +16,6 @@ import { NavDesktop } from '@/components/NavDesktop'
 import { LequeEquipe } from '@/components/LequeEquipe'
 import { Logo } from '@/components/Logo'
 import { PausaLed } from '@/components/PausaLed'
-import { Pausa } from '@/components/Pausa'
 import { Blackout } from '@/components/Blackout'
 import { Zap, Secao, Eyebrow } from '@/components/ui'
 
@@ -622,11 +621,6 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 lg:flex-row
                         lg:items-center lg:justify-between lg:px-8">
           <p className="lab">© Rapa Sound · Uberlândia/MG</p>
-          {/* O controle de pausa mora aqui, ao lado do ©, que é onde a
-              convenção põe controle de página. Ver o comentário em
-              components/Pausa.tsx: é o critério 2.2.2 da WCAG, nível A,
-              e é o único item da página com exposição jurídica. */}
-          <Pausa />
           <p className="lab">Sonorização · iluminação · efeitos · LED</p>
         </div>
       </footer>

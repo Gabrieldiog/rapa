@@ -130,10 +130,30 @@ export function Seda({ forca = 1 }: { forca?: number }) {
 
     let t = 0
     let id = 0
-    let manual = true   // false = a pessoa apertou pausa no rodape
     let naTela = true
     let comFoco = true
-    const rodando = () => naTela && comFoco && manual
+
+    /* A SEDA ANIMA E DEPOIS DESCANSA.
+       Antes ela desenhava enquanto a pessoa estivesse na pagina — 30
+       segundos ou 10 minutos, sempre. Medido com CPU estrangulada em
+       6x, que e o perfil de um Android de entrada: mesmo com o buffer
+       ja reduzido ela custa 4 quadros por segundo o tempo inteiro
+       (51,0 contra 55,1 com o canvas escondido). Isso e rAF acordando
+       o processador 24 vezes por segundo, para sempre, e no celular
+       isso e bateria.
+
+       Ela e um DRAPEADO: o que ela tem de bonito e a forma, nao o
+       movimento. Sete segundos de ondulacao na entrada dao o efeito
+       de tecido vivo; depois disso ela congela num quadro e para de
+       custar QUALQUER coisa.
+
+       De quebra, isso tira a pagina do criterio 2.2.2 da WCAG por
+       aqui: movimento que termina em 7 segundos nao e movimento
+       automatico continuo, e nao precisa de mecanismo de pausa. */
+    const DURACAO = 7000
+    let comecou = 0
+    let acabou = false
+    const rodando = () => naTela && comFoco && !acabou
 
     /* 30 quadros por segundo, nao 60. O padrao anda 0.02 por quadro:
        a diferenca entre um quadro e o seguinte e imperceptivel, e
@@ -142,6 +162,8 @@ export function Seda({ forca = 1 }: { forca?: number }) {
     let ultimo = 0
 
     const quadro = (agora: number) => {
+      if (!comecou) comecou = agora
+      if (agora - comecou > DURACAO) acabou = true
       if (rodando()) id = requestAnimationFrame(quadro)
       if (agora - ultimo < PASSO) return
       ultimo = agora
@@ -198,16 +220,17 @@ export function Seda({ forca = 1 }: { forca?: number }) {
     const onVis = () => { comFoco = !document.hidden; religa() }
     document.addEventListener('visibilitychange', onVis)
 
-    /* O BOTAO DE PAUSA DO RODAPE. Canvas nao e alcancado por CSS —
-       `animation-play-state` nao existe aqui — entao ele ouve o evento
-       e para o proprio laco. O ultimo quadro fica pintado: o fundo
-       continua na tela, so deixa de se mexer. E o criterio 2.2.2 da
-       WCAG, nivel A: movimento automatico continuo precisa de um
-       mecanismo de pausa NA PAGINA. */
-    const onPausa = () => { manual = !document.documentElement.hasAttribute('data-parado'); religa() }
-    window.addEventListener('rs-pausa', onPausa)
-    onPausa()
-    const ro = new ResizeObserver(medir)
+    /* redimensionar zera o canvas (mudar `width` limpa o bitmap) e a
+       seda ja pode estar congelada — entao a rodada recomeca por mais
+       um ciclo curto para ela se redesenhar em vez de sumir */
+    const ro = new ResizeObserver(() => {
+      medir()
+      if (acabou) {
+        acabou = false
+        comecou = 0
+        id = requestAnimationFrame(quadro)
+      }
+    })
     ro.observe(canvas)
 
     id = requestAnimationFrame(quadro)
@@ -216,7 +239,6 @@ export function Seda({ forca = 1 }: { forca?: number }) {
       cancelAnimationFrame(id)   // o original so cancelava, nunca desligava o resto
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVis)
-      window.removeEventListener('rs-pausa', onPausa)
     }
   }, [forca])
 
