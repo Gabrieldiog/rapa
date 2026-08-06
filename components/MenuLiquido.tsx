@@ -5,25 +5,43 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { zap } from '@/lib/conteudo'
 
 /**
- * MENU LÍQUIDO — adaptado de melhorias/menu.md.
+ * MENU LÍQUIDO — porte do `liquid-morph-floating-menu` de
+ * melhorias/menu.md, vestido na direção da casa.
  *
- * A pílula morfa em painel, com o círculo escuro subindo de baixo e o
- * rolar de letra por caractere no hover. Vestido na direção TUBO.
+ * O MORPH E O DO ORIGINAL: pílula que cresce, fundo âmbar, e o círculo
+ * escuro subindo de baixo — 200% de lado, `bottom` de -200% a -20%.
  *
- * O que corrigi do original:
- *  - era uma <div> com onClick: sem teclado, sem aria-expanded, sem Esc.
- *    Agora o gatilho é <button>, fecha no Esc, devolve o foco e move o
- *    foco para o painel ao abrir;
- *  - fechava só em `mousedown`, o que ignora toque. Agora é `pointerdown`;
- *  - os itens não tinham href — viraram <a> de verdade, para funcionar
- *    sem JS e para o Google seguir as âncoras;
- *  - cor e fonte estavam fixas no componente; agora vêm dos tokens;
- *  - o "rolar de letra" saiu: disparava em `mouseenter` dentro de um
- *    componente `lg:hidden`. No desktop não existe, no celular
- *    `mouseenter` não dispara. Era código morto para 100% do público.
+ * O ROLAR DE LETRA VOLTOU, e por um caminho diferente.
+ * No original ele dispara em `onMouseEnter`. Este componente é
+ * `lg:hidden`: no desktop ele não existe, e no celular `mouseenter` não
+ * dispara. Era código morto para 100% do público — por isso saiu na
+ * primeira versão. Agora ele dispara na ABERTURA, escalonado por item e
+ * por caractere, o que funciona no toque e ainda vira entrada em vez de
+ * enfeite de hover.
  *
- * O WhatsApp fica FORA do morph, sempre visível: é a única conversão da
- * página e não pode depender de abrir menu.
+ * O que mais mudou do original, e por quê:
+ *
+ *  - era uma <div> com onClick: sem teclado, sem aria-expanded, sem
+ *    Esc. Agora o gatilho é <button>, fecha no Esc, devolve o foco e
+ *    move o foco para o painel ao abrir;
+ *  - fechava só em `mousedown`, que ignora toque. Agora é `pointerdown`;
+ *  - os itens não tinham href — viraram <a> de verdade;
+ *  - o rolar duplica cada caractere. Leitor de tela leria "SSEEÇÇÕÕEESS",
+ *    então o visual é `aria-hidden` e o nome acessível vem de um
+ *    `sr-only` ao lado;
+ *  - cor e fonte estavam fixas no componente; agora vêm dos tokens.
+ *
+ * ⚠️ OS ITENS SÓ EXISTEM NO DOM DEPOIS DE ABRIR. Estão dentro do
+ * `AnimatePresence`, então o HTML servido não os contém — sem JS este
+ * menu é só um botão. Isso é aceitável porque a página é uma rolagem
+ * só e tudo se alcança rolando, MAS exige que a `NavDesktop` liste
+ * TODAS as âncoras: ela é quem as entrega no HTML. Foi assim que
+ * `#sobre` e `#contato` ficaram sem nenhum link apontando para elas.
+ *
+ * A PÍLULA DE WHATSAPP SOME QUANDO O MENU ABRE. Não é capricho: a 380px
+ * a soma do painel aberto com a pílula passava da largura da tela. Ela
+ * volta como o último item do painel, em destaque — a conversão continua
+ * a um toque, e sem estourar a linha.
  */
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -39,8 +57,27 @@ const SECOES = [
   { href: '#contato', label: 'Contato' },
 ]
 
+/** Uma palavra em colunas de um caractere, cada uma com o mesmo
+ *  caractere duas vezes. O rolo sobe 50% e a letra tomba sobre si. */
+function Rolo({ texto, i }: { texto: string; i: number }) {
+  return (
+    <span aria-hidden className="rolo">
+      {Array.from(texto, (ch, c) => (
+        <span key={c} className="rolo__col"
+              style={{ ['--c' as string]: c, ['--i' as string]: i }}>
+          <span className="rolo__par">
+            <span>{ch === ' ' ? ' ' : ch}</span>
+            <span>{ch === ' ' ? ' ' : ch}</span>
+          </span>
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export function MenuLiquido() {
   const [aberto, setAberto] = useState(false)
+  const [rolar, setRolar] = useState(false)
   const raiz = useRef<HTMLDivElement>(null)
   const gatilho = useRef<HTMLButtonElement>(null)
   const painel = useRef<HTMLDivElement>(null)
@@ -49,6 +86,14 @@ export function MenuLiquido() {
     setAberto(false)
     gatilho.current?.focus()
   }, [])
+
+  /* O rolo começa DEPOIS do morph. Disparado junto, a letra tombava
+     enquanto a caixa ainda crescia e as duas coisas se anulavam. */
+  useEffect(() => {
+    if (!aberto) { setRolar(false); return }
+    const t = setTimeout(() => setRolar(true), 340)
+    return () => clearTimeout(t)
+  }, [aberto])
 
   // Esc fecha e o foco volta para o gatilho
   useEffect(() => {
@@ -81,9 +126,9 @@ export function MenuLiquido() {
            hidratacao. */
         initial={false}
         animate={{
-          width: aberto ? 'min(17rem, calc(100vw - 1.5rem))' : 124,
-          height: aberto ? 316 : 52,
-          borderRadius: aberto ? 24 : 26,
+          width: aberto ? 'min(17.5rem, calc(100vw - 1.5rem))' : 124,
+          height: aberto ? 444 : 52,
+          borderRadius: aberto ? 26 : 26,
         }}
         transition={{ duration: 0.8, ease,
                       height: { duration: aberto ? 0.8 : 0.15 } }}
@@ -100,7 +145,43 @@ export function MenuLiquido() {
           transition={{ duration: aberto ? 0.8 : 0.5, ease }}
         />
 
-        {/* fechado: o rótulo */}
+        {/* ---------- as âncoras ----------
+            Vêm ANTES da barra e com flex-1, entao a barra fica sempre
+            no rodape da pilula — ancorada onde o dedo tocou, como no
+            original. Na primeira versao a barra ficava no topo e o
+            painel crescia para baixo do dedo. */}
+        <AnimatePresence>
+          {aberto && (
+            <motion.div
+              ref={painel}
+              id="menu-secoes"
+              data-rolar={rolar ? '' : undefined}
+              className="relative z-10 flex flex-1 flex-col items-center justify-center
+                         gap-3.5 overflow-hidden px-6 pt-7"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
+              {SECOES.map((s, i) => (
+                <a key={s.href} href={s.href} onClick={fechar}
+                   className="menu-item text-branco">
+                  <span className="sr-only">{s.label}</span>
+                  <Rolo texto={s.label} i={i} />
+                </a>
+              ))}
+
+              {/* O WhatsApp entra aqui porque a pilula de fora some com o
+                  menu aberto. Em destaque: e a unica conversao da pagina. */}
+              <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
+                 target="_blank" rel="noopener noreferrer" data-zap onClick={fechar}
+                 className="menu-item mt-1 text-ambar">
+                <span className="sr-only">Falar no WhatsApp</span>
+                <Rolo texto="WhatsApp" i={SECOES.length} />
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ---------- a barra, sempre no rodapé ---------- */}
         <button
           ref={gatilho}
           type="button"
@@ -124,48 +205,31 @@ export function MenuLiquido() {
           </span>
           {aberto ? 'Fechar' : 'Seções'}
         </button>
-
-        {/* aberto: as âncoras */}
-        <AnimatePresence>
-          {aberto && (
-            <motion.div
-              ref={painel}
-              id="menu-secoes"
-              className="relative z-10 flex flex-col gap-0.5 px-6 pb-5"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.35 }}
-            >
-              {SECOES.map((s, i) => (
-                <motion.a
-                  key={s.href} href={s.href} onClick={fechar}
-                  className="flex h-[30px] items-center text-branco
-                             font-[family-name:var(--font-display)] text-base leading-none"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.4 + i * 0.045, ease }}
-                >
-                  {s.label}
-                </motion.a>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
 
-      {/* ---------- WhatsApp: fora do morph, sempre alcançável ---------- */}
-      <motion.a
-        href={zap('Oi! Quero um orçamento. Meu evento é:')}
-        target="_blank" rel="noopener noreferrer" data-zap
-        aria-label="Falar com a Rapa Sound no WhatsApp"
-        className="flex h-13 shrink-0 items-center rounded-[26px] border border-ambar px-4
-                   font-mono text-2xs font-medium uppercase tracking-[0.14em] text-ambar
-                   backdrop-blur-md"
-        style={{ background: 'color-mix(in srgb, var(--color-void) 82%, transparent)' }}
-        initial={false}
-        whileTap={{ scale: 0.96 }}
-      >
-        WhatsApp
-      </motion.a>
+      {/* ---------- WhatsApp: some quando o menu abre ----------
+          A 380px o painel aberto + esta pilula passavam da largura da
+          tela. Com o menu aberto ela sai e reaparece como item do
+          painel; com o menu fechado ela e a conversao a um toque. */}
+      <AnimatePresence>
+        {!aberto && (
+          <motion.a
+            href={zap('Oi! Quero um orçamento. Meu evento é:')}
+            target="_blank" rel="noopener noreferrer" data-zap
+            aria-label="Falar com a Rapa Sound no WhatsApp"
+            className="flex h-13 shrink-0 items-center rounded-[26px] border border-ambar px-4
+                       font-mono text-2xs font-medium uppercase tracking-[0.14em] text-ambar
+                       backdrop-blur-md"
+            style={{ background: 'color-mix(in srgb, var(--color-void) 82%, transparent)' }}
+            initial={false}
+            exit={{ opacity: 0, scale: 0.92 }}
+            transition={{ duration: 0.2 }}
+            whileTap={{ scale: 0.96 }}
+          >
+            WhatsApp
+          </motion.a>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

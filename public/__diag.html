@@ -43,8 +43,14 @@
      medir. */
   const vr = new URLSearchParams(location.search).get('vr')
 
+  /* ?rolar=1200 rola o iframe antes de medir. Sem isso a auditoria
+     nunca via a NavDesktop nem os `sticky`: a nav e `display:none`
+     ate haver rolagem, e elemento em display:none nao tem caixa. */
+  const rolar = Number(new URLSearchParams(location.search).get('rolar') || 0)
+
   f.addEventListener('load', () => setTimeout(() => {
     const d0 = f.contentDocument
+    if (rolar) f.contentWindow.scrollTo(0, rolar)
     if (seek) {
       for (const el of d0.querySelectorAll('*'))
         for (const a of el.getAnimations()) { a.pause(); a.currentTime = seek }
