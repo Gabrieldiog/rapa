@@ -75,6 +75,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
+        {/* MATA SERVICE WORKER VELHO.
+            O log do servidor mostrou `GET /sw.js 404`: existe um
+            service worker registrado nesta origem, de algum projeto
+            anterior que morava na mesma porta. Este site NAO usa
+            service worker — entao qualquer um que esteja ali so pode
+            estar servindo bundle e CSS antigos do cache dele, e o
+            sintoma e exatamente "o menu nao funciona" e "o site ficou
+            sem CSS": HTML novo pedindo arquivos que o worker responde
+            com versao velha.
+            Um worker orfao sobrevive a Ctrl+Shift+R — quem o remove e
+            `unregister()`. Sao seis linhas e elas so fazem alguma
+            coisa se houver worker registrado. */}
+        <script
+          dangerouslySetInnerHTML={{ __html:
+            `if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations()` +
+            `.then(function(rs){var m=false;rs.forEach(function(r){r.unregister();m=true});` +
+            `if(m&&window.caches)caches.keys().then(function(k){k.forEach(function(n){caches.delete(n)})});` +
+            `if(m)location.reload()}).catch(function(){})}`,
+          }}
+        />
       </head>
       <body>
         {/* O FUNDO, UMA VEZ SO, ATRAS DA PAGINA INTEIRA.

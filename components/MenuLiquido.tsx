@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import { zap } from '@/lib/conteudo'
 import { Logo } from '@/components/Logo'
 
@@ -92,6 +92,21 @@ export function MenuLiquido() {
   const gatilho = useRef<HTMLButtonElement>(null)
   const painel = useRef<HTMLDivElement>(null)
 
+  /* A MARCA NA BARRA SÓ APARECE DEPOIS DO HERO.
+     No topo havia DUAS Rapa Sound na mesma tela: a da barra e a do
+     hero, que é grande e centralizada e é o primeiro argumento da
+     página. Repetir a marca 40px acima dela não informa nada — só
+     divide a atenção e faz parecer erro.
+     É exatamente o que a NavDesktop já faz, e pelo mesmo motivo: no
+     topo ela competiria com o que a página tem de mais forte.
+     A barra em si NÃO some: ela carrega o menu e o WhatsApp, que
+     precisam estar alcançáveis o tempo todo. Some só a marca. */
+  const { scrollY } = useScroll()
+  const [passouHero, setPassouHero] = useState(false)
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    setPassouHero(y > window.innerHeight * 0.6)
+  })
+
   const fechar = useCallback(() => {
     setAberto(false)
     gatilho.current?.focus()
@@ -130,7 +145,17 @@ export function MenuLiquido() {
       {/* ══════════ A BARRA, no topo ══════════ */}
       <div ref={raiz} className="barra-cel lg:hidden">
         <a href="#conteudo" aria-label="Rapa Sound — voltar ao topo"
-           className="flex min-h-11 items-center">
+           className="barra-cel__marca flex min-h-11 items-center"
+           data-visivel={passouHero ? '' : undefined}
+           /* `inert` e não só `opacity: 0`: invisível mas focável é o
+              pior dos dois mundos — o Tab leva o foco para um link que
+              ninguém vê.
+              Booleano de verdade, não string vazia: no React 19 `inert`
+              é prop booleana nativa, e `inert=""` dispara
+              "Received an empty string for a boolean attribute" e é
+              tratado como FALSE — ou seja, silenciosamente não inertiza
+              nada. */
+           inert={!passouHero}>
           <Logo className="w-[6.5rem] text-branco" />
         </a>
 
@@ -166,19 +191,33 @@ export function MenuLiquido() {
 
         {/* A pílula é ABSOLUTA dentro da barra: crescendo, ela não pode
             empurrar a marca nem esticar a altura da barra. */}
+        {/* A ALTURA SAIU DO JAVASCRIPT E FOI PARA O CSS, e isso é o
+            conserto do "o menu não aparece de jeito nenhum".
+
+            Antes a altura era `animate={{ height: aberto ? 452 : 44 }}`.
+            O painel vive DENTRO desta caixa, que tem `overflow: hidden`
+            — então a visibilidade dos nove itens dependia de uma
+            animação de JavaScript chegar ao fim. Qualquer coisa que
+            interrompesse essa animação (aba em segundo plano, service
+            worker servindo bundle velho, quadro perdido no meio do
+            morph) deixava a caixa em 44px com o painel inteiro
+            recortado: o hambúrguer virava X, aparecia "Fechar", e nada
+            mais — que é exatamente a descrição do defeito.
+
+            Agora quem abre é o CSS, por `data-aberto`. Basta o React
+            trocar o atributo — o mesmo que já troca o `aria-expanded`.
+            Se a animação não rodar, a caixa simplesmente salta para a
+            altura certa e os itens aparecem. O morph continua, mas
+            deixou de ser condição para o menu funcionar. */}
         <motion.div
+          data-aberto={aberto ? '' : undefined}
           className="barra-cel__pilula flex flex-col overflow-hidden"
           /* initial={false}: o menu nasce pronto no HTML. Com initial
              animado ele sairia com opacity:0 e so apareceria depois da
              hidratacao. */
           initial={false}
-          animate={{
-            width: aberto ? 'min(17.5rem, calc(100vw - 1.5rem))' : 124,
-            height: aberto ? 452 : 44,
-            borderRadius: 22,
-          }}
-          transition={{ duration: 0.8, ease,
-                        height: { duration: aberto ? 0.8 : 0.15 } }}
+          animate={{ width: aberto ? 'min(17.5rem, calc(100vw - 1.5rem))' : 124 }}
+          transition={{ duration: 0.8, ease }}
         >
           {/* fundo âmbar */}
           <span aria-hidden className="absolute inset-0 rounded-[inherit] bg-ambar" />

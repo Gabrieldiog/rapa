@@ -1417,12 +1417,41 @@
     position: absolute;
     inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
     inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
-    /* TETO DE ALTURA. O motion escreve `height: 452px` inline, e a
-       caixa tem `overflow: hidden`. Com o texto do navegador em 200%
-       — criterio 1.4.4, nivel AA — os nove itens passam de 670px e os
-       ultimos ficavam cortados e inalcancaveis. O teto respeita a
-       tela; quem rola por dentro e o painel. */
+    border-radius: 22px;
+    /* A ALTURA E DAQUI, e nao do JavaScript. O painel vive dentro
+       desta caixa com `overflow: hidden`: enquanto a altura vinha de
+       uma animacao de JS, ver os nove itens dependia dessa animacao
+       chegar ao fim — e se ela fosse interrompida a caixa ficava em
+       44px com tudo recortado. Bastava o hamburguer virar X e nada
+       mais aparecer. Agora o React so troca o atributo; abrir e
+       fechar sao estado de CSS, e a transicao e enfeite. */
+    block-size: 2.75rem;
+    transition: block-size 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* TETO. Com o texto do navegador em 200% — criterio 1.4.4, nivel
+       AA — os nove itens passam de 670px; o teto respeita a tela e
+       quem rola por dentro e o painel. */
     max-block-size: calc(100dvh - 6rem - env(safe-area-inset-top, 0px));
+  }
+  .barra-cel__pilula[data-aberto] { block-size: 28.25rem; }
+  /* fechar e mais rapido do que abrir, como no original */
+  .barra-cel__pilula:not([data-aberto]) { transition-duration: 150ms; }
+  @media (prefers-reduced-motion: reduce) {
+    .barra-cel__pilula { transition: none; }
+  }
+
+  /* a marca da barra so entra depois do hero: no topo ela repetia a
+     marca grande do hero, 40px acima dela */
+  .barra-cel__marca {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+    pointer-events: none;
+    transition: opacity 320ms var(--ease-out-cut),
+                transform 320ms var(--ease-out-cut);
+  }
+  .barra-cel__marca[data-visivel] {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
   }
   .menu-painel {
     position: relative;
