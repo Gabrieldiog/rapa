@@ -1,0 +1,716 @@
+{
+  "ctrl": {
+    "aplicou": 1,
+    "frames": {
+      "n": 386,
+      "fps": 55.1,
+      "p50": 16.7,
+      "p90": 17.5,
+      "p95": 33.3,
+      "max": 100,
+      "perdidos": 26
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15678
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 386,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.303,
+      "layout": 0,
+      "prePaint": 0.181,
+      "paint": 0.282,
+      "layerize": 0.205,
+      "commit": 0.784,
+      "principalTotal": 0,
+      "tarefas": 5.415
+    },
+    "totais": {
+      "RunTask": 2090.3,
+      "rAF": 0,
+      "UpdateLayoutTree": 116.8,
+      "Paint": 109,
+      "nRecalc": 76,
+      "nPaint": 122
+    }
+  },
+  "view60": {
+    "aplicou": 1,
+    "frames": {
+      "n": 385,
+      "fps": 55,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.3,
+      "max": 116.6,
+      "perdidos": 27
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 405,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.299,
+      "layout": 0,
+      "prePaint": 0.147,
+      "paint": 0.21,
+      "layerize": 0.083,
+      "commit": 0.653,
+      "principalTotal": 0,
+      "tarefas": 5.977
+    },
+    "totais": {
+      "RunTask": 2420.7,
+      "rAF": 0,
+      "UpdateLayoutTree": 121,
+      "Paint": 85.1,
+      "nRecalc": 93,
+      "nPaint": 101
+    }
+  },
+  "view200": {
+    "aplicou": 1,
+    "frames": {
+      "n": 355,
+      "fps": 50.7,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 33.7,
+      "max": 100.8,
+      "perdidos": 51
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 377,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.281,
+      "layout": 0,
+      "prePaint": 0.165,
+      "paint": 0.141,
+      "layerize": 0.165,
+      "commit": 1.278,
+      "principalTotal": 0,
+      "tarefas": 9.919
+    },
+    "totais": {
+      "RunTask": 3739.4,
+      "rAF": 0,
+      "UpdateLayoutTree": 106.1,
+      "Paint": 53,
+      "nRecalc": 95,
+      "nPaint": 104
+    }
+  },
+  "view400": {
+    "aplicou": 1,
+    "frames": {
+      "n": 343,
+      "fps": 49,
+      "p50": 16.7,
+      "p90": 33.4,
+      "p95": 33.8,
+      "max": 67.4,
+      "perdidos": 66
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 391,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.238,
+      "layout": 0,
+      "prePaint": 0.159,
+      "paint": 0.115,
+      "layerize": 0.126,
+      "commit": 1.766,
+      "principalTotal": 0,
+      "tarefas": 10.522
+    },
+    "totais": {
+      "RunTask": 4114,
+      "rAF": 0,
+      "UpdateLayoutTree": 93.2,
+      "Paint": 44.8,
+      "nRecalc": 106,
+      "nPaint": 100
+    }
+  },
+  "prop60": {
+    "aplicou": 1,
+    "frames": {
+      "n": 388,
+      "fps": 55.4,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.4,
+      "max": 50.2,
+      "perdidos": 31
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 392,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.316,
+      "layout": 0,
+      "prePaint": 0.147,
+      "paint": 0.307,
+      "layerize": 0.117,
+      "commit": 0.653,
+      "principalTotal": 0,
+      "tarefas": 5.946
+    },
+    "totais": {
+      "RunTask": 2331,
+      "rAF": 0,
+      "UpdateLayoutTree": 123.9,
+      "Paint": 120.2,
+      "nRecalc": 83,
+      "nPaint": 120
+    }
+  },
+  "prop200": {
+    "aplicou": 1,
+    "frames": {
+      "n": 361,
+      "fps": 51.5,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 33.8,
+      "max": 66.6,
+      "perdidos": 48
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 363,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.596,
+      "layout": 0,
+      "prePaint": 0.164,
+      "paint": 0.425,
+      "layerize": 0.157,
+      "commit": 0.691,
+      "principalTotal": 0,
+      "tarefas": 10.229
+    },
+    "totais": {
+      "RunTask": 3713,
+      "rAF": 0,
+      "UpdateLayoutTree": 216.5,
+      "Paint": 154.4,
+      "nRecalc": 74,
+      "nPaint": 139
+    }
+  },
+  "blur20": {
+    "aplicou": 1,
+    "frames": {
+      "n": 394,
+      "fps": 56.2,
+      "p50": 16.7,
+      "p90": 17.5,
+      "p95": 32.8,
+      "max": 50.6,
+      "perdidos": 24
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 413,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.205,
+      "layout": 0,
+      "prePaint": 0.13,
+      "paint": 0.183,
+      "layerize": 0.114,
+      "commit": 0.639,
+      "principalTotal": 0,
+      "tarefas": 4.498
+    },
+    "totais": {
+      "RunTask": 1857.7,
+      "rAF": 0,
+      "UpdateLayoutTree": 84.8,
+      "Paint": 75.5,
+      "nRecalc": 98,
+      "nPaint": 110
+    }
+  },
+  "sombra60": {
+    "aplicou": 1,
+    "frames": {
+      "n": 387,
+      "fps": 55.3,
+      "p50": 16.7,
+      "p90": 18.5,
+      "p95": 33.2,
+      "max": 51.5,
+      "perdidos": 28
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 415,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.143,
+      "layout": 0,
+      "prePaint": 0.122,
+      "paint": 0.228,
+      "layerize": 0.145,
+      "commit": 0.466,
+      "principalTotal": 0,
+      "tarefas": 4.729
+    },
+    "totais": {
+      "RunTask": 1962.7,
+      "rAF": 0,
+      "UpdateLayoutTree": 59.3,
+      "Paint": 94.8,
+      "nRecalc": 96,
+      "nPaint": 138
+    }
+  },
+  "escala60": {
+    "aplicou": 1,
+    "frames": {
+      "n": 387,
+      "fps": 55.3,
+      "p50": 16.7,
+      "p90": 18.6,
+      "p95": 32.7,
+      "max": 51.1,
+      "perdidos": 30
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 402,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.188,
+      "layout": 0,
+      "prePaint": 0.083,
+      "paint": 0.154,
+      "layerize": 0.159,
+      "commit": 0.713,
+      "principalTotal": 0,
+      "tarefas": 5.22
+    },
+    "totais": {
+      "RunTask": 2098.6,
+      "rAF": 0,
+      "UpdateLayoutTree": 75.7,
+      "Paint": 62,
+      "nRecalc": 79,
+      "nPaint": 85
+    }
+  },
+  "clip60": {
+    "aplicou": 1,
+    "frames": {
+      "n": 273,
+      "fps": 38.9,
+      "p50": 16.7,
+      "p90": 33.2,
+      "p95": 35.1,
+      "max": 767.4,
+      "perdidos": 32
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 302,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.338,
+      "layout": 0,
+      "prePaint": 0.179,
+      "paint": 0.438,
+      "layerize": 0.297,
+      "commit": 0.646,
+      "principalTotal": 0,
+      "tarefas": 6.933
+    },
+    "totais": {
+      "RunTask": 2093.9,
+      "rAF": 0,
+      "UpdateLayoutTree": 102.2,
+      "Paint": 132.2,
+      "nRecalc": 85,
+      "nPaint": 133
+    }
+  },
+  "parallaxJS12": {
+    "aplicou": 1,
+    "frames": {
+      "n": 367,
+      "fps": 52.4,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.4,
+      "max": 82.5,
+      "perdidos": 32
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 489,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 1.198,
+      "layout": 0,
+      "prePaint": 0.171,
+      "paint": 0.434,
+      "layerize": 0.391,
+      "commit": 1.039,
+      "principalTotal": 0,
+      "tarefas": 9.46
+    },
+    "totais": {
+      "RunTask": 4626.1,
+      "rAF": 0,
+      "UpdateLayoutTree": 585.8,
+      "Paint": 212.1,
+      "nRecalc": 750,
+      "nPaint": 251
+    }
+  },
+  "parallaxView12": {
+    "aplicou": 1,
+    "frames": {
+      "n": 383,
+      "fps": 54.7,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.3,
+      "max": 66.6,
+      "perdidos": 31
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 400,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.352,
+      "layout": 0,
+      "prePaint": 0.123,
+      "paint": 0.287,
+      "layerize": 0.13,
+      "commit": 0.706,
+      "principalTotal": 0,
+      "tarefas": 5.221
+    },
+    "totais": {
+      "RunTask": 2088.5,
+      "rAF": 0,
+      "UpdateLayoutTree": 140.8,
+      "Paint": 114.9,
+      "nRecalc": 96,
+      "nPaint": 110
+    }
+  },
+  "parallaxView12G": {
+    "aplicou": 1,
+    "frames": {
+      "n": 394,
+      "fps": 56.3,
+      "p50": 16.7,
+      "p90": 17.5,
+      "p95": 32.6,
+      "max": 99.6,
+      "perdidos": 21
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 400,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.144,
+      "layout": 0,
+      "prePaint": 0.091,
+      "paint": 0.169,
+      "layerize": 0.109,
+      "commit": 0.599,
+      "principalTotal": 0,
+      "tarefas": 3.735
+    },
+    "totais": {
+      "RunTask": 1494.2,
+      "rAF": 0,
+      "UpdateLayoutTree": 57.6,
+      "Paint": 67.7,
+      "nRecalc": 83,
+      "nPaint": 90
+    }
+  },
+  "vidro": {
+    "aplicou": 1,
+    "frames": {
+      "n": 332,
+      "fps": 47.4,
+      "p50": 16.7,
+      "p90": 33.4,
+      "p95": 34.3,
+      "max": 174.2,
+      "perdidos": 68
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15677
+    },
+    "quadrosCommit": 465,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.561,
+      "layout": 0,
+      "prePaint": 0.179,
+      "paint": 0.955,
+      "layerize": 0.448,
+      "commit": 1.412,
+      "principalTotal": 0,
+      "tarefas": 7.331
+    },
+    "totais": {
+      "RunTask": 3408.8,
+      "rAF": 0,
+      "UpdateLayoutTree": 260.8,
+      "Paint": 443.9,
+      "nRecalc": 390,
+      "nPaint": 639
+    }
+  },
+  "seda160": {
+    "aplicou": 1,
+    "frames": {
+      "n": 229,
+      "fps": 32.8,
+      "p50": 17.6,
+      "p90": 49.2,
+      "p95": 50,
+      "max": 801,
+      "perdidos": 109
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "quadrosCommit": 354,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.706,
+      "layout": 0,
+      "prePaint": 0.596,
+      "paint": 1.551,
+      "layerize": 0.919,
+      "commit": 1.587,
+      "principalTotal": 0,
+      "tarefas": 14.304
+    },
+    "totais": {
+      "RunTask": 5063.6,
+      "rAF": 0,
+      "UpdateLayoutTree": 249.9,
+      "Paint": 549.1,
+      "nRecalc": 328,
+      "nPaint": 548
+    }
+  },
+  "seda100": {
+    "aplicou": 1,
+    "frames": {
+      "n": 357,
+      "fps": 51,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 33.4,
+      "max": 99.7,
+      "perdidos": 56
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "quadrosCommit": 403,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.694,
+      "layout": 0,
+      "prePaint": 0.436,
+      "paint": 0.746,
+      "layerize": 0.57,
+      "commit": 1.209,
+      "principalTotal": 0,
+      "tarefas": 8.169
+    },
+    "totais": {
+      "RunTask": 3292.2,
+      "rAF": 0,
+      "UpdateLayoutTree": 279.7,
+      "Paint": 300.4,
+      "nRecalc": 354,
+      "nPaint": 256
+    }
+  },
+  "sedaOriginal": {
+    "aplicou": 1,
+    "frames": {
+      "n": 194,
+      "fps": 27.8,
+      "p50": 33.3,
+      "p90": 66.1,
+      "p95": 66.8,
+      "max": 100,
+      "perdidos": 121
+    },
+    "antes": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "depois": {
+      "scrollW": 430,
+      "bodyW": 430,
+      "docH": 15466
+    },
+    "quadrosCommit": 309,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.565,
+      "layout": 0,
+      "prePaint": 0.386,
+      "paint": 0.829,
+      "layerize": 0.603,
+      "commit": 1.312,
+      "principalTotal": 0,
+      "tarefas": 25.936
+    },
+    "totais": {
+      "RunTask": 8014.3,
+      "rAF": 0,
+      "UpdateLayoutTree": 174.7,
+      "Paint": 256.2,
+      "nRecalc": 237,
+      "nPaint": 253
+    }
+  }
+}

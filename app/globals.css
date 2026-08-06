@@ -714,236 +714,121 @@
     transform: scale(1.45);
   }
 
-  /* ---------- OS DEPOIMENTOS EM ORBITA ----------------------
-     Porte do `Orbiting Circles with Globe` de melhorias/algum.png.
-     A cupula e canvas; os arcos sao SVG; as bolas correm por
-     `rotate` em cima de um raio, que e transform puro e roda na GPU.
+  /* ---------- AS FALAS -------------------------------------
+     A primeira versao era a orbita do algum.png: cupula de particulas
+     e as falas girando por cima. Saiu — "faca um mais profissional".
+     Esta certo: numa pagina que argumenta competencia tecnica, a prova
+     social nao pode parecer atracao de parque. Quem tem depoimento bom
+     mostra o depoimento, nao a animacao em volta dele.
 
-     TEXTO NAO GIRA. O balao e o eco visual; quem carrega o conteudo e
-     a lista `.orbita__falas`, que existe mesmo sem animacao nenhuma.
+     Ela vive dentro do `.registro`, que e o estado tecnico da pagina —
+     monoespacado, sem cor de ambiente. E de proposito: depoimento aqui
+     nao e emocao, e REFERENCIA, do mesmo jeito que o rider e a lista
+     dos 116. A emocao ja foi dada pelas fotos e pelos videos la em
+     cima; aqui e a hora de ser sobrio.
      --------------------------------------------------------- */
-  /* `container-type` para os raios medirem a CAIXA, e nao a janela.
-     Sem isso a cupula (calculada em JS, sobre a altura real) e as
-     orbitas (em rem, fixas por breakpoint) descolavam uma da outra: a
-     361px de janela as bolas corriam POR DENTRO da cupula, e a 1400px
-     por fora e longe. Agora as duas derivam da mesma altura. */
-  .orbita { container-type: inline-size; display: flex; flex-direction: column; }
-
-  .orbita__palco {
-    position: relative;
-    inline-size: 100%;
-    /* a caixa e mais larga que alta: e meia cupula, nao um globo.
-       `--alt` repete a conta de `aspect-ratio` + `max-block-size` para
-       que o raio das orbitas possa sair dela. */
-    --alt: min(56.25cqi, 26rem);
-    aspect-ratio: 16 / 9;
-    max-block-size: 26rem;
-    /* AS ORBITAS SAO 0,86 / 0,775 / 0,69 DA ALTURA, e a cupula e 0,60.
-       Os tres aneis correm POR CIMA dela em qualquer largura, que e o
-       desenho da referencia. Numero fixo em rem nao aguenta isso. */
-    --r-base: calc(var(--alt) * 0.86);
-    /* clip e nao hidden: hidden viraria scroll container */
-    overflow: clip;
-  }
-  .orbita__cupula { position: absolute; inset: 0; display: block; }
-
-  /* ---- as bolas ----
-     Cada `li` e um braco que gira em torno do centro da base; o botao
-     dentro dele desgira, para o rosto da bola nunca ficar de cabeca
-     para baixo. Sao dois `rotate` opostos, e e assim que se faz orbita
-     sem trigonometria em JavaScript a cada quadro. */
-  .orbita__bolas {
-    position: absolute;
-    inset-inline-start: 50%;
-    inset-block-end: 0;
-    inline-size: 0;
-    block-size: 0;
-    list-style: none;
-  }
-  .orbita__orbita {
-    /* 0,86 · 0,775 · 0,69 da altura da caixa */
-    --raio: calc(var(--r-base) * (1 - var(--anel) * 0.098));
-    position: absolute;
-    inset: 0;
-    /* espalha as bolas pela meia volta de cima: de -78deg a 78deg */
-    --abre: calc(-78deg + (156deg / (var(--n) - 1)) * var(--i));
-    transform: rotate(var(--abre));
-    transform-origin: 0 0;
-  }
-  .orbita__bola {
-    position: absolute;
-    /* o braco: o botao sobe pelo raio e desgira o mesmo tanto */
-    inset-block-start: calc(var(--raio) * -1);
-    inset-inline-start: 0;
-    translate: -50% 0;
-    rotate: calc(var(--abre) * -1);
+  .falas {
     display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--color-branco) 16%, transparent);
-    background: color-mix(in srgb, var(--color-off) 88%, transparent);
-    backdrop-filter: blur(8px);
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    color: var(--color-branco-2);
-    transition: color 320ms var(--ease-out-cut),
-                border-color 320ms var(--ease-out-cut),
-                background-color 320ms var(--ease-out-cut),
-                scale 420ms var(--ease-tubo);
+    gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    /* `1fr` NAS LINHAS, e nao `auto`: sem isto cada linha tem a altura
+       do seu texto mais comprido e os cards saem de tamanhos
+       diferentes. Com `1fr` toda linha herda a altura da maior, e os
+       sete ficam identicos. */
+    grid-auto-rows: 1fr;
   }
-  .orbita__bola[data-ativa] {
-    color: var(--color-void);
-    background: var(--color-ambar);
-    border-color: var(--color-ambar);
-    scale: 1.16;
-    box-shadow: 0 10px 30px -12px var(--color-ambar);
-  }
-  .orbita__bola:hover, .orbita__bola:focus-visible {
-    color: var(--color-branco);
-    border-color: var(--color-branco-2);
-  }
-  .orbita__bola[data-ativa]:hover { color: var(--color-void); }
+  @media (min-width: 768px)  { .falas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { .falas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-  /* o raio, por tamanho de tela. E custom property para os tres aneis
-     derivarem dele com uma conta so. */
+  /* O ULTIMO CARD NAO ESTICA MAIS. Ele ocupava as colunas que sobravam
+     na ultima linha, para nao deixar buraco — mas isso so fazia sentido
+     quando os cards eram celulas coladas sobre um chao de filete. Com
+     vao de verdade entre eles, buraco na ultima linha e so espaco, e
+     card do tamanho dos outros vale mais que linha fechada. */
 
-  /* ---- o balao ---- */
-  .orbita__balao {
+  .fala {
     position: relative;
-    margin-block-start: 2rem;
-    max-inline-size: 46rem;
-    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
-    border-radius: var(--radius-placa);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
     border: 1px solid var(--color-rule);
+    border-radius: var(--radius-card);
+    /* clip para o segmento ambar da borda esquerda respeitar o raio —
+       e nao criar scroll container, que `hidden` criaria */
+    overflow: clip;
+    /* grao por cima de um chao levemente mais claro que o void: sem
+       isso o card e um retangulo preto chapado, e uma grade de
+       retangulos pretos chapados le como tabela, nao como fala. */
     background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-      linear-gradient(180deg,
-        color-mix(in srgb, var(--color-branco) 3%, var(--color-off)) 0%,
-        var(--color-off) 60%);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+      linear-gradient(168deg,
+        color-mix(in srgb, var(--color-branco) 3%, var(--color-void)) 0%,
+        var(--color-void) 62%);
     background-repeat: repeat, no-repeat;
     background-size: 140px 140px, 100% 100%;
-    animation: balao-troca 420ms var(--ease-out-cut) both;
+    transition: border-color 260ms var(--ease-out-cut);
   }
-  /* o bico do balao, apontando para a cupula */
-  .orbita__balao::before {
+
+  /* O SEGMENTO ACESO. Tres pixels ambar no canto de cima — o mesmo
+     marcador do `.eyebrow`, que saiu do VU meter da marca. E o unico
+     enfeite do card, e ele nao e enfeite: e o que amarra a secao ao
+     resto da pagina em vez de deixar sete caixas soltas. */
+  .fala::before {
     content: '';
     position: absolute;
-    inset-block-start: -7px;
-    inset-inline-start: clamp(2rem, 8vw, 4rem);
-    inline-size: 12px;
-    block-size: 12px;
-    rotate: 45deg;
-    border-inline-start: 1px solid var(--color-rule);
-    border-block-start: 1px solid var(--color-rule);
-    background: color-mix(in srgb, var(--color-branco) 3%, var(--color-off));
+    inset-block-start: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    inset-inline-start: 0;
+    inline-size: 3px;
+    block-size: 1.25rem;
+    background: var(--color-ambar);
+    transition: block-size 320ms var(--ease-out-cut);
   }
-  @keyframes balao-troca {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .orbita__balao { animation: none; }
-  }
-  .orbita__texto {
+  .fala:hover::before { block-size: 2.5rem; }
+
+  .fala__texto {
+    flex: 1;
+    /* DISPLAY, e nao a sans do corpo. Uma citacao tem que LER como
+       citacao — na sans de 16px ela vira mais um paragrafo da pagina.
+       O serif e a mesma voz dos titulos, que e a voz da casa falando;
+       aqui e a voz de quem contratou, e o contraste com o mono da
+       ficha logo abaixo e o que separa as duas. */
     font-family: var(--font-display);
-    font-size: clamp(1.125rem, 0.92rem + 0.86vw, 1.5rem);
-    line-height: 1.4;
+    font-size: clamp(1.0625rem, 1rem + 0.28vw, 1.25rem);
+    line-height: 1.5;
+    /* 46ch mesmo no card que estica na ultima linha: sem teto, a fala
+       final virava uma linha de 1000px, que ninguem le. */
+    max-inline-size: 46ch;
     color: var(--color-branco);
     text-wrap: pretty;
   }
-  .orbita__quem {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.25rem 0.75rem;
-    margin-block-start: 1.25rem;
-    padding-block-start: 1rem;
-    border-block-start: 1px solid var(--color-rule);
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-branco-2);
-  }
-  .orbita__quem b { font-weight: 500; color: var(--color-ambar); }
 
-  /* ---- os controles ----
-     A PAUSA E OBRIGATORIA E TEM QUE SER VISIVEL. Movimento automatico
-     que passa de cinco segundos em paralelo com outro conteudo aciona
-     o criterio 2.2.2 da WCAG, que e NIVEL A e exige mecanismo de pausa
-     NA PAGINA. `prefers-reduced-motion` nao fecha esse criterio: a
-     tecnica que o usa e de 2.3.3, que e AAA. Carrossel que gira sozinho
-     sem pausa e falha, nao e estilo. */
-  .orbita__controles {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    margin-block-start: 1.25rem;
-  }
-  .orbita__pausa {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: 2.75rem;
-    padding-inline: 1.1rem;
-    border-radius: var(--radius-botao);
-    border: 1px solid var(--color-rule);
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-branco-2);
-    transition: color 200ms var(--ease-out-cut),
-                border-color 200ms var(--ease-out-cut);
-  }
-  .orbita__pausa:hover, .orbita__pausa:focus-visible {
-    color: var(--color-ambar);
-    border-color: var(--color-ambar);
-  }
-  .orbita__conta b { color: var(--color-branco); font-variant-numeric: tabular-nums; }
-
-  /* ---- a lista de verdade ----
-     E daqui que leitor de tela e busca leem os depoimentos. No desktop
-     o balao ja mostra a fala em destaque, entao ela sai da vista sem
-     sair do DOM. No celular, onde a orbita e pequena, ELA e a
-     apresentacao: os sete em sequencia, legiveis, sem depender de
-     animacao nenhuma. */
-  .orbita__falas {
+  /* A FICHA. Nome, papel e evento em tres registros diferentes.
+     O PAPEL e o que carrega — "mae da debutante" e o que faz a proxima
+     mae se reconhecer; o nome sozinho nao diz nada a ninguem. Por isso
+     ele e o unico em corpo de texto, e os outros dois sao mono. */
+  .fala__quem {
     display: grid;
-    gap: 0.75rem;
-    margin-block-start: 2.5rem;
+    gap: 0.3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--color-rule);
   }
-  .orbita__fala blockquote {
-    padding: 1.25rem;
-    border-radius: var(--radius-card);
-    border: 1px solid var(--color-rule);
-    background: color-mix(in srgb, var(--color-off) 62%, transparent);
+  .fala__nome {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ambar);
   }
-  .orbita__fala p { font-size: var(--text-xs); line-height: 1.6; color: var(--color-branco); }
-  .orbita__fala footer {
-    margin-block-start: 0.75rem;
+  .fala__papel {
+    font-size: var(--text-sm);
+    line-height: 1.2;
+    color: var(--color-branco);
+  }
+  .fala__onde {
     font-family: var(--font-mono);
     font-size: var(--text-2xs);
     letter-spacing: 0.1em;
-    text-transform: uppercase;
     color: var(--color-branco-2);
-  }
-  .orbita__fala footer b { font-weight: 500; color: var(--color-ambar); }
-  @media (min-width: 1024px) {
-    /* `clip-path: inset(50%)` e nao `display: none`: o texto continua
-       no DOM e na arvore de acessibilidade, so nao ocupa a tela. */
-    .orbita__falas {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      margin: -1px;
-      padding: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-      border: 0;
-    }
   }
 
   /* ---------- O PAINEL DOS ARTISTAS -------------------------

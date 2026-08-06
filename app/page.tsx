@@ -4,7 +4,6 @@ import {
   CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
-import { Orbita } from '@/components/Orbita'
 import { CardServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
@@ -294,27 +293,6 @@ export default function Home() {
         </div>
       </Secao>
 
-      {/* ══════════════ DEPOIMENTOS EM ÓRBITA ══════════════
-          Entra logo depois dos vídeos de propósito: quem acabou de VER
-          a festa acontecer é quem está mais pronto para ouvir alguém
-          falar dela. Prova visual e prova social, uma atrás da outra.
-
-          ⚠️ OS SETE TEXTOS SÃO EXEMPLO — ver P15 no PENDENCIAS.md.
-          A seção existe para o cliente ver o formato e aprovar antes
-          de a empresa sair colhendo depoimento de verdade. */}
-      <Secao id="falam" className="relative overflow-clip">
-        <Reveal>
-          <Eyebrow><b>Quem contratou</b> · <i>{FALAS.length}</i> falas</Eyebrow>
-          <h2 className="max-w-[22ch] text-2xl lg:text-3xl">
-            O que dizem depois da festa
-          </h2>
-        </Reveal>
-
-        <Reveal delay={90} className="mt-12 block lg:mt-16">
-          <Orbita falas={FALAS} />
-        </Reveal>
-      </Secao>
-
       {/* A VIRADA foi removida.
           Ela era 170svh de rolagem cujo unico proposito era acender a
           sala em sete degraus ate o branco — e o branco acabou. Sem o
@@ -499,6 +477,43 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
+      </Secao>
+
+      {/* ══════════════ O QUE DIZEM ══════════════
+          PENÚLTIMA seção, a pedido, e dentro do `.registro` — o estado
+          técnico da página, monoespacado e sem cor de ambiente.
+          Não é acaso: depoimento aqui não é emoção, é REFERÊNCIA, do
+          mesmo jeito que o rider e a lista dos 116. A emoção já foi
+          dada pelas fotos e pelos vídeos lá em cima. Vindo logo antes
+          do contato, ela é a última coisa que a pessoa lê antes de
+          decidir chamar no WhatsApp — que é exatamente onde prova
+          social trabalha.
+
+          ⚠️ OS SETE TEXTOS SÃO EXEMPLO — ver P15 no PENDENCIAS.md. */}
+      <Secao id="falam" className="border-t border-rule">
+        <Reveal>
+          <Eyebrow><b>Quem contratou</b> · <i>{FALAS.length}</i> falas</Eyebrow>
+          <h2 className="max-w-[22ch] text-2xl lg:text-3xl">
+            O que dizem depois da festa
+          </h2>
+        </Reveal>
+
+        {/* `<ul>` de `<blockquote>`: é citação de verdade, e leitor de
+            tela anuncia "lista de 7 itens" antes de entrar nelas. */}
+        <Reveal delay={90} className="mt-12 block lg:mt-16">
+          <ul className="falas">
+            {FALAS.map((f) => (
+              <li key={f.quem + f.onde} className="fala">
+                <blockquote className="fala__texto">{f.texto}</blockquote>
+                <div className="fala__quem">
+                  <span className="fala__nome">{f.quem}</span>
+                  <span className="fala__papel">{f.papel}</span>
+                  <span className="fala__onde">{f.onde}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
       </Secao>
 
       {/* ══════════════ CONTATO ══════════════ */}
