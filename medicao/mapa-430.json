@@ -1,0 +1,1651 @@
+{
+ "larguraDoc": 430,
+ "innerW": 430,
+ "alturaDoc": 15466,
+ "nElementos": 1499,
+ "scrollers": [
+  {
+   "el": "a.sr-only.focus:not-sr-only.focus:absolute.focus:left-4",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "a.sr-only.focus:not-sr-only.focus:absolute.focus:left-4"
+  },
+  {
+   "el": "svg",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "header#conteudo.relative.overflow-clip > div.relative.mx-auto.flex.min-h-[92svh] > svg"
+  },
+  {
+   "el": "section#casamento.scroll-mt-20.py-24.lg:py-40.relative",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#casamento.scroll-mt-20.py-24.lg:py-40.relative"
+  },
+  {
+   "el": "span.card__foto",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#servicos.scroll-mt-20.py-24.lg:py-40.relative > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.flex.flex-col.gap-16 > div.rev > div.bloco > div.bloco__grade > article#sonorizacao-palco.card > span.card__foto"
+  },
+  {
+   "el": "span.card__foto",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#servicos.scroll-mt-20.py-24.lg:py-40.relative > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.flex.flex-col.gap-16 > div.rev > div.bloco > div.bloco__grade > article#painel-de-led.card > span.card__foto"
+  },
+  {
+   "el": "span.card__foto",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#servicos.scroll-mt-20.py-24.lg:py-40.relative > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.flex.flex-col.gap-16 > div.rev > div.bloco > div.bloco__grade > article#quinze-anos.card > span.card__foto"
+  },
+  {
+   "el": "span.card__foto",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#servicos.scroll-mt-20.py-24.lg:py-40.relative > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.flex.flex-col.gap-16 > div.rev > div.bloco > div.bloco__grade > article#casamento.card > span.card__foto"
+  },
+  {
+   "el": "div.relative.aspect-video.w-full.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > div.relative.aspect-video.w-full.overflow-hidden"
+  },
+  {
+   "el": "svg",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > div.relative.aspect-video.w-full.overflow-hidden > button.group.absolute.inset-0.block > span.absolute.inset-0.flex.flex-col > span.relative.flex.h-16.w-16 > svg"
+  },
+  {
+   "el": "ul.trilho.mt-5.flex.snap-x",
+   "overflowX": "auto",
+   "overflowY": "auto",
+   "rolaX": true,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "span.relative.block.aspect-video.overflow-hidden",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.relative.block.aspect-video.overflow-hidden"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": true,
+   "rolaY": true,
+   "caminho": "section#eventos.scroll-mt-20.py-24.lg:py-40 > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-12 > div > ul.trilho.mt-5.flex.snap-x > li.shrink-0.snap-start > button.mini.group.relative.block > span.sr-only"
+  },
+  {
+   "el": "ul.equipe__trilho",
+   "overflowX": "auto",
+   "overflowY": "auto",
+   "rolaX": true,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "figure.equipe__figura",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div > ul.equipe__trilho > li.equipe__card > figure.equipe__figura"
+  },
+  {
+   "el": "svg",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div.equipe__setas > button.equipe__seta > svg"
+  },
+  {
+   "el": "svg",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "div.registro > section#sobre.scroll-mt-20.py-24.lg:py-40.border-t > div.mx-auto.w-full.max-w-6xl.px-5 > div.mt-14.block.min-w-0.lg:mt-20 > div.equipe > div.equipe__setas > button.equipe__seta > svg"
+  },
+  {
+   "el": "nav.morf__nav",
+   "overflowX": "auto",
+   "overflowY": "auto",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-branco > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.sr-only",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.sr-only"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "span.rolo__col",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "dialog#menu-secoes.morf.lg:hidden > div.morf__caixa > nav.morf__nav > ul > li > a.menu-item.text-ambar > span.rolo > span.rolo__col"
+  },
+  {
+   "el": "svg",
+   "overflowX": "hidden",
+   "overflowY": "hidden",
+   "rolaX": false,
+   "rolaY": false,
+   "caminho": "nav.fixed.inset-x-0.top-0.z-[90] > div.border-b.border-rule.backdrop-blur-xl > div.mx-auto.flex.h-16.w-full > a.block.shrink-0.text-branco.transition-opacity > svg"
+  }
+ ],
+ "blocosFixos": [
+  {
+   "el": "g",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#sonorizacao-palco.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#iluminacao-cenica.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#iluminacao-pista.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#painel-de-led.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#pista-de-led.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#tubos-de-led.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#tunel-de-led.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#efeitos-especiais.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#area-instagramavel.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#projetos-3d.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#criacao-de-conteudo.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#quinze-anos.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "article#casamento.card",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.mt-14.block.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.min-w-0.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.mt-14.block.min-w-0.lg:mt-20",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.equipe",
+   "transform": false,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "inline-size"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "img.equipe__foto",
+   "transform": false,
+   "perspective": "none",
+   "filter": "grayscale(1) contrast(1.06)",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "button.equipe__seta",
+   "transform": false,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "blur(12px)",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "span.equipe__ponto",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "button.equipe__seta",
+   "transform": false,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "blur(12px)",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.rev",
+   "transform": true,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "none",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  },
+  {
+   "el": "div.border-b.border-rule.backdrop-blur-xl",
+   "transform": false,
+   "perspective": "none",
+   "filter": "none",
+   "backdrop": "blur(24px)",
+   "willChange": "auto",
+   "contain": "none",
+   "containerType": "normal"
+  }
+ ],
+ "comTimeline": [
+  {
+   "el": "span.painel__varre",
+   "timeline": "view()",
+   "range": "entry",
+   "nomeAnim": "card-brilho",
+   "duracao": "auto"
+  }
+ ],
+ "nComTimeline": 1,
+ "ativas": {
+  "vu-acende @ rect": {
+   "n": 16,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "led-varre @ span.led": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-entra @ article#sonorizacao-palco.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#sonorizacao-palco.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#iluminacao-cenica.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#iluminacao-cenica.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#iluminacao-pista.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#iluminacao-pista.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#painel-de-led.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#painel-de-led.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#pista-de-led.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#pista-de-led.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#tubos-de-led.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#tubos-de-led.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#tunel-de-led.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#tunel-de-led.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#efeitos-especiais.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#efeitos-especiais.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#area-instagramavel.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#area-instagramavel.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#projetos-3d.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#projetos-3d.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#criacao-de-conteudo.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#criacao-de-conteudo.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#quinze-anos.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#quinze-anos.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-entra @ article#casamento.card": {
+   "n": 1,
+   "linha": "DocumentTimeline",
+   "fonte": "-"
+  },
+  "card-brilho @ article#casamento.card::after": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  },
+  "card-brilho @ span.painel__varre": {
+   "n": 1,
+   "linha": "ViewTimeline",
+   "fonte": "html(documento)"
+  }
+ }
+}

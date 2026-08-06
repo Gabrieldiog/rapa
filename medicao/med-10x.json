@@ -1,0 +1,206 @@
+{
+  "url": "http://localhost:3000",
+  "throttle": 10,
+  "estado": {
+    "canvas": true,
+    "canvasW": 138,
+    "canvasH": 300,
+    "cards": 13,
+    "revs": 33,
+    "revOn": 0,
+    "imgs": 29,
+    "docH": 15678,
+    "docW": 430,
+    "innerW": 430,
+    "dpr": 3,
+    "supportsView": true
+  },
+  "seda": {
+    "w": 138,
+    "h": 300,
+    "px": 41400,
+    "loopMs": 7.07,
+    "putMs": 0.05,
+    "totalMs": 7.12
+  },
+  "recalc": {
+    "recalcTudoMs": 17.855,
+    "layout40elMs": 16.58,
+    "nEls": 29,
+    "nNodes": 1499
+  },
+  "frames": {
+    "n": 102,
+    "fps": 11.4,
+    "p50": 83.3,
+    "p75": 116,
+    "p95": 167.1,
+    "p99": 233.3,
+    "max": 315.7,
+    "acima16": 97,
+    "acima33": 90
+  },
+  "largura": {
+    "scrollW": 430,
+    "bodyScrollW": 430,
+    "innerW": 430,
+    "revOn": 33,
+    "rev": 33
+  },
+  "trace": [
+    {
+      "evento": "RunTask",
+      "msTotal": 19040,
+      "n": 2970,
+      "msMedio": 6.411
+    },
+    {
+      "evento": "ProxyMain::BeginMainFrame",
+      "msTotal": 16796.2,
+      "n": 231,
+      "msMedio": 72.711
+    },
+    {
+      "evento": "FunctionCall",
+      "msTotal": 13243.2,
+      "n": 1460,
+      "msMedio": 9.071
+    },
+    {
+      "evento": "PageAnimator::serviceScriptedAnimations",
+      "msTotal": 12540.8,
+      "n": 231,
+      "msMedio": 54.289
+    },
+    {
+      "evento": "FireAnimationFrame",
+      "msTotal": 12001.6,
+      "n": 459,
+      "msMedio": 26.147
+    },
+    {
+      "evento": "LocalFrameView::RunPaintLifecyclePhase",
+      "msTotal": 1598.9,
+      "n": 289,
+      "msMedio": 5.532
+    },
+    {
+      "evento": "Commit",
+      "msTotal": 847,
+      "n": 232,
+      "msMedio": 3.651
+    },
+    {
+      "evento": "Paint",
+      "msTotal": 824.5,
+      "n": 759,
+      "msMedio": 1.086
+    },
+    {
+      "evento": "UpdateLayoutTree",
+      "msTotal": 757.4,
+      "n": 226,
+      "msMedio": 3.351
+    },
+    {
+      "evento": "LocalFrameView::RunStyleAndLayoutLifecyclePhases",
+      "msTotal": 709.2,
+      "n": 352,
+      "msMedio": 2.015
+    },
+    {
+      "evento": "WidgetBaseInputHandler::OnHandleInputEvent",
+      "msTotal": 658.2,
+      "n": 120,
+      "msMedio": 5.485
+    },
+    {
+      "evento": "LatencyInfo.Flow",
+      "msTotal": 655.6,
+      "n": 123,
+      "msMedio": 5.33
+    },
+    {
+      "evento": "WebFrameWidgetImpl::HandleInputEvent",
+      "msTotal": 637.4,
+      "n": 120,
+      "msMedio": 5.311
+    },
+    {
+      "evento": "Layerize",
+      "msTotal": 570.2,
+      "n": 232,
+      "msMedio": 2.458
+    },
+    {
+      "evento": "EventDispatch",
+      "msTotal": 496.5,
+      "n": 386,
+      "msMedio": 1.286
+    },
+    {
+      "evento": "RunMicrotasks",
+      "msTotal": 387.5,
+      "n": 216,
+      "msMedio": 1.794
+    },
+    {
+      "evento": "PrePaint",
+      "msTotal": 380.8,
+      "n": 349,
+      "msMedio": 1.091
+    },
+    {
+      "evento": "LayerTreeHost::DoUpdateLayers",
+      "msTotal": 293,
+      "n": 232,
+      "msMedio": 1.263
+    },
+    {
+      "evento": "LocalFrameView::RunPrePaintLifecyclePhase",
+      "msTotal": 228.9,
+      "n": 341,
+      "msMedio": 0.671
+    },
+    {
+      "evento": "HitTest",
+      "msTotal": 215.9,
+      "n": 100,
+      "msMedio": 2.159
+    },
+    {
+      "evento": "LocalFrameView::layout",
+      "msTotal": 169.7,
+      "n": 18,
+      "msMedio": 9.427
+    },
+    {
+      "evento": "Layout",
+      "msTotal": 169.6,
+      "n": 18,
+      "msMedio": 9.42
+    }
+  ],
+  "longTasks": [
+    165.3,
+    67.5,
+    53.5,
+    151,
+    92.6,
+    68.1,
+    72.5,
+    85.5,
+    85.8,
+    85,
+    52.8,
+    131.2,
+    118.5,
+    56.4,
+    117.5,
+    138.4,
+    98.4,
+    105.7,
+    88,
+    64
+  ]
+}

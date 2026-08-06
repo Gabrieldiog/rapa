@@ -153,7 +153,7 @@
    mesma expressao mantem --tx/--ty vivos. */
 @keyframes card-entra {
   from { opacity: 0;
-         transform: perspective(900px) translateY(26px); }
+         transform: perspective(900px) translateY(14px); }
   to   { opacity: 1;
          transform: perspective(900px)
                     rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); }
@@ -372,9 +372,7 @@
     position: relative;
     display: block;
     block-size: 100%;
-    /* clip e nao hidden: recorta igual e NAO cria scroll container,
-       que sequestraria `animation-timeline: view()` de descendentes */
-    overflow: clip;
+    overflow: hidden;
     border-radius: var(--radius-card);
     border: 1px solid var(--color-rule);
     background: var(--color-off);
@@ -716,66 +714,121 @@
     transform: scale(1.45);
   }
 
-  /* ---------- O TOPO QUE SAI DE CENA ------------------------
-     Rolando para fora do hero, a marca e a manchete sobem um pouco e
-     apagam. Nao e enfeite: sem isso o topo simplesmente some cortado
-     pela borda da tela, o que le como "acabou o carregamento". Saindo
-     devagar, ele entrega a pagina em vez de sumir dela.
+  /* ---------- AS FALAS -------------------------------------
+     A primeira versao era a orbita do algum.png: cupula de particulas
+     e as falas girando por cima. Saiu — "faca um mais profissional".
+     Esta certo: numa pagina que argumenta competencia tecnica, a prova
+     social nao pode parecer atracao de parque. Quem tem depoimento bom
+     mostra o depoimento, nao a animacao em volta dele.
 
-     A faixa e `exit`, que so corre DEPOIS que o elemento comeca a
-     deixar a tela — enquanto o hero esta inteiro na tela nada acontece.
-     Termina em 78% para o bloco nunca ficar transparente enquanto
-     ainda ha muito dele visivel.
-
-     ATENCAO: o H1 tem `background-clip: text` na palavra varrida, e
-     contexto de empilhamento MATA isso no Chrome. Por isso quem anima
-     e o CONTAINER, com `transform` e `opacity` — e nao o H1. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .topo-sai {
-        animation: topo-sai linear both;
-        animation-timeline: view();
-        animation-range: exit 0% exit 78%;
-      }
-    }
+     Ela vive dentro do `.registro`, que e o estado tecnico da pagina —
+     monoespacado, sem cor de ambiente. E de proposito: depoimento aqui
+     nao e emocao, e REFERENCIA, do mesmo jeito que o rider e a lista
+     dos 116. A emocao ja foi dada pelas fotos e pelos videos la em
+     cima; aqui e a hora de ser sobrio.
+     --------------------------------------------------------- */
+  .falas {
+    display: grid;
+    gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    /* `1fr` NAS LINHAS, e nao `auto`: sem isto cada linha tem a altura
+       do seu texto mais comprido e os cards saem de tamanhos
+       diferentes. Com `1fr` toda linha herda a altura da maior, e os
+       sete ficam identicos. */
+    grid-auto-rows: 1fr;
   }
-  @keyframes topo-sai {
-    from { opacity: 1; transform: none; }
-    to   { opacity: 0; transform: translateY(-40px); }
+  @media (min-width: 768px)  { .falas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { .falas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* O ULTIMO CARD NAO ESTICA MAIS. Ele ocupava as colunas que sobravam
+     na ultima linha, para nao deixar buraco — mas isso so fazia sentido
+     quando os cards eram celulas coladas sobre um chao de filete. Com
+     vao de verdade entre eles, buraco na ultima linha e so espaco, e
+     card do tamanho dos outros vale mais que linha fechada. */
+
+  .fala {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-card);
+    /* clip para o segmento ambar da borda esquerda respeitar o raio —
+       e nao criar scroll container, que `hidden` criaria */
+    overflow: clip;
+    /* grao por cima de um chao levemente mais claro que o void: sem
+       isso o card e um retangulo preto chapado, e uma grade de
+       retangulos pretos chapados le como tabela, nao como fala. */
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+      linear-gradient(168deg,
+        color-mix(in srgb, var(--color-branco) 3%, var(--color-void)) 0%,
+        var(--color-void) 62%);
+    background-repeat: repeat, no-repeat;
+    background-size: 140px 140px, 100% 100%;
+    transition: border-color 260ms var(--ease-out-cut);
   }
 
-  /* ---------- A FOTO QUE RESPIRA ----------------------------
-     A foto anda mais devagar que a moldura enquanto a moldura cruza a
-     tela. E o unico parallax da pagina, e ele existe por um motivo
-     concreto: sao fotos de festa parada num retangulo, e um retangulo
-     parado nao lembra festa. O deslocamento e de 24px no total — o
-     bastante para o olho registrar profundidade, pouco o bastante para
-     ninguem enjoar.
-
-     A moldura precisa recortar, e por isso as molduras deste projeto
-     usam `overflow: clip` e nao `hidden`: `hidden` criaria scroll
-     container e sequestraria a linha do tempo de `view()` aqui dentro.
-
-     Escala 1.06 fixa: sem ela o deslocamento mostraria a borda vazia.
-     So `transform` — composto, roda na GPU, nao dispara layout. */
-  .respira { overflow: clip; }
-  .respira > img { display: block; inline-size: 100%; }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .respira > img {
-        animation: respira linear both;
-        animation-timeline: view();
-        /* `cover` de proposito AQUI: nao ha estado final a preservar,
-           o efeito e continuo do inicio ao fim da travessia. Uma foto
-           ja visivel no primeiro quadro nasce no meio do percurso, que
-           e exatamente o certo para parallax. */
-        animation-range: cover 0% cover 100%;
-      }
-    }
+  /* O SEGMENTO ACESO. Tres pixels ambar no canto de cima — o mesmo
+     marcador do `.eyebrow`, que saiu do VU meter da marca. E o unico
+     enfeite do card, e ele nao e enfeite: e o que amarra a secao ao
+     resto da pagina em vez de deixar sete caixas soltas. */
+  .fala::before {
+    content: '';
+    position: absolute;
+    inset-block-start: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    inset-inline-start: 0;
+    inline-size: 3px;
+    block-size: 1.25rem;
+    background: var(--color-ambar);
+    transition: block-size 320ms var(--ease-out-cut);
   }
-  @keyframes respira {
-    from { transform: scale(1.06) translateY(-12px); }
-    to   { transform: scale(1.06) translateY(12px); }
+  .fala:hover::before { block-size: 2.5rem; }
+
+  .fala__texto {
+    flex: 1;
+    /* DISPLAY, e nao a sans do corpo. Uma citacao tem que LER como
+       citacao — na sans de 16px ela vira mais um paragrafo da pagina.
+       O serif e a mesma voz dos titulos, que e a voz da casa falando;
+       aqui e a voz de quem contratou, e o contraste com o mono da
+       ficha logo abaixo e o que separa as duas. */
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1rem + 0.28vw, 1.25rem);
+    line-height: 1.5;
+    /* 46ch mesmo no card que estica na ultima linha: sem teto, a fala
+       final virava uma linha de 1000px, que ninguem le. */
+    max-inline-size: 46ch;
+    color: var(--color-branco);
+    text-wrap: pretty;
+  }
+
+  /* A FICHA. Nome, papel e evento em tres registros diferentes.
+     O PAPEL e o que carrega — "mae da debutante" e o que faz a proxima
+     mae se reconhecer; o nome sozinho nao diz nada a ninguem. Por isso
+     ele e o unico em corpo de texto, e os outros dois sao mono. */
+  .fala__quem {
+    display: grid;
+    gap: 0.3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--color-rule);
+  }
+  .fala__nome {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ambar);
+  }
+  .fala__papel {
+    font-size: var(--text-sm);
+    line-height: 1.2;
+    color: var(--color-branco);
+  }
+  .fala__onde {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    color: var(--color-branco-2);
   }
 
   /* ---------- O PAINEL DOS ARTISTAS -------------------------
@@ -1072,24 +1125,8 @@
     transform-style: flat;   /* explicito: overflow+isolation ja forcam */
   }
 
-  /* ENTRADA DIRIGIDA PELA ROLAGEM, e nao pelo carregamento.
-     Antes era `animation: card-entra 560ms both` com atraso por indice:
-     os treze cards animavam TODOS no load, mesmo os que estao a 4000px
-     abaixo da dobra. Quem chegava neles rolando ja encontrava tudo
-     parado — a animacao acontecia para ninguem, e ainda custava quadro
-     na hora em que a pagina mais precisa deles.
-     Agora cada card tem a sua propria linha do tempo, ancorada na
-     posicao DELE. Zero JS.
-     Sem `view()` nao ha regra e o card nasce assentado: a lei da casa. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .card {
-        animation: card-entra linear both;
-        animation-timeline: view();
-        animation-range: entry 4% entry 58%;
-      }
-    }
-  }
+  /* entrada: sobe e assenta. O atraso vem do --d, com teto no JSX. */
+  .card { animation: card-entra 560ms var(--ease-out-cut) both; animation-delay: var(--d, 0ms); }
 
   /* ---------- A TINTA E O GRAO -------------------------------
      A queixa foi "os cards estao muito cinzas sem vida". Duas causas,
@@ -1257,8 +1294,7 @@
     position: relative;
     z-index: 1;
     display: block;
-    /* clip: recorta igual e nao vira scroll container */
-    overflow: clip;
+    overflow: hidden;
     /* Sangra ate a borda e herda o raio MENOS a espessura da borda.
        A formula antiga era calc(--radius-card - 0.75rem), com a foto a
        1.5rem da borda: dava raio NEGATIVO. */
@@ -1691,58 +1727,15 @@
      Caminho rapido em CSS puro onde animation-timeline existe;
      fallback por IntersectionObserver (~0.4KB) no resto.
      --------------------------------------------------------- */
-  /* A ENTRADA E DIRIGIDA PELA ROLAGEM, e nao por um cronometro.
-     Antes era um IntersectionObserver que disparava uma transicao de
-     320ms: o bloco cruzava um limiar e a animacao corria sozinha, sem
-     relacao com o quanto a pessoa rolou. Agora o progresso E a posicao
-     — quem rola devagar ve o bloco subir devagar, quem rola rapido ve
-     ele ja assentado. E o que faz "as coisas irem aparecendo" em vez
-     de "as coisas piscarem".
-
-     E CSS PURO. Nada aqui depende de JS: se o JS morrer, a rolagem
-     continua revelando. O `Reveal` so entra em campo onde `view()`
-     nao existe — Firefox ate a 156, e navegadores antigos. No trafego
-     de celular brasileiro isso e ~10%, e para eles o fallback e o
-     observador de sempre.
-
-     A LEI DA CASA CONTINUA VALENDO: quem esconde e o `@supports`. Sem
-     suporte a `view()`, `.rev` nao tem regra nenhuma e o bloco nasce
-     visivel. O HTML servido nunca esconde nada. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .rev {
-        animation: rev-entra linear both;
-        /* `animation-timeline` DEPOIS do shorthand, sempre: a timeline
-           e reset-only em `animation`, e qualquer declaracao posterior
-           a zera de volta para o relogio do documento, em silencio. */
-        animation-timeline: view();
-        /* TERMINA DENTRO DE `entry`, e isso e obrigatorio. `view()` nao
-           tem estado inicial: ele calcula o progresso pela posicao
-           ATUAL. Com `cover` um bloco ja visivel no primeiro quadro
-           nasceria em 50% — congelado no meio da entrada. Com `entry`
-           "ja entrou" mapeia para 100%, que e o estado final. */
-        animation-range: entry 6% entry 62%;
-      }
-      /* o `--d` do JSX vira ATRASO EM DISTANCIA, nao em tempo: o bloco
-         irmao comeca a subir um pouco mais tarde na rolagem. */
-      .rev[style*="--d"] { animation-range: entry 12% entry 72%; }
-    }
-  }
-  @keyframes rev-entra {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: none; }
-  }
-
-  /* O CAMINHO DE FALLBACK, so onde `view()` nao existe. A classe e
-     posta por JS depois da montagem e apenas em bloco ABAIXO da dobra
-     — o que ja esta na tela nunca chega a sumir, nem por um quadro. */
-  .rev-js { opacity: 0; transform: translateY(14px); }
+  .rev { opacity: 0; transform: translateY(14px); }
   .rev-on {
     opacity: 1; transform: none;
     transition: opacity 320ms var(--ease-out-cut),
                 transform 320ms var(--ease-tubo);
     transition-delay: var(--d, 0ms);
   }
+  /* `.rev` so e aplicada por JS, depois da montagem, e apenas em
+     elemento ABAIXO da dobra. O HTML servido nunca esconde nada. */
 
   /* ---------- O BEAT DE BLACKOUT ----------------------------
      ~400ms, UM so na pagina inteira. Nao segura o paint: a foto

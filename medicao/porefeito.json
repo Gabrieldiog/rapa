@@ -1,0 +1,192 @@
+{
+  "E1_cards_entram": {
+    "nAnims": 27,
+    "scrollW": 430,
+    "frames": {
+      "fps": 47.3,
+      "p50": 16.7,
+      "p90": 33.4,
+      "p95": 34.2,
+      "max": 100.1,
+      "perdidos": 63
+    },
+    "quadros": 357,
+    "msQuadro": 8.329,
+    "recalcMs": 0.808,
+    "nRecalc": 328,
+    "paintMs": 1.036,
+    "nPaint": 336,
+    "totalRunTask": 2973.5
+  },
+  "E2_foto_card_respira": {
+    "nAnims": 18,
+    "scrollW": 430,
+    "frames": {
+      "fps": 52,
+      "p50": 16.7,
+      "p90": 17.7,
+      "p95": 33.8,
+      "max": 100,
+      "perdidos": 36
+    },
+    "quadros": 482,
+    "msQuadro": 5.71,
+    "recalcMs": 0.557,
+    "nRecalc": 396,
+    "paintMs": 0.755,
+    "nPaint": 348,
+    "totalRunTask": 2752.4
+  },
+  "E3_fotos_grandes_respiram": {
+    "nAnims": 22,
+    "scrollW": 430,
+    "frames": {
+      "fps": 53.6,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.4,
+      "max": 82.9,
+      "perdidos": 24
+    },
+    "quadros": 431,
+    "msQuadro": 11.995,
+    "recalcMs": 0.541,
+    "nRecalc": 374,
+    "paintMs": 0.606,
+    "nPaint": 292,
+    "totalRunTask": 5169.7
+  },
+  "E4_nomes_painel_cascata": {
+    "nAnims": 26,
+    "scrollW": 430,
+    "frames": {
+      "fps": 50.1,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 33.8,
+      "max": 117,
+      "perdidos": 56
+    },
+    "quadros": 364,
+    "msQuadro": 7.654,
+    "recalcMs": 0.763,
+    "nRecalc": 328,
+    "paintMs": 0.957,
+    "nPaint": 278,
+    "totalRunTask": 2786
+  },
+  "E5_contador_rider_acende": {
+    "nAnims": 20,
+    "scrollW": 430,
+    "frames": {
+      "fps": 51.4,
+      "p50": 16.7,
+      "p90": 33,
+      "p95": 34,
+      "max": 100,
+      "perdidos": 47
+    },
+    "quadros": 414,
+    "msQuadro": 6.594,
+    "recalcMs": 0.699,
+    "nRecalc": 362,
+    "paintMs": 0.987,
+    "nPaint": 283,
+    "totalRunTask": 2729.8
+  },
+  "E6_eyebrow_varrida": {
+    "nAnims": 24,
+    "scrollW": 430,
+    "frames": {
+      "fps": 40.7,
+      "p50": 17,
+      "p90": 34.3,
+      "p95": 50,
+      "max": 100.1,
+      "perdidos": 100
+    },
+    "quadros": 439,
+    "msQuadro": 9.279,
+    "recalcMs": 0.894,
+    "nRecalc": 451,
+    "paintMs": 1.709,
+    "nPaint": 1004,
+    "totalRunTask": 4073.3
+  },
+  "E7a_h2_sobe": {
+    "nAnims": 23,
+    "scrollW": 430,
+    "frames": {
+      "fps": 50.8,
+      "p50": 16.7,
+      "p90": 33.2,
+      "p95": 33.7,
+      "max": 116.6,
+      "perdidos": 48
+    },
+    "quadros": 381,
+    "msQuadro": 7.241,
+    "recalcMs": 0.829,
+    "nRecalc": 344,
+    "paintMs": 0.82,
+    "nPaint": 282,
+    "totalRunTask": 2758.9
+  },
+  "E7b_filete_sob_h2": {
+    "nAnims": 23,
+    "scrollW": 430,
+    "frames": {
+      "fps": 53,
+      "p50": 16.7,
+      "p90": 33,
+      "p95": 33.3,
+      "max": 83.4,
+      "perdidos": 43
+    },
+    "quadros": 375,
+    "msQuadro": 6.674,
+    "recalcMs": 0.703,
+    "nRecalc": 350,
+    "paintMs": 0.88,
+    "nPaint": 304,
+    "totalRunTask": 2502.7
+  },
+  "E8_rider_cat_entra": {
+    "nAnims": 20,
+    "scrollW": 430,
+    "frames": {
+      "fps": 51.8,
+      "p50": 16.7,
+      "p90": 32.6,
+      "p95": 33.4,
+      "max": 83.3,
+      "perdidos": 43
+    },
+    "quadros": 396,
+    "msQuadro": 7.286,
+    "recalcMs": 0.748,
+    "nRecalc": 345,
+    "paintMs": 0.701,
+    "nPaint": 262,
+    "totalRunTask": 2885.3
+  },
+  "Z_controle": {
+    "nAnims": 14,
+    "scrollW": 430,
+    "frames": {
+      "fps": 53.2,
+      "p50": 16.7,
+      "p90": 17.6,
+      "p95": 33.4,
+      "max": 116.2,
+      "perdidos": 33
+    },
+    "quadros": 404,
+    "msQuadro": 5.995,
+    "recalcMs": 0.427,
+    "nRecalc": 355,
+    "paintMs": 0.705,
+    "nPaint": 301,
+    "totalRunTask": 2422.2
+  }
+}

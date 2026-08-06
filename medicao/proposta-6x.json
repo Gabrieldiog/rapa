@@ -1,0 +1,206 @@
+{
+  "A_pagina_atual": {
+    "info": null,
+    "aplic": null,
+    "frames": {
+      "n": 135,
+      "fps": 19.2,
+      "p50": 50.1,
+      "p90": 67.5,
+      "p95": 83.8,
+      "max": 133.3,
+      "perdidos": 112
+    },
+    "largura": {
+      "scrollW": 430,
+      "innerW": 430,
+      "docH": 17646
+    },
+    "larguraMaxDurante": 430,
+    "quadros": 217,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.759,
+      "paint": 1.535,
+      "commit": 1.918,
+      "tarefaTotal": 45.861
+    },
+    "contagens": {
+      "recalc": 180,
+      "paint": 288,
+      "layout": 0
+    },
+    "totais": {
+      "RunTask": 9951.8,
+      "rAF": 0
+    }
+  },
+  "B_atual_mais_8_efeitos": {
+    "info": null,
+    "aplic": {
+      "envolvidas": 8,
+      "elementosComTimeline": 59,
+      "totalAnimacoes": 109,
+      "porFonte": {
+        "DocumentTimeline": 18,
+        "ViewTimeline/html": 91
+      }
+    },
+    "frames": {
+      "n": 101,
+      "fps": 14.4,
+      "p50": 66.1,
+      "p90": 83.3,
+      "p95": 84.3,
+      "max": 800.5,
+      "perdidos": 100
+    },
+    "largura": {
+      "scrollW": 430,
+      "innerW": 430,
+      "docH": 17976
+    },
+    "larguraMaxDurante": 430,
+    "quadros": 184,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 1.226,
+      "paint": 1.809,
+      "commit": 2.507,
+      "tarefaTotal": 53.773
+    },
+    "contagens": {
+      "recalc": 164,
+      "paint": 395,
+      "layout": 0
+    },
+    "totais": {
+      "RunTask": 9894.2,
+      "rAF": 0
+    }
+  },
+  "C_seda110_mais_8_efeitos": {
+    "info": "51x110=5610",
+    "aplic": {
+      "envolvidas": 8,
+      "elementosComTimeline": 59,
+      "totalAnimacoes": 109,
+      "porFonte": {
+        "DocumentTimeline": 18,
+        "ViewTimeline/html": 91
+      }
+    },
+    "frames": {
+      "n": 246,
+      "fps": 35.1,
+      "p50": 17.5,
+      "p90": 49.9,
+      "p95": 50.3,
+      "max": 200,
+      "perdidos": 118
+    },
+    "largura": {
+      "scrollW": 430,
+      "innerW": 430,
+      "docH": 17976
+    },
+    "larguraMaxDurante": 430,
+    "quadros": 394,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 1.111,
+      "paint": 1.776,
+      "commit": 2.051,
+      "tarefaTotal": 14.448
+    },
+    "contagens": {
+      "recalc": 384,
+      "paint": 983,
+      "layout": 0
+    },
+    "totais": {
+      "RunTask": 5692.4,
+      "rAF": 0
+    }
+  },
+  "D_seda110_sem_efeitos": {
+    "info": "51x110=5610",
+    "aplic": null,
+    "frames": {
+      "n": 354,
+      "fps": 50.7,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 33.5,
+      "max": 116.6,
+      "perdidos": 48
+    },
+    "largura": {
+      "scrollW": 430,
+      "innerW": 430,
+      "docH": 17646
+    },
+    "larguraMaxDurante": 430,
+    "quadros": 817,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.328,
+      "paint": 0.459,
+      "commit": 1.248,
+      "tarefaTotal": 6.67
+    },
+    "contagens": {
+      "recalc": 434,
+      "paint": 343,
+      "layout": 0
+    },
+    "totais": {
+      "RunTask": 5449.4,
+      "rAF": 0
+    }
+  },
+  "E_sem_seda_mais_8_efeitos": {
+    "info": null,
+    "aplic": {
+      "envolvidas": 8,
+      "elementosComTimeline": 59,
+      "totalAnimacoes": 109,
+      "porFonte": {
+        "DocumentTimeline": 18,
+        "ViewTimeline/html": 91
+      }
+    },
+    "frames": {
+      "n": 342,
+      "fps": 48.8,
+      "p50": 16.7,
+      "p90": 33.3,
+      "p95": 34,
+      "max": 67.8,
+      "perdidos": 62
+    },
+    "largura": {
+      "scrollW": 430,
+      "innerW": 430,
+      "docH": 17976
+    },
+    "larguraMaxDurante": 430,
+    "quadros": 488,
+    "msPorQuadro": {
+      "rAF": 0,
+      "recalcEstilo": 0.737,
+      "paint": 0.859,
+      "commit": 1.011,
+      "tarefaTotal": 7.988
+    },
+    "contagens": {
+      "recalc": 408,
+      "paint": 502,
+      "layout": 0
+    },
+    "totais": {
+      "RunTask": 3898.3,
+      "rAF": 0
+    }
+  }
+}

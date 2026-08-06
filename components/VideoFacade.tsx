@@ -17,7 +17,7 @@ export function VideoFacade({ video, prioridade = false }: { video: Video; prior
 
   if (ligado) {
     return (
-      <div className="relative aspect-video overflow-clip bg-void">
+      <div className="relative aspect-video overflow-hidden bg-void">
         <iframe
           className="absolute inset-0 h-full w-full"
           src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`}
@@ -33,7 +33,7 @@ export function VideoFacade({ video, prioridade = false }: { video: Video; prior
     <button
       type="button"
       onClick={() => setLigado(true)}
-      className="group relative block aspect-video w-full overflow-clip bg-off text-left"
+      className="group relative block aspect-video w-full overflow-hidden bg-off text-left"
       aria-label={`Assistir: ${video.titulo}`}
     >
       <img
