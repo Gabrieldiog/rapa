@@ -1341,116 +1341,88 @@
   .navbar__zap { background: var(--color-ambar); color: var(--color-void); font-weight: 500; }
   .navbar__zap:hover { color: var(--color-void); }
 
-  /* ---------- A BARRA DO CELULAR ----------------------------
-     Existe porque o PC tem navbar e o celular nao tinha nada em cima —
-     o menu morava no rodape e nao lia como navegacao.
+  /* ---------- O MENU FLUTUANTE DO CELULAR ------------------
+     A BARRA PRETA MORREU. Foram duas tentativas — um painel descendo
+     de uma pilula presa no canto de cima, depois uma gaveta lateral —
+     as duas penduradas numa faixa fixa no topo. "No mobile nao faz
+     sentido ter uma barra preta" esta certo: ela comia 64px de altura
+     o tempo todo, repetia a marca que ja esta no hero, e existia so
+     para segurar um botao. O menu.md nunca teve barra.
 
-     `env(safe-area-inset-top)` so tem valor se o `<meta viewport>`
-     trouxer `viewport-fit=cover`; sem isso ele devolve 0. Como a barra
-     e opaca e cobre a faixa da ilha/entalhe, o `max()` garante um piso
-     de respiro nos aparelhos que nao reportam nada.
+     Fechado: duas pilulas flutuando no rodape, na zona do polegar.
+     Aberto: a mesma pilula, crescida, com as secoes dentro.
      --------------------------------------------------------- */
-  .barra-cel {
+  .flutua {
     position: fixed;
     inset-inline: 0;
-    inset-block-start: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    min-block-size: 4rem;
-    /* O SAFE-AREA LATERAL NAO E ZERO EM PAISAGEM: num iPhone com ilha
-       ele vale de 44 a 62px de cada lado. Com padding fixa de 20px a
-       marca cai debaixo do entalhe assim que o aparelho vira.
-       Em retrato, e em aba normal do Safari, os quatro insets valem 0
-       (o 59/62 so aparece em PWA standalone) — entao `max()` cai no
-       1.25rem e nada muda no caso comum. */
-    padding-inline:
-      max(1.25rem, env(safe-area-inset-left, 0px))
-      max(1.25rem, env(safe-area-inset-right, 0px));
-    /* `calc(X + env())` e nao `max(X, env())`: max() de um valor >= 0
-       com 0 devolve sempre o proprio valor — a versao anterior era um
-       no-op que nao garantia respiro nenhum. */
-    padding-block-start: env(safe-area-inset-top, 0px);
-    background: color-mix(in srgb, var(--color-void) 86%, transparent);
-    backdrop-filter: blur(14px);
-    border-block-end: 1px solid var(--color-rule);
-  }
-
-  /* o WhatsApp DENTRO da barra, ao lado do hamburguer. Redondo e so
-     com o icone: a 360px a soma de marca + rotulo + pilula do menu nao
-     fecha. 44px e o minimo da casa e o criterio 2.5.5 da WCAG. */
-  .barra-cel__zap {
-    position: absolute;
-    inset-inline-end: calc(max(0.75rem, env(safe-area-inset-right, 0px)) + 8.5rem);
-    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-ambar);
-    color: var(--color-ambar);
-    background: color-mix(in srgb, var(--color-void) 70%, transparent);
-  }
-
-  /* A pilula e ABSOLUTA: crescendo, ela nao pode empurrar a marca nem
-     esticar a altura da barra. O `top` soma o safe-area porque a
-     posicao absoluta ignora a padding do pai — sem isso a pilula
-     subiria para dentro da ilha dinamica num iPhone. */
-  /* o gatilho: a pilula ambar do menu.md. Deixou de MORFAR — quem
-     abre agora e a gaveta lateral — entao ela e so um botao. */
-  .barra-cel__pilula {
-    position: absolute;
-    inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
-    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+    inset-block-end: max(1.75rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+    z-index: 90;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
-    block-size: 2.75rem;
-    padding-inline: 1.25rem;
-    border-radius: 22px;
-    background: var(--color-ambar);
-    color: var(--color-void);
+    padding-inline: 1rem;
+    pointer-events: none;
+    transition: opacity 200ms var(--ease-out-cut);
+  }
+  .flutua > * { pointer-events: auto; }
+  /* com o menu aberto ela sai: o painel ocupa o mesmo lugar */
+  .flutua[data-oculto] { opacity: 0; pointer-events: none; }
+
+  .flutua__pilula, .flutua__zap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    block-size: 3rem;
+    padding-inline: 1.375rem;
+    border-radius: 999px;
     font-family: var(--font-mono);
     font-size: var(--text-2xs);
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    white-space: nowrap;
     transition: transform 180ms var(--ease-out-cut);
   }
-  .barra-cel__pilula:active { transform: scale(0.95); }
-
-  /* a marca da barra so entra depois do hero: no topo ela repetia a
-     marca grande do hero, 40px acima dela */
-  .barra-cel__marca {
-    opacity: 0;
-    transform: translateY(-0.375rem);
-    pointer-events: none;
-    transition: opacity 320ms var(--ease-out-cut),
-                transform 320ms var(--ease-out-cut);
+  .flutua__pilula {
+    background: var(--color-ambar);
+    color: var(--color-void);
+    box-shadow: 0 14px 38px -14px var(--color-ambar);
   }
-  .barra-cel__marca[data-visivel] {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
+  .flutua__zap {
+    border: 1px solid var(--color-ambar);
+    color: var(--color-ambar);
+    background: color-mix(in srgb, var(--color-void) 82%, transparent);
+    backdrop-filter: blur(12px);
   }
+  .flutua__pilula:active, .flutua__zap:active { transform: scale(0.95); }
 
-  /* ---------- A GAVETA LATERAL -----------------------------
-     `<dialog>` aberto com showModal(). O elemento vai para a TOP LAYER
-     do navegador, acima de qualquer z-index da pagina — a classe de
-     defeito "alguma coisa esta cobrindo o menu" deixa de ser possivel.
+  .flutua__risco { display: flex; flex-direction: column; gap: 3px; }
+  .flutua__risco > span {
+    display: block;
+    inline-size: 1rem;
+    block-size: 2px;
+    background: currentColor;
+    transition: transform 300ms var(--ease-out-cut),
+                opacity 200ms var(--ease-out-cut);
+  }
+  .flutua__risco[data-x] > span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  .flutua__risco[data-x] > span:nth-child(2) { opacity: 0; }
+  .flutua__risco[data-x] > span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
 
-     A REGRA QUE EU JA QUEBREI DUAS VEZES AQUI: a gaveta ABERTA tem
-     `translate: 0` como estado BASE, e a transicao so desliza ate ele.
-     Se a transicao nao rodar, ela aparece inteira de uma vez. Antes a
-     altura do painel vinha de uma animacao de JS dentro de uma caixa
-     que recortava, e bastava a animacao nao terminar para o menu sumir
-     com o hamburguer ja virado em X.
+  /* ---------- O MORPH ---------------------------------------
+     `<dialog>` modal: TOP LAYER do navegador, acima de qualquer
+     z-index. Depois de tres rodadas de "o menu nao aparece", nada aqui
+     depende de empilhamento.
+
+     E O TAMANHO ABERTO E O ESTADO BASE. `data-entrando` encolhe por um
+     quadro, e SAIR dele e o que produz o morph. Se a transicao nao
+     rodar, o painel aparece aberto. A lei que eu ja quebrei duas vezes
+     neste arquivo: nada que seja preciso VER pode depender de uma
+     animacao terminar.
      --------------------------------------------------------- */
-  .gaveta {
-    /* o <dialog> ocupa a tela toda para receber o toque no fundo;
-       quem tem largura de gaveta e o painel de dentro */
+  .morf {
     position: fixed;
     inset: 0;
     inline-size: 100%;
@@ -1461,95 +1433,101 @@
     padding: 0;
     border: 0;
     background: transparent;
-    overflow: hidden;
   }
-  .gaveta::backdrop {
-    background: color-mix(in srgb, var(--color-void) 68%, transparent);
-    backdrop-filter: blur(3px);
+  .morf::backdrop {
+    background: color-mix(in srgb, var(--color-void) 62%, transparent);
     opacity: 0;
     transition: opacity 320ms var(--ease-out-cut);
   }
-  .gaveta[data-aberta]::backdrop { opacity: 1; }
+  .morf[data-aberto]::backdrop { opacity: 1; }
 
-  .gaveta__painel {
+  .morf__caixa {
     position: absolute;
-    inset-block: 0;
-    inset-inline-end: 0;
-    inline-size: min(20rem, 84vw);
+    inset-block-end: max(1.75rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+    inset-inline-start: 50%;
+    translate: -50% 0;
     display: flex;
     flex-direction: column;
-    padding:
-      calc(env(safe-area-inset-top, 0px) + 1.25rem)
-      max(1.5rem, env(safe-area-inset-right, 0px))
-      calc(env(safe-area-inset-bottom, 0px) + 1.5rem)
-      1.5rem;
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-      linear-gradient(200deg,
-        color-mix(in srgb, var(--color-ambar) 7%, var(--color-off)) 0%,
-        var(--color-off) 42%);
-    background-repeat: repeat, no-repeat;
-    background-size: 140px 140px, 100% 100%;
-    border-inline-start: 1px solid var(--color-rule);
-    box-shadow: -24px 0 60px -20px var(--color-void);
-    /* fechada: fora da tela, pelo lado direito */
-    translate: 100% 0;
-    transition: translate 320ms var(--ease-out-cut);
+    overflow: hidden;
+    /* ABERTO e o estado base */
+    inline-size: min(19rem, calc(100vw - 2rem));
+    block-size: min(30rem, calc(100dvh - 8rem));
+    border-radius: 26px;
+    transition: inline-size 620ms cubic-bezier(0.22, 1, 0.36, 1),
+                block-size  620ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* o quadro encolhido de onde o morph cresce — exatamente o tamanho
+     da pilula fechada, para a caixa nascer em cima dela */
+  .morf__caixa[data-entrando] {
+    inline-size: 9.25rem;
+    block-size: 3rem;
+    border-radius: 999px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .morf__caixa, .morf::backdrop { transition: none; }
+  }
+
+  .morf__ambar {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--color-ambar);
+  }
+  /* o circulo escuro subindo de baixo: 200% de lado, `bottom` de
+     -200% a -20%. E o "liquid" do menu.md, literal. */
+  .morf__circulo {
+    position: absolute;
+    inset-inline-start: 50%;
+    inline-size: 200%;
+    aspect-ratio: 1;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: var(--color-void);
+    inset-block-end: -20%;
+    transition: inset-block-end 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .morf__caixa[data-entrando] .morf__circulo { inset-block-end: -200%; }
+
+  .morf__nav {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline: 1.5rem;
+    padding-block-start: 1.25rem;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
-  .gaveta[data-aberta] .gaveta__painel { translate: 0 0; }
-  @media (prefers-reduced-motion: reduce) {
-    .gaveta__painel, .gaveta::backdrop { transition: none; }
-  }
-
-  .gaveta__topo {
+  .morf__nav ul {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-block-end: 1.25rem;
-    border-block-end: 1px solid var(--color-rule);
+    gap: 0.4rem;
   }
-  .gaveta__x {
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    margin-inline-end: -0.5rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-rule);
-    color: var(--color-branco);
-    transition: border-color 200ms var(--ease-out-cut),
-                color 200ms var(--ease-out-cut);
-  }
-  .gaveta__x:hover, .gaveta__x:focus-visible {
-    border-color: var(--color-ambar);
-    color: var(--color-ambar);
-  }
+  .morf__nav .menu-item { display: flex; align-items: center; min-block-size: 2.5rem; }
 
-  .gaveta__nav { flex: 1; padding-block: 1.75rem; }
-  .gaveta__nav ul { display: flex; flex-direction: column; gap: 0.25rem; }
-  .gaveta__nav .menu-item {
+  /* o rodape da pilula: rotulo e hamburguer, ancorados onde o dedo
+     tocou. Vem DEPOIS da nav no DOM e nao encolhe, entao ele fica
+     colado embaixo — como no original. */
+  .morf__rodape {
+    position: relative;
+    z-index: 1;
+    flex: none;
     display: flex;
-    align-items: center;
-    min-block-size: 3rem;
-  }
-
-  .gaveta__zap {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    min-block-size: 3.25rem;
-    border-radius: var(--radius-botao);
-    background: var(--color-ambar);
-    color: var(--color-void);
+    gap: 0.625rem;
+    block-size: 3rem;
+    padding-inline: 1.375rem;
     font-family: var(--font-mono);
     font-size: var(--text-2xs);
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--color-branco);
   }
 
   /* trava a rolagem do fundo. O showModal() NAO trava sozinho — e
@@ -1557,16 +1535,15 @@
   html:has(dialog[open]) { overflow: hidden; }
 
 
-  /* UM SO ELEMENTO FIXO. O WhatsApp entrou na barra do topo, entao nao
-     ha mais nada preso no rodape — o `padding-block-end` no body e o
-     `scroll-padding-block-end` saíram junto.
-     E o `scroll-padding-block-start` saiu TAMBEM: o `Secao` ja tem
-     `scroll-mt-16`, e os dois SOMAVAM. Uma ancora no celular parava
-     144px abaixo do titulo para uma barra de 64px — 80px de buraco
-     morto em cima de cada secao. Quem cuida do desvio e o
-     `scroll-mt-20` do proprio Secao, que da os 64px da barra mais
-     16px de respiro, e vale igual nas duas larguras porque a
-     NavDesktop tambem mede 64px. */
+  /* O menu voltou para o RODAPE, entao a ancora precisa de folga
+     embaixo e o corpo tambem — senao o ultimo bloco da pagina fica
+     atras da pilula. Em cima nao ha mais barra no celular; quem cuida
+     do desvio da ancora e o `scroll-mt-20` do proprio Secao, que serve
+     a NavDesktop no desktop e nao atrapalha no celular. */
+  @media (max-width: 1023px) {
+    html { scroll-padding-block-end: 6rem; }
+    body { padding-block-end: 6rem; }
+  }
 
   /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
   .folha {

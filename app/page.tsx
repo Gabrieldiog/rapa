@@ -45,14 +45,12 @@ export default function Home() {
             o fundo continua e ela nao. A vinheta agora e do proprio
             fundo, fixa e sem costura. */}
 
-        {/* A barra do celular e FIXA NO TOPO e tem 4rem — o pt-16
-            antigo deixava a marca encostada nela. E o rodape ficou
-            LIVRE: o WhatsApp entrou na barra de cima, entao nao ha
-            mais nada preso embaixo para o topo desviar. Eram 152px de
-            barra fixa somados, 27,5% da tela de um iPhone SE; agora
-            sao 64px. */}
+        {/* Sem barra no topo: o topo do celular voltou a ser so a
+            pagina. Quem flutua e o menu, no RODAPE — dai o pb maior,
+            para o CTA nao ficar atras dele. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 pt-24 pb-16
+                        items-center justify-center px-5 pt-14
+                        pb-[calc(6.5rem+env(safe-area-inset-bottom))]
                         text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o
