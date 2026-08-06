@@ -1374,53 +1374,79 @@
     display: flex;
     align-items: center;
     min-block-size: 4rem;
-    padding-inline: 1.25rem;
-    padding-block-start: max(env(safe-area-inset-top), 0px);
+    /* O SAFE-AREA LATERAL NAO E ZERO EM PAISAGEM: num iPhone com ilha
+       ele vale de 44 a 62px de cada lado. Com padding fixa de 20px a
+       marca cai debaixo do entalhe assim que o aparelho vira.
+       Em retrato, e em aba normal do Safari, os quatro insets valem 0
+       (o 59/62 so aparece em PWA standalone) — entao `max()` cai no
+       1.25rem e nada muda no caso comum. */
+    padding-inline:
+      max(1.25rem, env(safe-area-inset-left, 0px))
+      max(1.25rem, env(safe-area-inset-right, 0px));
+    /* `calc(X + env())` e nao `max(X, env())`: max() de um valor >= 0
+       com 0 devolve sempre o proprio valor — a versao anterior era um
+       no-op que nao garantia respiro nenhum. */
+    padding-block-start: env(safe-area-inset-top, 0px);
     background: color-mix(in srgb, var(--color-void) 86%, transparent);
     backdrop-filter: blur(14px);
     border-block-end: 1px solid var(--color-rule);
   }
+
+  /* o WhatsApp DENTRO da barra, ao lado do hamburguer. Redondo e so
+     com o icone: a 360px a soma de marca + rotulo + pilula do menu nao
+     fecha. 44px e o minimo da casa e o criterio 2.5.5 da WCAG. */
+  .barra-cel__zap {
+    position: absolute;
+    inset-inline-end: calc(max(0.75rem, env(safe-area-inset-right, 0px)) + 8.5rem);
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-ambar);
+    color: var(--color-ambar);
+    background: color-mix(in srgb, var(--color-void) 70%, transparent);
+  }
+
   /* A pilula e ABSOLUTA: crescendo, ela nao pode empurrar a marca nem
      esticar a altura da barra. O `top` soma o safe-area porque a
      posicao absoluta ignora a padding do pai — sem isso a pilula
      subiria para dentro da ilha dinamica num iPhone. */
   .barra-cel__pilula {
     position: absolute;
-    inset-inline-end: 0.75rem;
-    inset-block-start: calc(max(env(safe-area-inset-top), 0px) + 0.625rem);
+    inset-inline-end: max(0.75rem, env(safe-area-inset-right, 0px));
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+    /* TETO DE ALTURA. O motion escreve `height: 452px` inline, e a
+       caixa tem `overflow: hidden`. Com o texto do navegador em 200%
+       — criterio 1.4.4, nivel AA — os nove itens passam de 670px e os
+       ultimos ficavam cortados e inalcancaveis. O teto respeita a
+       tela; quem rola por dentro e o painel. */
+    max-block-size: calc(100dvh - 6rem - env(safe-area-inset-top, 0px));
+  }
+  .menu-painel {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline: 1.5rem;
+    padding-block-end: 1.75rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  /* o WhatsApp sozinho na zona do polegar */
-  .zap-flutua {
-    position: fixed;
-    inset-inline-end: 0.875rem;
-    inset-block-end: max(0.875rem, env(safe-area-inset-bottom));
-    z-index: 100;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-block-size: 3.25rem;
-    padding-inline: 1.15rem;
-    border-radius: 999px;
-    background: var(--color-ambar);
-    color: var(--color-void);
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    box-shadow: 0 12px 34px -14px var(--color-ambar);
-  }
-
-  /* A ancora nao pode parar atras de barra nenhuma — nem da de cima,
-     nem da pilula de baixo. Os dois lados precisam de folga. */
-  @media (max-width: 1023px) {
-    html {
-      scroll-padding-block-start: 5rem;
-      scroll-padding-block-end: 5.5rem;
-    }
-    body { padding-block-end: 5.5rem; }
-  }
+  /* UM SO ELEMENTO FIXO. O WhatsApp entrou na barra do topo, entao nao
+     ha mais nada preso no rodape — o `padding-block-end` no body e o
+     `scroll-padding-block-end` saíram junto.
+     E o `scroll-padding-block-start` saiu TAMBEM: o `Secao` ja tem
+     `scroll-mt-16`, e os dois SOMAVAM. Uma ancora no celular parava
+     144px abaixo do titulo para uma barra de 64px — 80px de buraco
+     morto em cima de cada secao. Quem cuida do desvio e o
+     `scroll-mt-20` do proprio Secao, que da os 64px da barra mais
+     16px de respiro, e vale igual nas duas larguras porque a
+     NavDesktop tambem mede 64px. */
 
   /* ---------- A FOLHA DE SEÇÕES ----------------------------- */
   .folha {

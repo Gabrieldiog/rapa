@@ -19,9 +19,16 @@ export default function Home() {
   return (
     <>
       <Blackout />
+      {/* z-200, e nao z-100. A barra do celular tambem e z-100 e vem
+          DEPOIS no DOM — com o mesmo indice, quem vem depois pinta por
+          cima, e o link de pular ficava inteiramente atras dela. E a
+          falha F110 da WCAG ao pe da letra (2.4.11, nivel AA:
+          "o componente com foco nao pode ficar inteiramente escondido
+          por conteudo do autor"), e foi regressao direta da barra
+          nova. */}
       <a href="#conteudo"
          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4
-                    focus:z-[100] focus:bg-ambar focus:px-4 focus:py-2 focus:text-void">
+                    focus:z-[200] focus:bg-ambar focus:px-4 focus:py-2 focus:text-void">
         Pular para o conteúdo
       </a>
 
@@ -38,14 +45,14 @@ export default function Home() {
             o fundo continua e ela nao. A vinheta agora e do proprio
             fundo, fixa e sem costura. */}
 
-        {/* A barra do celular agora e FIXA NO TOPO e tem 4rem de altura
-            — o pt-16 antigo deixava a marca encostada nela. O pb caiu
-            de 6.5rem para 5rem porque so a pilula de WhatsApp continua
-            no rodape; o menu subiu. `justify-center` centraliza o que
-            sobra, entao o bloco assenta entre as duas barras. */}
+        {/* A barra do celular e FIXA NO TOPO e tem 4rem — o pt-16
+            antigo deixava a marca encostada nela. E o rodape ficou
+            LIVRE: o WhatsApp entrou na barra de cima, entao nao ha
+            mais nada preso embaixo para o topo desviar. Eram 152px de
+            barra fixa somados, 27,5% da tela de um iPhone SE; agora
+            sao 64px. */}
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-3xl flex-col
-                        items-center justify-center px-5 pt-24
-                        pb-[calc(5rem+env(safe-area-inset-bottom))]
+                        items-center justify-center px-5 pt-24 pb-16
                         text-center lg:py-24">
           {/* A MARCA. `animar` acende o VU meter de baixo para cima uma
               vez, na entrada — e o que um medidor faz quando pega o

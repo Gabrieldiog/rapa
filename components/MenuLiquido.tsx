@@ -110,8 +110,11 @@ export function MenuLiquido() {
     if (!aberto) return
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') fechar() }
     // pointerdown cobre toque, o mousedown do original nao cobria
+    /* Fechar clicando fora TEM que devolver o foco. Sem isto o foco
+       cai no <body> e a próxima tecla Tab recomeça do topo do
+       documento — é o critério 2.4.3 (Focus Order, nível A). */
     const onFora = (e: PointerEvent) => {
-      if (raiz.current && !raiz.current.contains(e.target as Node)) setAberto(false)
+      if (raiz.current && !raiz.current.contains(e.target as Node)) fechar()
     }
     document.addEventListener('keydown', onKey)
     document.addEventListener('pointerdown', onFora)
@@ -130,6 +133,36 @@ export function MenuLiquido() {
            className="flex min-h-11 items-center">
           <Logo className="w-[6.5rem] text-branco" />
         </a>
+
+        {/* O WHATSAPP MORA AQUI, e não numa segunda pílula flutuante.
+            Dois elementos fixos custavam 152px num iPhone SE — 27,5%
+            da tela visível, e 59,6% em paisagem. A técnica C34 da WCAG
+            manda soltar o `fixed` em viewport curta justamente por
+            isso, e o critério 1.4.10 exige que a página funcione com
+            256px de ALTURA, onde 152px de barra não deixam nada.
+            Num elemento só o custo cai para 64px, 11,6%.
+            E é literalmente o que foi pedido: a navbar do PC tem marca,
+            navegação e o botão âmbar de WhatsApp. Agora o celular tem
+            os três, na mesma ordem. */}
+        <AnimatePresence>
+          {!aberto && (
+            <motion.a
+              href={zap('Oi! Quero um orçamento. Meu evento é:')}
+              target="_blank" rel="noopener noreferrer" data-zap
+              aria-label="Falar com a Rapa Sound no WhatsApp"
+              className="barra-cel__zap"
+              initial={false}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.18 }}
+              whileTap={{ scale: 0.94 }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden
+                   className="h-5 w-5">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.25 8.24a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.39c0-4.54 3.7-8.24 8.25-8.24Zm-2.5 4.02c-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66s.72 1.93.82 2.06c.1.13 1.4 2.14 3.4 3 .47.2.84.32 1.13.42.48.15.91.13 1.25.08.38-.06 1.17-.48 1.34-.95.16-.46.16-.86.11-.94-.05-.08-.18-.13-.38-.23-.2-.1-1.17-.58-1.35-.64-.18-.07-.31-.1-.44.1-.13.2-.51.64-.62.77-.12.13-.23.15-.43.05a5.4 5.4 0 0 1-1.6-.99 6.03 6.03 0 0 1-1.1-1.38c-.12-.2-.02-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.44-1.07-.6-1.46-.16-.38-.32-.33-.44-.34h-.37Z" />
+              </svg>
+            </motion.a>
+          )}
+        </AnimatePresence>
 
         {/* A pílula é ABSOLUTA dentro da barra: crescendo, ela não pode
             empurrar a marca nem esticar a altura da barra. */}
@@ -156,7 +189,13 @@ export function MenuLiquido() {
           <motion.span
             aria-hidden
             className="absolute left-1/2 rounded-full bg-void"
-            style={{ width: '220%', aspectRatio: '1', x: '-50%' }}
+            /* O `y` VAI NO STYLE, e não só no `animate`. Sem valor
+               inicial declarado, o motion lê a posição atual do DOM —
+               que é 0 — e o círculo escuro nasce COBRINDO a pílula
+               âmbar no HTML servido, com o texto "Menu" em cor escura
+               por cima dele. Fica um retângulo preto vazio até a
+               hidratação animar para fora. */
+            style={{ width: '220%', aspectRatio: '1', x: '-50%', y: '-200%' }}
             animate={{ y: aberto ? '-12%' : '-200%' }}
             transition={{ duration: aberto ? 0.8 : 0.5, ease }}
           />
@@ -190,63 +229,49 @@ export function MenuLiquido() {
             {aberto ? 'Fechar' : 'Menu'}
           </button>
 
-          {/* ---------- as âncoras ---------- */}
+          {/* ---------- as âncoras ----------
+              `<nav>` com `<ul>`, e não um punhado de `<a>` soltos: é
+              navegação, e leitor de tela anuncia "lista de 9 itens".
+              `overflow-y: auto` no painel porque a altura da pílula é
+              px cravado e a caixa tem `overflow: hidden`: com o texto
+              do navegador em 200% (critério 1.4.4, nível AA) os nove
+              itens passam de 670px numa caixa de 452 e os últimos
+              ficavam cortados e inalcançáveis. O CSS ainda limita a
+              altura ao que cabe na tela. */}
           <AnimatePresence>
             {aberto && (
-              <motion.div
+              <motion.nav
                 ref={painel}
                 id="menu-secoes"
+                aria-label="Seções da página"
                 data-rolar={rolar ? '' : undefined}
-                className="relative z-10 flex flex-1 flex-col items-center justify-center
-                           gap-3.5 overflow-hidden px-6 pb-7"
+                className="menu-painel"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
               >
-                {SECOES.map((s, i) => (
-                  <a key={s.href} href={s.href} onClick={fechar}
-                     className="menu-item text-branco">
-                    <span className="sr-only">{s.label}</span>
-                    <Rolo texto={s.label} i={i} />
-                  </a>
-                ))}
-
-                <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
-                   target="_blank" rel="noopener noreferrer" data-zap onClick={fechar}
-                   className="menu-item mt-1 text-ambar">
-                  <span className="sr-only">Falar no WhatsApp</span>
-                  <Rolo texto="WhatsApp" i={SECOES.length} />
-                </a>
-              </motion.div>
+                <ul className="flex flex-col items-center gap-3.5">
+                  {SECOES.map((s, i) => (
+                    <li key={s.href}>
+                      <a href={s.href} onClick={fechar} className="menu-item text-branco">
+                        <span className="sr-only">{s.label}</span>
+                        <Rolo texto={s.label} i={i} />
+                      </a>
+                    </li>
+                  ))}
+                  <li className="mt-1">
+                    <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
+                       target="_blank" rel="noopener noreferrer" data-zap onClick={fechar}
+                       className="menu-item text-ambar">
+                      <span className="sr-only">Falar no WhatsApp</span>
+                      <Rolo texto="WhatsApp" i={SECOES.length} />
+                    </a>
+                  </li>
+                </ul>
+              </motion.nav>
             )}
           </AnimatePresence>
         </motion.div>
       </div>
-
-      {/* ══════════ O WHATSAPP, no rodapé ══════════
-          Sozinho na zona do polegar. Ele some com o menu aberto — não
-          por capricho: com o painel descendo do topo, uma pílula acesa
-          no rodapé disputa a atenção com o menu que a pessoa acabou de
-          abrir, e o WhatsApp já é o último item do painel. */}
-      <AnimatePresence>
-        {!aberto && (
-          <motion.a
-            href={zap('Oi! Quero um orçamento. Meu evento é:')}
-            target="_blank" rel="noopener noreferrer" data-zap
-            aria-label="Falar com a Rapa Sound no WhatsApp"
-            className="zap-flutua lg:hidden"
-            initial={false}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.2 }}
-            whileTap={{ scale: 0.96 }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden
-                 className="h-5 w-5 shrink-0">
-              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.25 8.24a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.39c0-4.54 3.7-8.24 8.25-8.24Zm-2.5 4.02c-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66s.72 1.93.82 2.06c.1.13 1.4 2.14 3.4 3 .47.2.84.32 1.13.42.48.15.91.13 1.25.08.38-.06 1.17-.48 1.34-.95.16-.46.16-.86.11-.94-.05-.08-.18-.13-.38-.23-.2-.1-1.17-.58-1.35-.64-.18-.07-.31-.1-.44.1-.13.2-.51.64-.62.77-.12.13-.23.15-.43.05a5.4 5.4 0 0 1-1.6-.99 6.03 6.03 0 0 1-1.1-1.38c-.12-.2-.02-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.44-1.07-.6-1.46-.16-.38-.32-.33-.44-.34h-.37Z" />
-            </svg>
-            WhatsApp
-          </motion.a>
-        )}
-      </AnimatePresence>
     </>
   )
 }

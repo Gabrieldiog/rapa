@@ -40,8 +40,23 @@
     for (let i = 1; i <= 16; i++) setTimeout(() => w.scrollTo(0, (h/16)*i), i*50)
     if (q.get('rolar')) setTimeout(() => w.scrollTo(0, Number(q.get('rolar'))), 1000)
 
+    /* ?clique=<seletor> aperta um botao antes de medir. Serve para
+       sondar estado aberto — menu, <details>, modal. */
+    const cliqueSel = q.get('clique')
+    if (cliqueSel) setTimeout(() => {
+      const alvo = d.querySelector(cliqueSel)
+      if (alvo) alvo.click()
+      else console.warn('sem alvo para', cliqueSel)
+    }, 1100)
+
     setTimeout(() => {
       const linhas = []
+      if (cliqueSel) {
+        const alvo = d.querySelector(cliqueSel)
+        linhas.push('clique em ' + cliqueSel + ' -> ' +
+          (alvo ? 'achado, aria-expanded=' + alvo.getAttribute('aria-expanded')
+                : 'NAO ACHADO'))
+      }
       const alvos = d.querySelectorAll(sel)
       linhas.push('seletor: ' + sel + '  ->  ' + alvos.length + ' elemento(s)')
       const tr = d.querySelector('.equipe__trilho')
