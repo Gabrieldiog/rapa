@@ -770,33 +770,32 @@
     position: relative;
     padding-block: 1rem;
   }
-  /* O FILETE. Duas camadas no mesmo lugar: uma cinza que e o chao da
-     linha, e uma ambar por cima que cresce de 0 a 100% da esquerda
-     para a direita. Animar `transform` e nao `width` — largura dispara
-     layout a cada quadro, escala roda na GPU. */
-  .contato::before,
+  /* O FILETE DOURADO, FIXO em todas as linhas — hover nao existe em
+     tela de toque, e a maior parte do trafego nunca veria um dourado
+     que so aparece ao passar o mouse.
+
+     UMA CAMADA SO, E 2px. Eram duas — cinza embaixo, dourada por cima
+     — e isso escondia um defeito de subpixel.
+     Medido: as linhas nao tinham altura inteira. Eram 103,19px cada, e
+     a sobra vinha do `line-height` 1,6 sobre um rotulo de 12px, que da
+     19,2px. A base de cada linha caia num ponto diferente do pixel —
+     .22, .41, .59, .95 — e um filete de 1px nessas posicoes e repartido
+     entre dois pixels de dispositivo a meia intensidade. Com a camada
+     cinza logo abaixo, o resultado era uma linha dourada e a seguinte
+     acinzentada, alternando. No print parecia defeito de cor; era
+     geometria.
+     Consertado dos dois lados: os `line-height` viraram inteiros (a
+     causa) e o filete ficou com 2px (a margem de seguranca — mesmo
+     repartido, sempre sobra um pixel de cobertura cheia). A camada
+     cinza saiu junto: com dourado cheio ela so escurecia a borda. */
   .contato::after {
     content: '';
     position: absolute;
     inset-block-end: 0;
     inset-inline: 0;
-    block-size: 1px;
-  }
-  .contato::before { background: var(--color-rule); }
-  .contato::after {
+    block-size: 2px;
     background: var(--color-ambar);
-    transform-origin: 0 50%;
-    scale: 0 1;
-    transition: scale 420ms var(--ease-out-cut);
   }
-  .contato:hover::after,
-  .contato:focus-within::after { scale: 1 1; }
-
-  /* O WHATSAPP JA NASCE ACESO. Ele nao e mais um dado da lista: e a
-     conversao, e a pagina inteira empurra para la. Deixar o filete
-     dele apagado ate alguem passar o mouse seria esconder o unico
-     item que interessa — e no celular nao existe passar o mouse. */
-  .contato:first-child::after { scale: 1 1; }
 
   .contato__rot {
     display: flex;
@@ -806,12 +805,17 @@
     font-size: var(--text-2xs);
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    /* inteiro de proposito: 1.6 sobre 12px da 19,2px, e a sobra fazia
+       a base da linha cair no meio do pixel */
+    line-height: 1.25rem;
     color: var(--color-branco-2);
     transition: color 260ms var(--ease-out-cut);
   }
   .contato:hover .contato__rot,
   .contato:focus-within .contato__rot { color: var(--color-branco); }
-  /* o simbolo do WhatsApp ja nasce ambar, pelo mesmo motivo do filete */
+  /* O WhatsApp continua com o ROTULO em ambar — o filete agora e igual
+     em todos, entao a distincao da conversao passou para o texto. O
+     SIMBOLO nao: ele esta no verde da marca e nao herda cor nenhuma. */
   .contato:first-child .contato__rot { color: var(--color-ambar); }
 
   .contato__val {
@@ -831,7 +835,8 @@
   .contato__val a:hover, .contato__val a:focus-visible { color: var(--color-ambar); }
   .contato__val--quebra a { word-break: break-all; }
   .contato__val--calmo {
-    line-height: 1.6;
+    /* 22px: inteiro, e qualquer numero de linhas continua inteiro */
+    line-height: 1.375rem;
     color: var(--color-branco-2);
     font-style: normal;
   }
