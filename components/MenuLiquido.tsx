@@ -95,16 +95,32 @@ export function MenuLiquido() {
   const abrir = useCallback(() => {
     const d = cx.current
     if (!d || d.open) return
+    /* O ATRIBUTO VAI NO DOM À MÃO, ANTES do showModal(). Este é o
+       conserto do "pipoco".
+       Com `setEntrando(true)` o React só aplica o atributo no próximo
+       render — mas `showModal()` mostra o diálogo NA HORA. A sequência
+       real era: primeiro quadro pinta o painel INTEIRO, o render do
+       React chega e ele SALTA para o tamanho da pílula, e só então a
+       animação cresce. Três estados em três quadros: é o pipoco.
+       Escrevendo no elemento antes de abrir, o primeiro quadro já
+       nasce do tamanho da pílula. O estado do React vem junto só para
+       manter as duas fontes coerentes. */
+    const caixa = d.querySelector<HTMLElement>('.morf__caixa')
+    caixa?.setAttribute('data-entrando', '')
     setEntrando(true)
     d.showModal()
     setAberto(true)
-    requestAnimationFrame(() => requestAnimationFrame(() => setEntrando(false)))
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      caixa?.removeAttribute('data-entrando')
+      setEntrando(false)
+    }))
   }, [])
 
   const fechar = useCallback(() => {
     const d = cx.current
     if (!d || !d.open) return
     setAberto(false)
+    d.querySelector<HTMLElement>('.morf__caixa')?.setAttribute('data-entrando', '')
     setEntrando(true)
     /* `close()` espera o morph encolher. `transitionend` sozinho não
        serve: sem transição o evento nunca chega e o menu ficaria aberto
