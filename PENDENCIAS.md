@@ -183,6 +183,39 @@ cobertura em Araguari e Tiradentes, e "quase 30 anos" com os 116 artistas.
 
 ---
 
+## P15 · Os sete depoimentos são EXEMPLO — trocar antes de publicar
+
+**BLOQUEIA PUBLICAÇÃO. Não bloqueia desenvolvimento.**
+
+Os sete textos da seção "O que dizem depois da festa" **não são depoimentos reais**.
+Foram escritos a pedido — *"coloca uns 7 depoimentos como exemplo de como vai ficar
+para eu mostrar para ela"* — e a função deles é mostrar o LAYOUT, não vender.
+
+Publicar isto como se fosse fala de cliente é propaganda enganosa (art. 37 do CDC), e
+derruba a confiança da empresa no dia em que alguém cruzar os nomes.
+
+**A trava:** cada fala carrega `exemplo: true`, e `lib/conteudo.ts` emite um aviso no
+log de todo build enquanto houver um só `true`. Não apague o aviso — troque os textos.
+
+### Onde buscar os reais, em ordem de facilidade
+
+1. **WhatsApp.** A empresa já conversa com toda cliente por lá. É só pedir autorização
+   de uso do print. Duas por mês resolvem a seção.
+2. **Google Meu Negócio.** A ficha existe e está com **zero avaliação**. Cada avaliação
+   lá vira depoimento aqui **e** melhora a busca local — é o item de maior retorno.
+3. **Casamentos.com.br.** Há **um** depoimento real de 2016, da Tatiane, já verificado.
+   Um só não sustenta a seção.
+4. **Os quatro vídeos de depoimento** que já estão no acervo (Diana, Vitória, Maria
+   Antônia, Ana Laura) têm fala transcrevível.
+
+### O do Gabriel e o do Lucas
+
+Foram pedidos por nome e **não escrevi por eles**. Cada um manda o próprio texto, e o
+do Lucas Alencar precisa do "de acordo" dele antes de aparecer em qualquer lugar
+público — colocar palavra na boca de um parceiro é pior do que não ter depoimento.
+
+---
+
 ## P13 · Apagar as tres ferramentas de `public/` antes de publicar
 
 **Bloqueia publicação. Não bloqueia desenvolvimento.**

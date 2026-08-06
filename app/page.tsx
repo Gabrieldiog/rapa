@@ -1,9 +1,10 @@
 import {
   SERVICOS, BLOCOS, RIDER, DESTAQUES, TOTAL_ARTISTAS,
-  EVENTOS, DEPOIMENTOS, FAQ,
+  EVENTOS, DEPOIMENTOS, FAQ, FALAS,
   CONTATO, FOTOS_EVENTO, EQUIPE, zap,
 } from '@/lib/conteudo'
 import { Reveal } from '@/components/Reveal'
+import { Orbita } from '@/components/Orbita'
 import { CardServico } from '@/components/CardServico'
 import { LuzCursor } from '@/components/LuzCursor'
 import { Palco } from '@/components/Palco'
@@ -291,6 +292,27 @@ export default function Home() {
         <div className="mt-12">
           <Palco videos={[...EVENTOS, ...DEPOIMENTOS]} />
         </div>
+      </Secao>
+
+      {/* ══════════════ DEPOIMENTOS EM ÓRBITA ══════════════
+          Entra logo depois dos vídeos de propósito: quem acabou de VER
+          a festa acontecer é quem está mais pronto para ouvir alguém
+          falar dela. Prova visual e prova social, uma atrás da outra.
+
+          ⚠️ OS SETE TEXTOS SÃO EXEMPLO — ver P15 no PENDENCIAS.md.
+          A seção existe para o cliente ver o formato e aprovar antes
+          de a empresa sair colhendo depoimento de verdade. */}
+      <Secao id="falam" className="relative overflow-clip">
+        <Reveal>
+          <Eyebrow><b>Quem contratou</b> · <i>{FALAS.length}</i> falas</Eyebrow>
+          <h2 className="max-w-[22ch] text-2xl lg:text-3xl">
+            O que dizem depois da festa
+          </h2>
+        </Reveal>
+
+        <Reveal delay={90} className="mt-12 block lg:mt-16">
+          <Orbita falas={FALAS} />
+        </Reveal>
       </Secao>
 
       {/* A VIRADA foi removida.

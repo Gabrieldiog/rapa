@@ -215,6 +215,82 @@ export const DESTAQUES = [
 ]
 
 /* ============================================================
+   AS FALAS — os depoimentos em orbita.
+
+   ⚠️ PENDENTE P15 — BLOQUEIA PUBLICACAO. LEIA ANTES DE SUBIR.
+
+   OS SETE TEXTOS ABAIXO SAO EXEMPLO, NAO SAO DEPOIMENTOS REAIS.
+   Existem por um pedido explicito — "coloca uns 7 depoimentos como
+   exemplo de como vai ficar para eu mostrar para ela" — e a funcao
+   deles e MOSTRAR O LAYOUT, nao vender.
+
+   Publicar isto como se fosse depoimento de cliente e propaganda
+   enganosa (art. 37 do CDC) e derruba a confianca da empresa se
+   alguem cruzar os nomes. Por isso cada um carrega `exemplo: true`, e
+   a secao inteira nao vai ao ar enquanto houver um so `true` na lista.
+
+   COMO TROCAR POR REAIS, em ordem de facilidade:
+    1. WhatsApp. A empresa ja conversa com toda cliente por la — e so
+       pedir autorizacao de uso do print. Duas por mes resolvem.
+    2. Google Meu Negocio. A ficha existe e esta com ZERO avaliacao.
+       Toda avaliacao la vira depoimento aqui E melhora a busca local.
+    3. Casamentos.com.br. Ha UM depoimento real de 2016, da Tatiane,
+       ja verificado. Um so nao sustenta a secao.
+    4. Os quatro videos de depoimento que ja estao no acervo (Diana,
+       Vitoria, Maria Antonia, Ana Laura) tem fala transcrivivel.
+
+   O do Gabriel e o do Lucas Alencar foram pedidos por nome. Nao
+   escrevi por eles: cada um tem que mandar o proprio texto, e o do
+   Lucas precisa do "de acordo" dele antes de aparecer em qualquer
+   lugar publico.
+   ============================================================ */
+
+export type Fala = {
+  /** primeiro nome + o papel: e o que a leitora reconhece como igual a ela */
+  quem: string
+  papel: string
+  /** o evento, para ancorar no real */
+  onde: string
+  texto: string
+  /** true = TEXTO DE EXEMPLO, nao pode ir ao ar */
+  exemplo: boolean
+}
+
+export const FALAS: Fala[] = [
+  { exemplo: true, quem: 'Renata', papel: 'mãe da debutante', onde: '15 anos · Uberlândia',
+    texto: 'Eu só entendi a diferença quando vi as fotos. A pista estava toda colorida e o rosto da minha filha saiu limpo em todas. Eles trocaram a luz na hora da valsa e eu nem percebi acontecendo.' },
+  { exemplo: true, quem: 'Camila', papel: 'noiva', onde: 'Casamento · Palácio de Cristal',
+    texto: 'Minha preocupação era a luz colorida estragar as fotos, e foi a primeira coisa que eles falaram sem eu perguntar. Mandaram o projeto pro meu fotógrafo antes de fechar.' },
+  { exemplo: true, quem: 'Júlia', papel: 'debutante', onde: '15 anos · Araguari',
+    texto: 'A abertura de pista foi a parte que todo mundo comenta até hoje. O túnel de LED na entrada era exatamente o que eu tinha mostrado pra eles numa foto.' },
+  { exemplo: true, quem: 'Marcos', papel: 'produtor', onde: 'Show · Uberlândia',
+    texto: 'Mandei o rider às onze da noite e às sete da manhã já tinha resposta item por item, com o que atendia e o que ia ter que substituir. Isso não é comum.' },
+  { exemplo: true, quem: 'Patrícia', papel: 'cerimonialista', onde: 'Casamento · Tiradentes',
+    texto: 'Trabalho com muita produtora e essa é das poucas em que o técnico fica do começo ao fim. Não é montar e sumir — tem gente na mesa a noite inteira.' },
+  { exemplo: true, quem: 'Eduardo', papel: 'pai da debutante', onde: '15 anos · Uberlândia',
+    texto: 'Caiu energia no salão e eu nem cheguei a ficar nervoso. Eles resolveram antes de a festa perceber que tinha acontecido alguma coisa.' },
+  { exemplo: true, quem: 'Sandra', papel: 'RH', onde: 'Evento corporativo · Uberlândia',
+    texto: 'Precisava de som que deixasse a mesa conversar no jantar e virar festa depois. Foi ajustado por setor, sem ninguém gritando pra ser ouvido.' },
+]
+
+/** Vira `true` no dia em que os sete textos forem reais. */
+export const FALAS_LIBERADAS = FALAS.every((f) => !f.exemplo)
+
+/* A TRAVA. Este bloco roda na geracao do site estatico, entao o aviso
+   sai no log de TODO build enquanto houver texto de exemplo. Nao e
+   decorativo: e a unica coisa entre "sete depoimentos de mentira" e
+   "sete depoimentos de mentira no ar com o nome da empresa em cima".
+   Nao apague — troque os textos. */
+if (!FALAS_LIBERADAS) {
+  const n = FALAS.filter((f) => f.exemplo).length
+  console.warn(
+    `\n  ⚠️  ${n} de ${FALAS.length} depoimentos ainda sao TEXTO DE EXEMPLO.\n` +
+    '     A secao "O que dizem depois da festa" NAO pode ir ao ar assim.\n' +
+    '     Ver P15 no PENDENCIAS.md.\n',
+  )
+}
+
+/* ============================================================
    FAQ — as objecoes reais, colhidas em forum e blog do setor.
    Ver pesquisa/03-conversao-seo.md §5.
 
