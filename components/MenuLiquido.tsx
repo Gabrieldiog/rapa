@@ -143,7 +143,12 @@ export function MenuLiquido() {
 
   return (
     <>
-      {/* ---------- fechado: a pílula e o WhatsApp, flutuando ---------- */}
+      {/* ---------- fechado: só a pílula ----------
+          A pílula de WhatsApp que ficava ao lado saiu a pedido. A
+          conversão não some com ela: o WhatsApp continua sendo o
+          último item do painel, em âmbar, e cada seção da página tem o
+          seu próprio botão em fluxo. O que sai é o segundo objeto
+          flutuando no mesmo canto. */}
       <div className="flutua lg:hidden" data-oculto={aberto ? '' : undefined}>
         <button ref={gatilho} type="button" onClick={abrir}
                 aria-expanded={aberto} aria-controls="menu-secoes"
@@ -153,12 +158,6 @@ export function MenuLiquido() {
           </span>
           Seções
         </button>
-
-        <a href={zap('Oi! Quero um orçamento. Meu evento é:')}
-           target="_blank" rel="noopener noreferrer" data-zap
-           className="flutua__zap">
-          WhatsApp
-        </a>
       </div>
 
       {/* ---------- aberto: o mesmo lugar, crescido ----------
