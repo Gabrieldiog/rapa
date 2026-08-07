@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rapa Sound">
+  <!--
+    O ÍCONE É O VU METER, e não a marca inteira.
+
+    O wordmark "Rapa Sound" tem 1427 unidades de largura por 733 de
+    altura: reduzido a 16px de aba de navegador vira uma mancha
+    ilegível. O que sobrevive nesse tamanho é o detalhe que já É a
+    assinatura da marca — as duas colunas de segmentos empilhados que
+    ocupam o lugar do "p", em vermelho, laranja, amarelo e verde.
+
+    A página inteira saiu desse detalhe (a coluna de pixels, o marcador
+    do sobretítulo, o tubo da miniatura de vídeo). Fazer o favicon a
+    partir dele fecha o círculo: o ícone não é uma redução da marca, é
+    a origem dela.
+
+    Cores idênticas às do componente Logo — #EB373D, #F48B3C, #FCCC2F,
+    #A9CF48 sobre o void #09090B.
+  -->
+  <rect width="64" height="64" rx="14" fill="#09090B" />
+  <g>
+    <!-- coluna da esquerda -->
+    <rect x="17" y="12" width="12" height="6" rx="1.6" fill="#EB373D" />
+    <rect x="17" y="20" width="12" height="6" rx="1.6" fill="#EB373D" />
+    <rect x="17" y="28" width="12" height="6" rx="1.6" fill="#F48B3C" />
+    <rect x="17" y="36" width="12" height="6" rx="1.6" fill="#FCCC2F" />
+    <rect x="17" y="44" width="12" height="6" rx="1.6" fill="#A9CF48" />
+    <!-- coluna da direita, um degrau abaixo: um medidor de dois canais
+         nunca marca o mesmo pico nos dois ao mesmo tempo -->
+    <rect x="35" y="20" width="12" height="6" rx="1.6" fill="#EB373D" />
+    <rect x="35" y="28" width="12" height="6" rx="1.6" fill="#F48B3C" />
+    <rect x="35" y="36" width="12" height="6" rx="1.6" fill="#FCCC2F" />
+    <rect x="35" y="44" width="12" height="6" rx="1.6" fill="#A9CF48" />
+  </g>
+</svg>

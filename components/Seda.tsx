@@ -83,8 +83,18 @@ export function Seda({ forca = 1 }: { forca?: number }) {
        suave nao mostra bloco, mostra um campo suave maior.
        O ganho e quadratico — 420x282 sao 118 mil pixels contra 1,1
        milhao de uma tela cheia. Nove vezes menos trigonometria. */
-    const LADO_MAX = 420
-    const LADO_MAX_MOVEL = 300
+    /* MEDIDO, e o numero antigo era alto demais. Com CPU estrangulada
+       em 6x — o perfil de um Android de entrada — a seda a 420/300
+       derruba a pagina para 27,8 quadros por segundo, com p50 de
+       33,3ms num orcamento de 16,7ms. A pagina inteira ficava a
+       16,9fps, e so `serviceScriptedAnimations` comia 40,7ms por
+       quadro. Reduzindo o buffer: 160 devolve 32,8fps, e 110 devolve
+       51,0 — contra 55,1 com o canvas escondido. A 110 a seda
+       praticamente para de custar.
+       E nao se perde nada: ela e um FUNDO, ampliado para a tela inteira
+       de qualquer jeito, e o que se ve dela e o drapeado grande. */
+    const LADO_MAX = 160
+    const LADO_MAX_MOVEL = 110
 
     let w = 0, h = 0, img: ImageData | null = null, ruido: Float32Array | null = null
 
@@ -122,7 +132,28 @@ export function Seda({ forca = 1 }: { forca?: number }) {
     let id = 0
     let naTela = true
     let comFoco = true
-    const rodando = () => naTela && comFoco
+
+    /* A SEDA ANIMA E DEPOIS DESCANSA.
+       Antes ela desenhava enquanto a pessoa estivesse na pagina — 30
+       segundos ou 10 minutos, sempre. Medido com CPU estrangulada em
+       6x, que e o perfil de um Android de entrada: mesmo com o buffer
+       ja reduzido ela custa 4 quadros por segundo o tempo inteiro
+       (51,0 contra 55,1 com o canvas escondido). Isso e rAF acordando
+       o processador 24 vezes por segundo, para sempre, e no celular
+       isso e bateria.
+
+       Ela e um DRAPEADO: o que ela tem de bonito e a forma, nao o
+       movimento. Sete segundos de ondulacao na entrada dao o efeito
+       de tecido vivo; depois disso ela congela num quadro e para de
+       custar QUALQUER coisa.
+
+       De quebra, isso tira a pagina do criterio 2.2.2 da WCAG por
+       aqui: movimento que termina em 7 segundos nao e movimento
+       automatico continuo, e nao precisa de mecanismo de pausa. */
+    const DURACAO = 7000
+    let comecou = 0
+    let acabou = false
+    const rodando = () => naTela && comFoco && !acabou
 
     /* 30 quadros por segundo, nao 60. O padrao anda 0.02 por quadro:
        a diferenca entre um quadro e o seguinte e imperceptivel, e
@@ -131,6 +162,8 @@ export function Seda({ forca = 1 }: { forca?: number }) {
     let ultimo = 0
 
     const quadro = (agora: number) => {
+      if (!comecou) comecou = agora
+      if (agora - comecou > DURACAO) acabou = true
       if (rodando()) id = requestAnimationFrame(quadro)
       if (agora - ultimo < PASSO) return
       ultimo = agora
@@ -177,19 +210,33 @@ export function Seda({ forca = 1 }: { forca?: number }) {
       cancelAnimationFrame(id)
       if (rodando()) id = requestAnimationFrame(quadro)
     }
-    const io = new IntersectionObserver(([e]) => { naTela = e.isIntersecting; religa() },
-                                        { threshold: 0 })
-    io.observe(canvas)
+    /* O OBSERVADOR OBSERVAVA O PROPRIO CANVAS, e o canvas e
+       `fixed inset-0`: ele esta SEMPRE na tela, por definicao. Ou seja
+       `naTela` nunca virava false e o laco rodava pelos 17.899px de
+       rolagem inteiros, do topo ao rodape, para sempre.
+       Nao ha o que observar: um fundo fixo nunca sai de vista. Quem
+       pausa de verdade e a aba perder o foco — e isso o
+       `visibilitychange` ja faz. O observador saiu. */
     const onVis = () => { comFoco = !document.hidden; religa() }
     document.addEventListener('visibilitychange', onVis)
-    const ro = new ResizeObserver(medir)
+
+    /* redimensionar zera o canvas (mudar `width` limpa o bitmap) e a
+       seda ja pode estar congelada — entao a rodada recomeca por mais
+       um ciclo curto para ela se redesenhar em vez de sumir */
+    const ro = new ResizeObserver(() => {
+      medir()
+      if (acabou) {
+        acabou = false
+        comecou = 0
+        id = requestAnimationFrame(quadro)
+      }
+    })
     ro.observe(canvas)
 
     id = requestAnimationFrame(quadro)
 
     return () => {
       cancelAnimationFrame(id)   // o original so cancelava, nunca desligava o resto
-      io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVis)
     }

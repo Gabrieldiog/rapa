@@ -323,7 +323,18 @@
          atraso de proposito: fora de fase elas competiriam pela
          atencao e o topo viraria pisca-pisca. Em fase, lê como uma
          luz so passando pelo bloco inteiro. */
-      animation: led-varre 7200ms linear 1200ms infinite;
+      /* TRES PASSADAS, E NAO `infinite`.
+       Ela anima `background-position`, que NAO roda na GPU: repinta a
+       palavra inteira a cada quadro, na thread principal. Infinita,
+       isso durava enquanto a pessoa estivesse na pagina.
+       Tres passadas dao 21,6s de varredura — tempo de sobra para
+       qualquer um ver — e depois a palavra descansa em ambar cheio,
+       que e o quadro final (`background-position: 0%` deixa a janela
+       do gradiente toda na faixa clara).
+       E tira a pagina do criterio 2.2.2 da WCAG por aqui: movimento
+       que termina nao e movimento automatico continuo, e nao precisa
+       de mecanismo de pausa. Era o que obrigava o botao no rodape. */
+    animation: led-varre 7200ms linear 1200ms 3;
     }
     /* Contínua, como pedido. A ressalva de bateria continua de pe —
        background-clip:text repinta na main thread, nao vai para o
@@ -712,6 +723,105 @@
   .equipe__ponto[data-atual] {
     background: var(--color-ambar);
     transform: scale(1.45);
+  }
+
+  /* O BOTAO DE PAUSA SAIU, e o motivo e melhor do que "nao gostei".
+     Ele existia porque a pagina tinha movimento automatico continuo —
+     a varredura de "marcantes" era `infinite` e a seda desenhava para
+     sempre — e o criterio 2.2.2 da WCAG, nivel A, exige mecanismo de
+     pausa NA PAGINA nesse caso.
+     Mas botao so ajuda quem aperta, e quase ninguem aperta. Movimento
+     FINITO ajuda todo mundo sem pedir nada: a varredura passa tres
+     vezes e descansa, a seda ondula sete segundos e congela num
+     quadro. Nada dura mais de cinco segundos por conta propria, o
+     criterio nao e acionado, e o rodape fica limpo.
+     De quebra a seda para de custar: medido com CPU estrangulada em
+     6x, ela comia 4 quadros por segundo o tempo inteiro (51,0 contra
+     55,1 com o canvas escondido). Congelada, custa zero. */
+
+  /* ---------- O PAINEL DE CONTATO ---------------------------
+     Cada dado e uma LINHA com simbolo e filete dourado embaixo.
+     Antes eram rotulo e valor soltos numa grade, e o WhatsApp — a
+     unica conversao da pagina — tinha exatamente o mesmo peso do CEP.
+     --------------------------------------------------------- */
+  .contatos { display: grid; gap: 0; }
+  @media (min-width: 640px) {
+    .contatos { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.5rem; }
+  }
+
+  .contato {
+    position: relative;
+    padding-block: 1rem;
+  }
+  /* O FILETE DOURADO, FIXO em todas as linhas — hover nao existe em
+     tela de toque, e a maior parte do trafego nunca veria um dourado
+     que so aparece ao passar o mouse.
+
+     UMA CAMADA SO, E 2px. Eram duas — cinza embaixo, dourada por cima
+     — e isso escondia um defeito de subpixel.
+     Medido: as linhas nao tinham altura inteira. Eram 103,19px cada, e
+     a sobra vinha do `line-height` 1,6 sobre um rotulo de 12px, que da
+     19,2px. A base de cada linha caia num ponto diferente do pixel —
+     .22, .41, .59, .95 — e um filete de 1px nessas posicoes e repartido
+     entre dois pixels de dispositivo a meia intensidade. Com a camada
+     cinza logo abaixo, o resultado era uma linha dourada e a seguinte
+     acinzentada, alternando. No print parecia defeito de cor; era
+     geometria.
+     Consertado dos dois lados: os `line-height` viraram inteiros (a
+     causa) e o filete ficou com 2px (a margem de seguranca — mesmo
+     repartido, sempre sobra um pixel de cobertura cheia). A camada
+     cinza saiu junto: com dourado cheio ela so escurecia a borda. */
+  .contato::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: var(--color-ambar);
+  }
+
+  .contato__rot {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    /* inteiro de proposito: 1.6 sobre 12px da 19,2px, e a sobra fazia
+       a base da linha cair no meio do pixel */
+    line-height: 1.25rem;
+    color: var(--color-branco-2);
+    transition: color 260ms var(--ease-out-cut);
+  }
+  .contato:hover .contato__rot,
+  .contato:focus-within .contato__rot { color: var(--color-branco); }
+  /* O WhatsApp continua com o ROTULO em ambar — o filete agora e igual
+     em todos, entao a distincao da conversao passou para o texto. O
+     SIMBOLO nao: ele esta no verde da marca e nao herda cor nenhuma. */
+  .contato:first-child .contato__rot { color: var(--color-ambar); }
+
+  .contato__val {
+    margin-block-start: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-branco);
+  }
+  /* 44px de altura no PROPRIO link: o criterio 2.5.8 da WCAG 2.2 mede
+     a caixa do <a>, e uma linha de texto tem 19px. */
+  .contato__val a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    transition: color 200ms var(--ease-out-cut);
+  }
+  .contato__val a:hover, .contato__val a:focus-visible { color: var(--color-ambar); }
+  .contato__val--quebra a { word-break: break-all; }
+  .contato__val--calmo {
+    /* 22px: inteiro, e qualquer numero de linhas continua inteiro */
+    line-height: 1.375rem;
+    color: var(--color-branco-2);
+    font-style: normal;
   }
 
   /* ---------- AS FALAS -------------------------------------
@@ -1799,7 +1909,27 @@
     background-image: none;
     -webkit-text-fill-color: var(--color-ambar);
   }
+  /* `animation-name: none` E O QUE DESLIGA DE VERDADE, e foi medido.
+     `animation-duration: 1ms` NAO governa animacao dirigida por
+     rolagem: com `animation-timeline: view()` a duracao nao e a fonte
+     do progresso — a posicao e. Sonda a 430px, elemento parado no meio
+     da faixa:
+       sem reduce                   -> opacity 0,601
+       com reduce (regra antiga)    -> opacity 0,601   IDENTICO
+       com `animation-name: none`   -> opacity 1       CORRETO
+     Ou seja, quem pediu movimento reduzido continuava recebendo a
+     varredura dos cards e a do painel dos artistas.
+
+     E `animation-timeline: none` seria PIOR que nada: devolve a
+     animacao para o relogio do documento com duracao 1ms e `fill`, e o
+     elemento congela no quadro INICIAL — invisivel para sempre. Foi
+     medido tambem: opacity 0,2.
+
+     Apagar o NOME funciona porque a regra base de todo efeito desta
+     pagina ja e o estado final. Sem animacao, a pagina fica parada e
+     COMPLETA. */
   *, *::before, *::after {
+    animation-name: none !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
