@@ -34,3 +34,6 @@ yarn-error.log*
 
 # Next
 next-env.d.ts
+
+# as ferramentas de auditoria moram em ferramentas/, nunca em public/
+public/__*.html

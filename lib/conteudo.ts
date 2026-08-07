@@ -373,4 +373,27 @@ export const EQUIPE: Pessoa[] = [
   { nome: 'Marcelo Augusto', papel: 'DJ e produtor',               src: '/img/equipe/6.webp' },
 ]
 
+
+/** Vira `true` no dia em que o cliente confirmar cada resposta. */
+export const FAQ_CONFIRMADO = FAQ.every((q) => !q.confirmar)
+
+/* A TRAVA DO FAQ, no mesmo padrao da das falas — e pelo mesmo motivo,
+   que aqui e ate mais serio.
+   As respostas assumem COMPROMISSOS OPERACIONAIS: tecnico presente do
+   inicio ao fim, equipamento reserva, visita tecnica, faixas de preco.
+   Isso nao veio do cliente: veio de norma do setor. Publicado, cada uma
+   delas vira oferta vinculante — art. 30 do CDC: "toda informacao
+   suficientemente precisa veiculada obriga o fornecedor e integra o
+   contrato". Se a empresa nao cumprir uma, ela responde por isso.
+   Nao apague o aviso — confirme as respostas com o cliente e vire cada
+   `confirmar` para false. */
+if (!FAQ_CONFIRMADO) {
+  const n = FAQ.filter((q) => q.confirmar).length
+  console.warn(
+    `\n  \u26a0\ufe0f  ${n} de ${FAQ.length} respostas do FAQ ainda NAO foram confirmadas\n` +
+    '     pelo cliente. Elas prometem coisas em nome da empresa.\n' +
+    '     Ver P12 no PENDENCIAS.md.\n',
+  )
+}
+
 export const FOTOS_EQUIPE = EQUIPE.map((p) => ({ src: p.src, w: 440, h: 635 }))

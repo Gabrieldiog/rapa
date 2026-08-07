@@ -8,6 +8,30 @@ Status: `🔴 bloqueia publicação` · `🟡 troca fácil` · `🟢 só melhora
 
 ---
 
+## ANTES DE PUBLICAR — a lista curta
+
+Tudo que é técnico está fechado. O que falta **só o cliente pode responder**, e
+três itens têm consequência jurídica, não estética.
+
+| | o que é | por que trava |
+|---|---|---|
+| 🔴 **P12** | As respostas do FAQ prometem coisas que o cliente não confirmou | Art. 30 do CDC: informação precisa veiculada **obriga o fornecedor e integra o contrato**. Cada resposta publicada vira oferta vinculante. |
+| 🔴 **P15** | Os sete depoimentos são texto de exemplo | Art. 37 do CDC: publicar texto inventado como fala de cliente é propaganda enganosa. |
+| 🔴 **P1** | Dois endereços diferentes no site antigo (Granja Marileusa × Bom Jesus) | Endereço errado no `LocalBusiness` estraga a busca local, que é metade da aquisição. |
+| 🟡 **P2** | CNPJ não aparece em lugar nenhum | Completa o `LocalBusiness` e é exigido em rodapé de empresa. |
+| 🟡 **P4** | "Quase 30 anos" — falta o ano de fundação | É afirmação de tempo de mercado; precisa ser verdadeira. |
+
+**As duas primeiras gritam em todo build.** `lib/conteudo.ts` emite aviso no log
+enquanto houver uma resposta do FAQ não confirmada ou um depoimento de exemplo.
+Não apague os avisos — resolva o conteúdo.
+
+**O que NÃO trava:** o site não tem formulário, não usa cookie, não carrega
+rastreador nenhum. O único armazenamento é um `sessionStorage` que marca se o
+blackout de entrada já rodou. Isso mantém a exposição de LGPD no mínimo — mas
+P3 (política de privacidade) continua de pé para quando houver formulário.
+
+---
+
 ## 🔴 P1 — Qual é o endereço válido?
 
 **Assumido:** `Av. Maria Silva Garcia, 575 — Sala 603 — Granja Marileusa — 38406-634 — Uberlândia/MG`
