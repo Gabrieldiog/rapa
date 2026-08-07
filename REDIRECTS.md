@@ -127,3 +127,30 @@ redirecionamento vai para uma URL literal com `%23`, que não existe.
 - [ ] Search Console → Inspeção de URL em 3 amostras depois do deploy
 - [ ] Google Business Profile apontando para o endereço confirmado (`PENDENCIAS.md` P1)
 - [ ] Monitorar impressões por 30 dias — queda que não recupera significa 301 mal resolvido
+
+---
+
+## ✅ FEITO — `vercel.json` na raiz
+
+Os 301 saíram do rascunho e entraram no repositório. Duas coisas que valem registrar:
+
+**1. `vercel.json` NÃO é o `redirects()` do Next.** O aviso lá em cima continua valendo — a
+chave `redirects` do `next.config.mjs` exige servidor Node e é ignorada em silêncio com
+`output: 'export'`. O `vercel.json` é outra camada: ele roda na borda da Vercel, **antes**
+de qualquer arquivo estático ser servido. É exatamente a "camada de hospedagem" que este
+arquivo pedia.
+
+**2. As origens vão SEM barra final.** O projeto usa `trailingSlash: true`, e a Vercel
+normaliza a barra antes de casar a rota. Escrever `/painel-de-led/` na origem faria a regra
+não casar com `/painel-de-led` e vice-versa — some uma das duas formas. Sem a barra, as duas
+entram.
+
+Junto foram os cabeçalhos: cache de um ano para fontes e imagens (têm hash no nome, então
+nunca ficam velhas), e quatro de segurança — `nosniff`, `Referrer-Policy`,
+`X-Frame-Options` e uma `Permissions-Policy` que desliga câmera, microfone, geolocalização
+e o FLoC.
+
+Continua pendente: o `410 Gone` de `/sample-page/`. A Vercel não emite 410 por
+`vercel.json` — só 301/302/307/308. Está redirecionando para `/`, o que resolve para o
+visitante mas remove do índice mais devagar. Se importar, dá para servir um `410` por
+função de borda; hoje não vale a complexidade.
