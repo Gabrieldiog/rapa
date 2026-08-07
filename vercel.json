@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "cleanUrls": false,
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/sonorizacaopalco", "destination": "/#sonorizacao-palco", "permanent": true },
+    { "source": "/iluminacao-cenica", "destination": "/#iluminacao-cenica", "permanent": true },
+    { "source": "/iluminacao-pista", "destination": "/#iluminacao-pista", "permanent": true },
+    { "source": "/painel-de-led", "destination": "/#painel-de-led", "permanent": true },
+    { "source": "/pista-de-led", "destination": "/#pista-de-led", "permanent": true },
+    { "source": "/tubos-de-led", "destination": "/#tubos-de-led", "permanent": true },
+    { "source": "/tunel-de-led", "destination": "/#tunel-de-led", "permanent": true },
+    { "source": "/efeitos-especiais", "destination": "/#efeitos-especiais", "permanent": true },
+    { "source": "/projetos-3d-personalizados", "destination": "/#projetos-3d", "permanent": true },
+    { "source": "/area-instagramavel", "destination": "/#area-instagramavel", "permanent": true },
+    { "source": "/criacao-de-conteudo", "destination": "/#criacao-de-conteudo", "permanent": true },
+    { "source": "/emocoes-15-anos", "destination": "/#quinze-anos", "permanent": true },
+    { "source": "/emocoes-casamento", "destination": "/#casamento", "permanent": true },
+    { "source": "/sample-page", "destination": "/", "permanent": true },
+    { "source": "/feed", "destination": "/", "permanent": true },
+    { "source": "/comments/feed", "destination": "/", "permanent": true },
+    { "source": "/wp-sitemap.xml", "destination": "/sitemap.xml", "permanent": true },
+    { "source": "/wp-sitemap-:resto*", "destination": "/sitemap.xml", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/img/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" }
+      ]
+    }
+  ]
+}
